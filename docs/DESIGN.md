@@ -9,9 +9,9 @@ domain: product
 
 ## What the game IS
 
-A short, repeatable, seeded text adventure that simulates navigating a long-winded philosophical argument. The player reads, types commands, and eventually realizes the argument's conclusion is identical to its premise — that they have completed a circle of begging the question.
+A short, repeatable, seeded text adventure in which **the player is a mind re-entering an argument it once made**, discovering that every path of justification leads back to the premise it was trying to prove. The full conceit is in [LORE.md](LORE.md); the voice is in [VOICE.md](VOICE.md). This document covers the *structural* spec.
 
-Every run is a single argument. Different seeds produce different nonsense but the same rhetorical shape.
+Every run is a single argument. Same seed → same argument. What varies across plays is the *reading* — per-room narration re-reads itself as the player's traits accumulate on the entities in the koota world.
 
 ## What the game IS NOT
 
@@ -60,6 +60,18 @@ Rooms belong to one of eight rhetorical categories, each with signature audio, c
 
 Lower rhetorical cost in the Yuka graph = rhetorically seductive. Fallacy rooms are the path of least resistance; honest argumentation costs more. Accepting the argument in a `circular` or `meta` room is the implicit win condition — not because the player "solved" anything, but because they completed the figure.
 
+## The three-act arc (implicit, never explained)
+
+The player is never told this structure. It falls out of mechanics.
+
+| Act | Turns (typical) | What changes under the hood | What the player feels |
+|---|---|---|---|
+| I — *I remember this place* | 1–4 | Rooms narrate from base templates. Trait traces minimal. Dijkstra weights default. | Clean, confident exploration. Feels like *Adventure*. |
+| II — *I've been here before* | 5–12 | Room descriptions thread in references to prior-visited rooms (via trait queries). Cross-room references appear. Fallacy-cheap edges start pulling the player's natural line. | Unease. Memory feels reliable but something is off. |
+| III — *Oh* | ≥13 or any circular/meta visit | Circular and meta room templates explicitly restate earlier premises. Argument-map ring visibly closes. Audio resolves. | Recognition. The circle closes whether you accept or reject. |
+
+Act boundaries are *emergent from turn count + rooms visited + traits accrued*, not hardcoded. Generators condition on world state.
+
 ## Pillars
 
-See [pillars/narrative-and-nonsense.md](pillars/narrative-and-nonsense.md) for the philosophical stance on using surrealist corpora over encyclopedic ones.
+See [LORE.md](LORE.md) for the full conceit. See [VOICE.md](VOICE.md) for per-type narration examples. See [pillars/narrative-and-nonsense.md](pillars/narrative-and-nonsense.md) for the philosophical stance on using surrealist corpora over encyclopedic ones.

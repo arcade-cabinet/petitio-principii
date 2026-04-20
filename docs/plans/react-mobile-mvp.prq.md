@@ -69,8 +69,10 @@ Canon in order of priority:
 ### P7 — Surrealist chaining (elevates the text)
 
 - [ ] **T26** Extend `scripts/build-corpus.ts` to include public-domain surrealist fragments (Carroll *Jabberwocky*, Breton *Manifeste du surréalisme* excerpts, Dada declarations) with POS tagging
-- [ ] **T27** `content/chaining.ts` — seeded Markov/template chainer that consumes the surrealist fragments and produces room-description variations on each visit (deterministic per seed + roomId + visitCount)
-- [ ] **T28** Thread chainer through `describeRoom` so revisiting a room yields subtly different phrasing (memory is unstable)
+- [ ] **T27** `content/chaining.ts` — seeded Markov/template chainer that consumes the surrealist fragments and produces room-description variations on each visit (deterministic per seed + roomId + visitCount + traitMask). Conditions on koota traits so the generator sees what the player has accepted/rejected/questioned.
+- [ ] **T28** Thread chainer through `describeRoom(room, world, visitCount)` — room descriptions condition on `WasAccepted`/`WasRejected`/`WasQuestioned`/`WasTracedThrough` traits applied by gameplay. Same seed + same acts → same text; different plays → different reads. Memory is unstable and self-reinforcing (see LORE.md).
+- [ ] **T27b** Three-act template sets per rhetorical type — each room type has Act I / Act II / Act III template families. Act boundaries are emergent from turn count + visited rooms + accrued traits, not hardcoded. See VOICE.md for concrete examples to write toward.
+- [ ] **T27c** Per-line trait system: on `ACCEPT`, attach `WasAccepted` to the current room entity AND `IsAcceptedConsequence` to the associated transcript OutputLine entities. Mirror for REJECT/QUESTION/TRACE. This is what future room-descriptions query against.
 
 ### P8 — Mobile (Capacitor)
 
