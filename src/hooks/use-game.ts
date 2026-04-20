@@ -4,6 +4,7 @@ import {
   applyCommand,
   createInitialGameState,
   describeRoom,
+  dismissActiveHint,
   generateArgumentGraph,
   generatePhrase,
 } from "@/engine";
@@ -30,6 +31,8 @@ export interface GameHandle {
   startGame: (seed: number) => Promise<void>;
   submitCommand: (raw: string) => void;
   requestNewGame: () => void;
+  /** Clear the active onboarding hint without consuming a turn. */
+  dismissHint: () => void;
   toggleMute: () => boolean;
   isMuted: () => boolean;
 }
@@ -148,12 +151,17 @@ export function useGame(): GameHandle {
     [audio, makeBridge, project]
   );
 
+  const dismissHint = useCallback(() => {
+    setState((prev) => dismissActiveHint(prev));
+  }, []);
+
   return {
     state,
     world,
     startGame,
     submitCommand,
     requestNewGame,
+    dismissHint,
     toggleMute: audio.toggleMute,
     isMuted: audio.isMuted,
   };

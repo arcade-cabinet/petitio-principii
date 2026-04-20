@@ -73,7 +73,7 @@ function entry(
   };
 }
 
-function mockState(transcript: TranscriptEntry[]): GameState {
+function mockState(transcript: TranscriptEntry[], overrides: Partial<GameState> = {}): GameState {
   const room = mockRoom();
   return {
     seed: 1,
@@ -84,6 +84,8 @@ function mockState(transcript: TranscriptEntry[]): GameState {
     turnCount: Math.max(0, ...transcript.map((e) => e.turnId)),
     started: true,
     phrase: "test phrase",
+    activeHint: null,
+    ...overrides,
   };
 }
 
@@ -128,6 +130,7 @@ describe("TerminalDisplay three-zone projection", () => {
         world={mockWorld()}
         onCommand={vi.fn()}
         onNewGame={vi.fn()}
+        onHintDismiss={vi.fn()}
       />
     );
     expect(screen.queryByTestId("past-zone")).toBeNull();
@@ -156,6 +159,7 @@ describe("TerminalDisplay three-zone projection", () => {
           world={mockWorld()}
           onCommand={vi.fn()}
           onNewGame={vi.fn()}
+          onHintDismiss={vi.fn()}
         />
       );
 
@@ -184,6 +188,7 @@ describe("TerminalDisplay three-zone projection", () => {
         world={mockWorld()}
         onCommand={vi.fn()}
         onNewGame={vi.fn()}
+        onHintDismiss={vi.fn()}
       />
     );
     // Per docs/UX.md §1.3: keycaps never vanish.
@@ -208,6 +213,7 @@ describe("TerminalDisplay three-zone projection", () => {
         world={mockWorld()}
         onCommand={vi.fn()}
         onNewGame={vi.fn()}
+        onHintDismiss={vi.fn()}
       />
     );
     // mockRoom() exposes only "north" — south/east/west/up/down/back/forward
@@ -253,6 +259,7 @@ describe("TerminalDisplay three-zone projection", () => {
           world={mockWorld()}
           onCommand={vi.fn()}
           onNewGame={vi.fn()}
+          onHintDismiss={vi.fn()}
         />
       );
 
@@ -274,6 +281,7 @@ describe("TerminalDisplay three-zone projection", () => {
           world={mockWorld()}
           onCommand={vi.fn()}
           onNewGame={vi.fn()}
+          onHintDismiss={vi.fn()}
         />
       );
 
@@ -294,6 +302,7 @@ describe("TerminalDisplay three-zone projection", () => {
           world={mockWorld()}
           onCommand={vi.fn()}
           onNewGame={vi.fn()}
+          onHintDismiss={vi.fn()}
         />
       );
 
@@ -319,6 +328,7 @@ describe("TerminalDisplay three-zone projection", () => {
           world={mockWorld()}
           onCommand={vi.fn()}
           onNewGame={vi.fn()}
+          onHintDismiss={vi.fn()}
         />
       );
 

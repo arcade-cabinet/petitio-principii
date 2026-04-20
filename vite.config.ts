@@ -22,12 +22,19 @@ export default defineConfig({
     // Prevent RTL from spinning up a second copy of React in the browser-mode
     // test runner (see the "useRef of null" failure mode). Dedupe keeps the
     // entire React graph unified across direct imports and test-lib's peers.
-    dedupe: ["react", "react-dom"],
+    // motion/react has its own React import path; without dedupe, vitest-browser
+    // ends up loading two copies and the "Invalid hook call" surfaces.
+    dedupe: ["react", "react-dom", "motion", "motion/react"],
   },
   // Pre-bundle these so the vitest-browser runner doesn't trigger a dynamic
   // re-optimization mid-test (which aborts the in-flight test file import).
   optimizeDeps: {
-    include: ["@testing-library/react", "@testing-library/user-event", "@testing-library/jest-dom"],
+    include: [
+      "@testing-library/react",
+      "@testing-library/user-event",
+      "@testing-library/jest-dom",
+      "motion/react",
+    ],
   },
   build: {
     target: "esnext",

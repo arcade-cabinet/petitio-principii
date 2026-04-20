@@ -3,6 +3,7 @@ import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
 import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
+import { HintLine } from "@/features/terminal/HintLine";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
 import { useViewport } from "@/hooks/use-viewport";
@@ -39,6 +40,8 @@ export interface TerminalDisplayProps {
   world: WorldHandle;
   onCommand: (raw: string) => void;
   onNewGame: () => void;
+  /** Clear the active onboarding hint (tap-dismiss + auto-fade). */
+  onHintDismiss: () => void;
 }
 
 const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string; hint?: string }> = [
@@ -72,7 +75,13 @@ function groupByTurn(
   return turns;
 }
 
-export function TerminalDisplay({ state, world, onCommand, onNewGame }: TerminalDisplayProps) {
+export function TerminalDisplay({
+  state,
+  world,
+  onCommand,
+  onNewGame,
+  onHintDismiss,
+}: TerminalDisplayProps) {
   const pastRef = useRef<HTMLDivElement>(null);
   const viewport = useViewport();
   // PAST zone collapses on portrait by default; landscape always expanded.
@@ -316,6 +325,8 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
               })}
             </div>
           )}
+          {/* Active onboarding hint — fades in/out via Motion One. T63. */}
+          <HintLine hint={state.activeHint} onDismiss={onHintDismiss} />
         </div>
       </GlowingPanel>
 

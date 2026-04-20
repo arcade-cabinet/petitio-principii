@@ -25,6 +25,7 @@ export function App() {
           world={game.world}
           onCommand={game.submitCommand}
           onNewGame={game.requestNewGame}
+          onHintDismiss={game.dismissHint}
         />
       ) : (
         <NewGameIncantation onBegin={game.startGame} />
