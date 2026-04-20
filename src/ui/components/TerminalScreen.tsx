@@ -1,4 +1,4 @@
-import { createEffect, For } from "solid-js";
+import { For, createEffect } from "solid-js";
 import type { Component } from "solid-js";
 import { InputLine } from "./InputLine";
 import { TextLine } from "./TextLine";

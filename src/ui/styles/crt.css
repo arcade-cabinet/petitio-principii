@@ -54,8 +54,11 @@
   }
 }
 
-.crt-effect {
-  animation: crt-flicker 8s infinite;
+/* Apply flicker only when the user hasn't requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .crt-effect {
+    animation: crt-flicker 8s infinite;
+  }
 }
 
 /* ---- Text glow ---- */

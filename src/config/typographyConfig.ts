@@ -1,7 +1,15 @@
+/**
+ * Typography configuration — values mirror the CSS custom properties in theme.css.
+ * Font sizes use clamp() in CSS for fluid scaling; the values here are the
+ * design-intent sizes at a typical desktop viewport (≥900px).
+ */
 export const TYPOGRAPHY = {
-  baseFontSize: "16px",
-  terminalFontSize: "14px",
-  smallFontSize: "12px",
+  /** CSS: clamp(14px, 4vw, 16px) */
+  baseFontSize: "clamp(14px, 4vw, 16px)",
+  /** CSS: clamp(13px, 3.8vw, 15px) — boosted to clamp(15px, 4.2vw, 16px) on mobile */
+  terminalFontSize: "clamp(13px, 3.8vw, 15px)",
+  /** CSS: clamp(11px, 3vw, 12px) */
+  smallFontSize: "clamp(11px, 3vw, 12px)",
   lineHeight: 1.6,
   letterSpacing: {
     normal: "0",

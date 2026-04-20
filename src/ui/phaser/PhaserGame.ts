@@ -1,4 +1,5 @@
-import Phaser from "phaser";
+import { AUTO, Game, Scale } from "phaser";
+import type { Game as GameType } from "phaser";
 import { RetroDisplay } from "retrozone";
 import { StarfieldScene } from "./StarfieldScene";
 
@@ -19,14 +20,14 @@ export interface PhaserBundle {
 export function createPhaserGame(parent: HTMLElement): PhaserBundle {
   let display: RetroDisplay | null = null;
 
-  const game = new Phaser.Game({
-    type: Phaser.AUTO,
+  const game: GameType = new Game({
+    type: AUTO,
     parent,
     backgroundColor: "#05010A",
     scene: [StarfieldScene],
     scale: {
-      mode: Phaser.Scale.RESIZE,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      mode: Scale.RESIZE,
+      autoCenter: Scale.CENTER_BOTH,
       width: window.innerWidth,
       height: window.innerHeight,
     },

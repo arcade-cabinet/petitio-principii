@@ -16,16 +16,18 @@
   --accent-green: #80ffb0;
   --font-terminal: "DM Mono", "IBM Plex Mono", "Courier New", monospace;
   --font-ui: "Space Grotesk", system-ui, sans-serif;
-  --font-size-base: 16px;
-  --font-size-terminal: 14px;
-  --font-size-small: 12px;
+  --font-size-base: clamp(14px, 4vw, 16px);
+  --font-size-terminal: clamp(13px, 3.8vw, 15px);
+  --font-size-small: clamp(11px, 3vw, 12px);
   --line-height: 1.6;
   --letter-spacing-wide: 0.05em;
   --letter-spacing-wider: 0.1em;
   --letter-spacing-widest: 0.2em;
   --panel-width: min(800px, 92vw);
-  --panel-height: min(600px, 85vh);
+  /* svh = stable small viewport height (unaffected by browser chrome show/hide) */
+  --panel-height: min(600px, 85svh);
   --border-radius: 4px;
+  --touch-target-min: 44px;
   --glow: 0 0 4px #c0c0ff, 0 0 12px #7a5cff;
   --glow-subtle: 0 0 2px #c0c0ff44;
   --transition: 120ms ease;
@@ -66,12 +68,17 @@ body {
   justify-content: center;
 }
 
-/* ---- Starfield ---- */
-.starfield-canvas {
+/* ---- Starfield (Phaser canvas container) ---- */
+.starfield-phaser {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+/* Phaser's Scale.RESIZE mode sizes the canvas to fill the container automatically */
+.starfield-phaser canvas {
+  display: block;
 }
 
 /* ---- Terminal wrapper ---- */
@@ -125,7 +132,9 @@ body {
   border: 1px solid var(--bg-panel-border);
   border-radius: var(--border-radius);
   padding: 3px 10px;
+  min-height: var(--touch-target-min);
   cursor: pointer;
+  touch-action: manipulation;
   transition: color var(--transition), border-color var(--transition);
 }
 
@@ -189,6 +198,8 @@ body {
   background: rgba(5, 1, 10, 0.6);
   flex-shrink: 0;
   gap: 8px;
+  /* Ensure a comfortable tap zone on touch devices */
+  min-height: var(--touch-target-min);
 }
 
 .prompt-symbol {
@@ -321,10 +332,12 @@ body {
   padding: 10px 24px;
   border-radius: var(--border-radius);
   cursor: pointer;
+  touch-action: manipulation;
   transition: all var(--transition);
   border: 1px solid transparent;
   text-transform: uppercase;
   width: 100%;
+  min-height: var(--touch-target-min);
 }
 
 .modal-btn.primary {
@@ -393,4 +406,126 @@ body {
 .seed-input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+/* ============================================================
+   RESPONSIVE LAYOUT
+   ============================================================ */
+
+/* ---- Tablet / narrow desktop (≤900px) ---- */
+@media (max-width: 900px) {
+  :root {
+    --panel-width: min(700px, 95vw);
+    --panel-height: min(600px, 90svh);
+  }
+}
+
+/* ---- Phone portrait (≤600px) — terminal fills the viewport ---- */
+@media (max-width: 600px) {
+  :root {
+    --border-radius: 0;
+    /* Fluid terminal font: 15px at 320px, scales up to 16px at ~400px */
+    --font-size-terminal: clamp(15px, 4.2vw, 16px);
+  }
+
+  .terminal-wrapper {
+    position: fixed;
+    inset: 0;
+    /* dvh adjusts dynamically as the on-screen keyboard appears / disappears,
+       keeping the input bar always visible above it.
+       svh is the stable fallback for browsers that don't support dvh yet. */
+    height: 100svh;
+    height: 100dvh;
+    width: 100%;
+    /* Push content away from notch / home indicator */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  .terminal-panel {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .terminal-header {
+    padding: 10px 14px;
+  }
+
+  .terminal-output {
+    padding: 10px 14px;
+  }
+
+  .input-line {
+    padding: 12px 14px;
+    min-height: 52px;
+    /* Extra bottom padding keeps the input above the iOS home indicator */
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+  }
+
+  /* Modal fills the screen on small phones */
+  .modal-panel {
+    width: 100vw;
+    min-height: 100svh;
+    min-height: 100dvh;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: max(20px, env(safe-area-inset-top, 20px)) 20px
+      max(20px, env(safe-area-inset-bottom, 20px));
+    justify-content: center;
+  }
+
+  .modal-title {
+    font-size: clamp(18px, 5vw, 22px);
+  }
+}
+
+/* ---- Landscape with limited height (phones rotated) ---- */
+@media (max-height: 500px) {
+  .terminal-header {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .input-line {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    min-height: 40px;
+  }
+
+  /* Compact modal so it fits in the short landscape viewport */
+  .modal-panel {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+
+  .modal-seed-section {
+    padding: 10px;
+  }
+}
+
+/* ---- Touch devices — font-size ≥ 16px on the live input prevents iOS auto-zoom ---- */
+@media (hover: none) and (pointer: coarse) {
+  .terminal-input {
+    font-size: 16px;
+  }
+
+  .seed-input {
+    font-size: 16px;
+  }
+}
+
+/* ---- Reduced motion — disable animations for accessibility ---- */
+@media (prefers-reduced-motion: reduce) {
+  .crt-effect {
+    animation: none;
+  }
+
+  .cursor-blink {
+    animation: none;
+    opacity: 1;
+  }
 }

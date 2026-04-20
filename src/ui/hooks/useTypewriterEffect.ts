@@ -23,6 +23,15 @@ export function createTypewriterEffect(
   let prevLength = 0;
   let timer: ReturnType<typeof setInterval> | undefined;
 
+  // Top-level cleanup: ensure the interval is cleared when the owner scope
+  // (the component that called createTypewriterEffect) is disposed.
+  onCleanup(() => {
+    if (timer !== undefined) {
+      clearInterval(timer);
+      timer = undefined;
+    }
+  });
+
   createEffect(() => {
     const lines = getLines(); // reactive tracking
 
@@ -42,6 +51,7 @@ export function createTypewriterEffect(
     const newLines = lines.slice(prevLength);
     prevLength = lines.length;
 
+    // Clear any running interval before starting a new one
     if (timer !== undefined) {
       clearInterval(timer);
       timer = undefined;
@@ -73,13 +83,6 @@ export function createTypewriterEffect(
         charIndex = 0;
       }
     }, 1000 / speed);
-
-    onCleanup(() => {
-      if (timer !== undefined) {
-        clearInterval(timer);
-        timer = undefined;
-      }
-    });
   });
 
   return { displayedLines, isTyping };

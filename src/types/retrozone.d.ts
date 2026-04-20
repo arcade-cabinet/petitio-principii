@@ -189,20 +189,9 @@ declare module "retrozone" {
     ...args: unknown[]
   ): void;
 
-  export function fillMaskRect(
-    gfx: GraphicsLike,
-    x: number,
-    y: number,
-    w: number,
-    h: number
-  ): void;
+  export function fillMaskRect(gfx: GraphicsLike, x: number, y: number, w: number, h: number): void;
 
-  export function fillMaskCircle(
-    gfx: GraphicsLike,
-    cx: number,
-    cy: number,
-    radius: number
-  ): void;
+  export function fillMaskCircle(gfx: GraphicsLike, cx: number, cy: number, radius: number): void;
 
   export function fillMaskEllipse(
     gfx: GraphicsLike,

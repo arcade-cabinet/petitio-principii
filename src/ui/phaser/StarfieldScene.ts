@@ -1,4 +1,5 @@
-import Phaser from "phaser";
+import { BlendModes, Scene } from "phaser";
+import type { GameObjects } from "phaser";
 import { drawGlowCircle } from "retrozone";
 
 // Star colours matching the game's night-sky palette
@@ -18,7 +19,15 @@ interface StarData {
   color: number;
 }
 
-function makeStars(count: number, width: number, height: number, minR: number, maxR: number): StarData[] {
+function makeStars(
+  count: number,
+  width: number,
+  height: number,
+  minR: number,
+  maxR: number
+): StarData[] {
+  // Stars use Math.random() intentionally — they are decorative background visuals
+  // and are not part of the deterministic argument graph driven by the seeded PRNG.
   return Array.from({ length: count }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -30,8 +39,8 @@ function makeStars(count: number, width: number, height: number, minR: number, m
   }));
 }
 
-export class StarfieldScene extends Phaser.Scene {
-  private gfx!: Phaser.GameObjects.Graphics;
+export class StarfieldScene extends Scene {
+  private gfx!: GameObjects.Graphics;
   private brightStars: StarData[] = [];
   private dimStars: StarData[] = [];
 
@@ -42,7 +51,7 @@ export class StarfieldScene extends Phaser.Scene {
   create(): void {
     // ADD blend mode is required for retrozone's multi-pass glow to composite correctly
     this.gfx = this.add.graphics();
-    this.gfx.setBlendMode(Phaser.BlendModes.ADD);
+    this.gfx.setBlendMode(BlendModes.ADD);
     this.initStars();
     this.scale.on("resize", () => this.initStars());
   }
