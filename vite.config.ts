@@ -6,14 +6,11 @@ import { defineConfig } from "vitest/config";
 
 // Base path depends on deploy target:
 //   - Capacitor (native WebView): relative paths so file:// loads work.
-//   - GitHub Pages: served under /petitio-principii/.
-//   - Local dev / preview: server root.
-const base =
-  process.env.CAPACITOR === "true"
-    ? "./"
-    : process.env.GITHUB_PAGES === "true"
-      ? "/petitio-principii/"
-      : "/";
+//   - GitHub Pages project site: served under /petitio-principii/.
+//   - Local dev / preview: the project path (so route-relative links work
+//     in `pnpm dev` the same way they do on Pages).
+// Pattern matches sibling arcade-cabinet games (midway-mayhem, winged-daemon).
+const base = process.env.CAPACITOR === "true" ? "./" : "/petitio-principii/";
 
 export default defineConfig({
   base,

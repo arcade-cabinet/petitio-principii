@@ -69,10 +69,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build (GITHUB_PAGES=true — matches cd.yml base path)
+      - name: Build
         run: pnpm build
-        env:
-          GITHUB_PAGES: "true"
 
       - name: Zip web bundle
         run: |
