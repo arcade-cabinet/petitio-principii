@@ -1,11 +1,8 @@
-import {
-  ADJECTIVES,
-  type ChainingMemory,
-  NOUNS,
-  RHETORICAL_TERMS,
-  chainDescription,
-} from "@/content";
-import { createSeededRandom, pickRandom, shuffleArray } from "../prng/seedRandom";
+import { type ChainingMemory, RHETORICAL_TERMS, chainDescription } from "@/content";
+import GRAMMARS from "@/content/generated/grammars.json";
+import { withSeededRng } from "@/lib/seeded-tracery";
+import tracery from "tracery-grammar";
+import { createSeededRandom, pickRandom } from "../prng/seedRandom";
 import type { Room } from "./Room";
 
 export interface DescribeRoomOptions {
@@ -17,14 +14,33 @@ export interface DescribeRoomOptions {
   readonly memory?: ChainingMemory;
 }
 
+/**
+ * generatePhrase — deterministic three-word incantation ("adj adj noun").
+ *
+ * Flattens the incantation rule in the frozen grammar under a seeded RNG.
+ * The `#adj# #adj# #noun#` rule can naturally repeat an adjective; we
+ * re-flatten (advancing the RNG, so determinism is preserved) when that
+ * happens, up to a small bound. With the current adjective pool the first
+ * retry is sufficient for every seed in the common range.
+ */
 export function generatePhrase(seed: number): string {
   const rng = createSeededRandom(seed);
-  const shuffledAdjectives = shuffleArray(ADJECTIVES, rng);
-  const adj1 = shuffledAdjectives[0];
-  const adj2 = shuffledAdjectives[1];
-  const noun = pickRandom(NOUNS, rng);
-
-  return `${adj1} ${adj2} ${noun}`;
+  const grammar = tracery.createGrammar({
+    origin: [...GRAMMARS.incantation.origin],
+    adj: [...GRAMMARS.incantation.adj],
+    noun: [...GRAMMARS.incantation.noun],
+  });
+  return withSeededRng(rng, () => {
+    for (let i = 0; i < 8; i++) {
+      const phrase = grammar.flatten("#origin#");
+      const parts = phrase.split(" ");
+      if (parts.length === 3 && parts[0] !== parts[1]) return phrase;
+    }
+    // Fallback — if 8 deterministic retries all collided (vanishingly
+    // unlikely with the current pool), return the last one unchanged rather
+    // than silently breaking the "three space-separated words" contract.
+    return grammar.flatten("#origin#");
+  });
 }
 
 export const RHETORICAL_EXAMINE: Record<Room["rhetoricalType"], string> = {
