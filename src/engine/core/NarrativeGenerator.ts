@@ -54,8 +54,10 @@ export const RHETORICAL_EXAMINE: Record<Room["rhetoricalType"], string> = {
   meta: "describe itself",
 };
 
-export const describeExamineFor = (room: Room) =>
-  `This is a ${room.rhetoricalType} space. The argument pauses here to ${RHETORICAL_EXAMINE[room.rhetoricalType]}.`;
+export const describeExamineFor = (room: Room) => {
+  const article = /^[aeiou]/i.test(room.rhetoricalType) ? "an" : "a";
+  return `This is ${article} ${room.rhetoricalType} space. The argument pauses here to ${RHETORICAL_EXAMINE[room.rhetoricalType]}.`;
+};
 
 /**
  * Render a room's description to a list of lines.

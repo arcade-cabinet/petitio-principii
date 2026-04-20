@@ -143,6 +143,8 @@ tmp/
 .vitest-attachments/
 *.tsbuildinfo
 .claude/state/
+# vitest-browser writes a screenshot per failed assertion; never commit
+src/**/__screenshots__/
 
 # Stray TypeScript declarations (generated). Hand-written ambient
 # declarations live under src/types/ and must be re-added explicitly.

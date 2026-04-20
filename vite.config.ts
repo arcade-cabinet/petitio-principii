@@ -1,16 +1,24 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
+// Pages project base derived from package.json `name` so a future rename
+// updates one place, not two. CodeRabbit caught the prior hard-coded
+// "/petitio-principii/" as a drift-risk.
+const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as {
+  name: string;
+};
+const PAGES_BASE = `/${pkg.name}/`;
+
 // Base path depends on deploy target:
 //   - Capacitor (native WebView): relative paths so file:// loads work.
-//   - GitHub Pages project site: served under /petitio-principii/.
-//   - Local dev / preview: the project path (so route-relative links work
-//     in `pnpm dev` the same way they do on Pages).
+//   - GitHub Pages project site: served under PAGES_BASE.
+//   - Local dev / preview: PAGES_BASE so route-relative links match prod.
 // Pattern matches sibling arcade-cabinet games (midway-mayhem, winged-daemon).
-const base = process.env.CAPACITOR === "true" ? "./" : "/petitio-principii/";
+const base = process.env.CAPACITOR === "true" ? "./" : PAGES_BASE;
 
 export default defineConfig({
   base,

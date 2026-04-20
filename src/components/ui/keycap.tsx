@@ -110,7 +110,14 @@ export function KeyCap({
           "active:translate-y-[1px]",
           "active:shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),inset_0_-2px_1px_-1px_rgba(122,92,255,0.6),0_0_16px_rgba(122,92,255,0.55)]",
         ],
-        disabled && "cursor-not-allowed opacity-40",
+        // Disabled silhouettes preserve the slot footprint so the layout
+        // never jitters when exits change. The opacity sits at 0.55 (was
+        // 0.40 — too faint at desktop where the dark backdrop swallowed
+        // the cap entirely; confirmed via screenshot review). We also
+        // strip the outer "physical key" border so disabled caps look
+        // visibly inert next to live ones at arm's length.
+        disabled &&
+          "cursor-not-allowed opacity-55 border-dashed border-[var(--color-panel-edge)]/50",
         !disabled && emphasisClasses,
         traversedRing
       )}

@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+import { GENERATED_PATHS } from "./verify-corpus";
 
 /**
  * T61 — verify-corpus must exit non-zero if any of the frozen generated
@@ -50,13 +51,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..");
 const grammarsPath = path.resolve(repoRoot, "src/content/generated/grammars.json");
 
-const GENERATED_PATHS = [
-  "src/content/generated/corpus.json",
-  "src/content/generated/corpus.ts",
-  "src/content/generated/surrealist.json",
-  "src/content/generated/surrealist.ts",
-  "src/content/generated/grammars.json",
-];
+// GENERATED_PATHS is imported from scripts/verify-corpus.ts so a new
+// generated artifact gets added in exactly one place (CodeRabbit feedback).
+// Use the local tsx binary directly — `npx tsx` can hit the registry on
+// cold caches and pick a different version than the one in node_modules.
+const tsxBin = path.resolve(repoRoot, "node_modules/.bin/tsx");
 
 let restore: (() => void) | null = null;
 
@@ -67,10 +66,10 @@ afterEach(() => {
   }
 });
 
-/** Run `tsx scripts/build-corpus.ts`. Returns { exitCode, output }. */
+/** Run the local tsx binary to invoke build-corpus directly. */
 function runBuildCorpus(): { exitCode: number; output: string } {
   try {
-    execFileSync("npx", ["tsx", "scripts/build-corpus.ts"], {
+    execFileSync(tsxBin, ["scripts/build-corpus.ts"], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
@@ -85,7 +84,7 @@ function runBuildCorpus(): { exitCode: number; output: string } {
   }
 }
 
-/** Run `git diff --exit-code` on the generated paths only. */
+/** Run `git diff --exit-code` on the imported GENERATED_PATHS list. */
 function runGitDiffGenerated(): { exitCode: number; output: string } {
   try {
     execFileSync("git", ["diff", "--exit-code", "--", ...GENERATED_PATHS], {
@@ -131,24 +130,29 @@ describe("verify-corpus drift gate", () => {
     expect(diff.exitCode, diff.output).not.toBe(0);
   }, 60_000);
 
-  it("hand-edit + rebuild: build-corpus's stable-render detects the structural change via lastBuilt rotation", () => {
+  it("hand-edit + rebuild: build-corpus removes the sentinel AND lastBuilt rotates so diff still flags drift", () => {
     expect(existsSync(grammarsPath)).toBe(true);
     const original = readFileSync(grammarsPath, "utf8");
     restore = () => writeFileSync(grammarsPath, original, "utf8");
 
-    // Same mutation as above.
     const parsed = JSON.parse(original) as Record<string, unknown>;
     parsed.__driftSentinel = "T61_gate_test_only";
     writeFileSync(grammarsPath, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
 
-    // Now rebuild. build-corpus's stable-render compares the new output
-    // against the on-disk file (which has the sentinel). Because the
-    // structure differs, the renderer emits a fresh lastBuilt timestamp
-    // and writes the clean output. The sentinel is gone but the
-    // timestamp rotated — so `git diff` against HEAD still shows drift.
+    // Sanity — sentinel exists on disk before rebuild.
+    expect(JSON.parse(readFileSync(grammarsPath, "utf8"))).toHaveProperty("__driftSentinel");
+
     const build = runBuildCorpus();
     expect(build.exitCode, build.output).toBe(0);
 
+    // Load-bearing assertion: build-corpus actually removed the sentinel
+    // (CodeRabbit flagged the prior version passed via lastBuilt rotation
+    // alone, never asserting the build cleaned the hand-edit).
+    const after = JSON.parse(readFileSync(grammarsPath, "utf8"));
+    expect(after).not.toHaveProperty("__driftSentinel");
+
+    // Diff still flags drift because lastBuilt rotated — that's how the
+    // CI gate notices the file was hand-edited even after rebuild.
     const diff = runGitDiffGenerated();
     expect(diff.exitCode, diff.output).not.toBe(0);
   }, 60_000);

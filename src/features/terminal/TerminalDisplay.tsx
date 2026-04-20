@@ -86,16 +86,19 @@ export function TerminalDisplay({
   const pastRef = useRef<HTMLDivElement>(null);
   const viewport = useViewport();
   // PAST zone collapses on portrait by default; landscape always expanded.
-  // Local-only state — never persisted; opening the drawer is a deliberate
-  // act on the current screen, not a setting.
-  const [pastExpanded, setPastExpanded] = useState<boolean>(viewport === "landscape");
-
-  // When the viewport changes (rotation, browser resize), re-evaluate the
-  // default. Keeps the contract docs/UX.md §3 promises: portrait → collapsed,
-  // landscape → expanded, regardless of how the user got there.
-  useEffect(() => {
-    setPastExpanded(viewport === "landscape");
-  }, [viewport]);
+  // Per-viewport user override stored in a Map so a portrait→landscape
+  // rotation doesn't strand the user with a closed drawer they explicitly
+  // opened on the prior viewport. CodeRabbit caught a stale-frame edge
+  // case in the prior version (state + effect → first frame after viewport
+  // change rendered with the old default).
+  const [overrides, setOverrides] = useState<{ portrait?: boolean; landscape?: boolean }>({});
+  const pastExpanded = overrides[viewport] ?? viewport === "landscape";
+  const setPastExpanded = (next: boolean | ((prev: boolean) => boolean)) =>
+    setOverrides((prev) => {
+      const current = prev[viewport] ?? viewport === "landscape";
+      const value = typeof next === "function" ? next(current) : next;
+      return { ...prev, [viewport]: value };
+    });
 
   const currentRoom = useMemo(
     () => state.rooms.get(state.currentRoomId),
@@ -148,12 +151,14 @@ export function TerminalDisplay({
   const compactedPast = useMemo(() => compactTurns(past), [past]);
 
   // Auto-scroll the PAST rail to the bottom so the most recent compacted
-  // summary is flush against the PRESENT on every new turn.
+  // summary is flush against the PRESENT on every new turn — and on every
+  // expand of the drawer in portrait (the ref wasn't mounted before; the
+  // pastLength-only dep used to skip this case).
   const pastLength = compactedPast.length;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pastLength drives the scroll
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pastLength + pastExpanded drive the scroll
   useEffect(() => {
     if (pastRef.current) pastRef.current.scrollTop = pastRef.current.scrollHeight;
-  }, [pastLength]);
+  }, [pastLength, pastExpanded]);
 
   // Keyboard parity — desktop users can still use the keyboard even though
   // the primary input model is taps. Movement, L, X, Q, T, A, R, ?.

@@ -33,7 +33,7 @@ jobs:
         with:
           # v4 requires release-type at the action level even when using a
           # manifest/config file. `node` matches this project's release-please-
-          # config.json which specifies package-name=petitio-principii and
+          # release-please-config.json which specifies package-name=petitio-principii and
           # uses npm-style version bumping.
           release-type: node
           config-file: release-please-config.json
