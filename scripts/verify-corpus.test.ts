@@ -9,18 +9,37 @@ import { afterEach, describe, expect, it } from "vitest";
  * artifacts (corpus.json, corpus.ts, surrealist.json, surrealist.ts,
  * grammars.json) drifts from the build-corpus output.
  *
- * We simulate drift by appending one byte to grammars.json, running
- * `pnpm verify-corpus`, and asserting the script exits with code != 0.
- * A finally-block restores the file so the test is idempotent.
+ * We simulate drift by parsing grammars.json, adding a sentinel key, then
+ * writing it back — the next build-corpus run overwrites our mutation with
+ * the authoritative output, and `git diff --exit-code` on the generated
+ * paths exits non-zero because the working tree was different from HEAD
+ * for the duration of the test. A finally-block restores the file so the
+ * test is idempotent.
  *
  * This locks in the release gate: if someone hand-edits a generated
  * artifact without running build-corpus, CI fails loudly instead of
  * silently shipping stale JSON.
+ *
+ * Implementation notes:
+ *   - We invoke `tsx scripts/build-corpus.ts` + `git diff` directly rather
+ *     than going through `pnpm verify-corpus`. The package.json script is
+ *     exactly `tsx + git diff`, and going via pnpm adds a layer that's
+ *     brittle across Corepack / npm-vs-pnpm-direct-invocation environments.
+ *   - We mutate via `JSON.parse` + `JSON.stringify` — never via regex —
+ *     so the test doesn't depend on the serializer's whitespace choices.
  */
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..");
 const grammarsPath = path.resolve(repoRoot, "src/content/generated/grammars.json");
+
+const GENERATED_PATHS = [
+  "src/content/generated/corpus.json",
+  "src/content/generated/corpus.ts",
+  "src/content/generated/surrealist.json",
+  "src/content/generated/surrealist.ts",
+  "src/content/generated/grammars.json",
+];
 
 let restore: (() => void) | null = null;
 
@@ -31,14 +50,38 @@ afterEach(() => {
   }
 });
 
-function runVerifyCorpus(): { exitCode: number; output: string } {
+/**
+ * Replicates what `pnpm verify-corpus` does: regenerate artifacts, then
+ * diff the specific paths. Returns the combined exit code — 0 iff the
+ * build ran AND nothing drifted.
+ */
+function runVerifyCorpusDirect(): { exitCode: number; output: string } {
+  const env = { ...process.env };
   try {
-    const output = execFileSync("pnpm", ["verify-corpus"], {
+    // Step 1 — regenerate. If this throws, propagate as non-zero.
+    execFileSync("npx", ["tsx", "scripts/build-corpus.ts"], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
+      env,
     });
-    return { exitCode: 0, output };
+  } catch (err: unknown) {
+    const e = err as { status?: number; stdout?: string; stderr?: string };
+    return {
+      exitCode: e.status ?? -1,
+      output: `build-corpus failed: ${e.stdout ?? ""}${e.stderr ?? ""}`,
+    };
+  }
+
+  // Step 2 — diff. Non-zero exit means drift.
+  try {
+    execFileSync("git", ["diff", "--exit-code", "--", ...GENERATED_PATHS], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env,
+    });
+    return { exitCode: 0, output: "" };
   } catch (err: unknown) {
     const e = err as { status?: number; stdout?: string; stderr?: string };
     return {
@@ -51,7 +94,7 @@ function runVerifyCorpus(): { exitCode: number; output: string } {
 describe("verify-corpus drift gate", () => {
   it("exits 0 when no drift exists", () => {
     // Baseline — grammars.json as checked in; no mutation.
-    const { exitCode } = runVerifyCorpus();
+    const { exitCode } = runVerifyCorpusDirect();
     expect(exitCode).toBe(0);
   });
 
@@ -60,14 +103,13 @@ describe("verify-corpus drift gate", () => {
     const original = readFileSync(grammarsPath, "utf8");
     restore = () => writeFileSync(grammarsPath, original, "utf8");
 
-    // Mutate — add a stray key the build would never emit. Must be valid
-    // JSON so the script gets far enough to run `git diff` on it.
-    const mutated = original.replace(/^\{\n/, '{\n  "__driftSentinel": "T61_gate_test_only",\n');
-    writeFileSync(grammarsPath, mutated, "utf8");
+    // Mutate via parse/stringify — independent of file whitespace. Adding
+    // a sentinel key the build will never emit guarantees drift.
+    const parsed = JSON.parse(original) as Record<string, unknown>;
+    parsed.__driftSentinel = "T61_gate_test_only";
+    writeFileSync(grammarsPath, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
 
-    const { exitCode, output } = runVerifyCorpus();
-    // build-corpus writes over the mutation, then git diff exits 1 because
-    // the working tree drifted from HEAD. We accept any non-zero code.
+    const { exitCode, output } = runVerifyCorpusDirect();
     expect(exitCode, output).not.toBe(0);
   }, 60_000);
 });
