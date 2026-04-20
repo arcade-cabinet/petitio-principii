@@ -1,9 +1,12 @@
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { KeyCap } from "@/components/ui/keycap";
-import type { GameState, TranscriptEntry } from "@/engine";
+import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
+import { parseCommand } from "@/engine";
 import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
 import { compactTurns } from "@/features/terminal/compactTurn";
+import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
 import type { WorldHandle } from "@/hooks/use-world";
+import { isCircleClosed } from "@/world";
 import {
   ArrowDown,
   ArrowLeft,
@@ -75,10 +78,46 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
     () => state.rooms.get(state.currentRoomId),
     [state.rooms, state.currentRoomId]
   );
-  const availableDirections = useMemo(
-    () => new Set((currentRoom?.exits ?? []).map((e) => e.direction)),
-    [currentRoom]
-  );
+
+  // Used verbs derived from the transcript's echo lines — matches the
+  // reducer's hint system so keycap emphasis stays in lockstep with the
+  // progressive onboarding logic.
+  const usedVerbs = useMemo(() => {
+    const set = new Set<CommandVerb>();
+    for (const entry of state.transcript) {
+      if (entry.kind !== "echo") continue;
+      const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
+      set.add(parseCommand(raw).verb);
+    }
+    return set;
+  }, [state.transcript]);
+
+  // Exits already traversed from this room (via movement-verb echoes in
+  // the current room). Used to draw the faint trail-glow on direction
+  // keycaps — the UX half of the argument map's geometry.
+  const traversedDirections = useMemo(() => {
+    const set = new Set<string>();
+    const DIRS = new Set(["north", "south", "east", "west", "up", "down", "back", "forward"]);
+    for (const entry of state.transcript) {
+      if (entry.kind !== "echo") continue;
+      const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
+      if (DIRS.has(raw)) set.add(raw);
+    }
+    return set;
+  }, [state.transcript]);
+
+  // Keycap layout — emphasis per rhetorical verb + per-direction state.
+  // Re-derives on every render because koota mutations aren't React-tracked;
+  // the cost is trivial (pure function, maybe-20 branches).
+  const layout = useMemo(() => {
+    if (!currentRoom) return null;
+    const w = world.getWorld();
+    const circleClosed = w ? isCircleClosed(w) : false;
+    return computeKeycapLayout(
+      { room: currentRoom, turnCount: state.turnCount, usedVerbs, circleClosed },
+      traversedDirections
+    );
+  }, [currentRoom, state.turnCount, usedVerbs, traversedDirections, world]);
 
   const turns = useMemo(() => groupByTurn(state.transcript), [state.transcript]);
   const past = turns.slice(0, -1);
@@ -248,69 +287,56 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
               label={v.label}
               variant="verb"
               shortcut={v.hint}
+              emphasis={layout?.rhetorical[emphasisKeyFor(v.verb)] ?? "charged"}
               onPress={() => onCommand(v.verb)}
             />
           ))}
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <KeyCap
-            label="N"
-            icon={<ArrowUp size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("north")}
-            onPress={() => onCommand("north")}
-          />
-          <KeyCap
-            label="S"
-            icon={<ArrowDown size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("south")}
-            onPress={() => onCommand("south")}
-          />
-          <KeyCap
-            label="E"
-            icon={<ArrowRight size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("east")}
-            onPress={() => onCommand("east")}
-          />
-          <KeyCap
-            label="W"
-            icon={<ArrowLeft size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("west")}
-            onPress={() => onCommand("west")}
-          />
-          <KeyCap
-            label="Up"
-            icon={<ChevronUp size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("up")}
-            onPress={() => onCommand("up")}
-          />
-          <KeyCap
-            label="Down"
-            icon={<ChevronDown size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("down")}
-            onPress={() => onCommand("down")}
-          />
-          <KeyCap
-            label="Back"
-            icon={<RotateCcw size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("back")}
-            onPress={() => onCommand("back")}
-          />
-          <KeyCap
-            label="Fwd"
-            icon={<MoveDiagonal size={18} aria-hidden />}
-            variant="direction"
-            disabled={!availableDirections.has("forward")}
-            onPress={() => onCommand("forward")}
-          />
+          {DIRECTION_KEYS.map((d) => {
+            const state = layout?.directions[d.dir];
+            return (
+              <KeyCap
+                key={d.dir}
+                label={d.label}
+                icon={d.icon}
+                variant="direction"
+                disabled={!state?.available}
+                traversed={state?.alreadyTraversed ?? false}
+                onPress={() => onCommand(d.dir)}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
+
+/**
+ * Map a RHETORICAL_VERBS[].verb (space-and-lowercase) to its emphasis key
+ * in computeKeycapLayout's RhetoricalEmphasis shape.
+ */
+function emphasisKeyFor(
+  verb: string
+): "look" | "examine" | "question" | "askWhy" | "accept" | "reject" | "traceBack" {
+  switch (verb) {
+    case "ask why":
+      return "askWhy";
+    case "trace back":
+      return "traceBack";
+    default:
+      return verb as "look" | "examine" | "question" | "accept" | "reject";
+  }
+}
+
+const DIRECTION_KEYS: ReadonlyArray<{ dir: string; label: string; icon: React.ReactElement }> = [
+  { dir: "north", label: "N", icon: <ArrowUp size={18} aria-hidden /> },
+  { dir: "south", label: "S", icon: <ArrowDown size={18} aria-hidden /> },
+  { dir: "east", label: "E", icon: <ArrowRight size={18} aria-hidden /> },
+  { dir: "west", label: "W", icon: <ArrowLeft size={18} aria-hidden /> },
+  { dir: "up", label: "Up", icon: <ChevronUp size={18} aria-hidden /> },
+  { dir: "down", label: "Down", icon: <ChevronDown size={18} aria-hidden /> },
+  { dir: "back", label: "Back", icon: <RotateCcw size={18} aria-hidden /> },
+  { dir: "forward", label: "Fwd", icon: <MoveDiagonal size={18} aria-hidden /> },
+];

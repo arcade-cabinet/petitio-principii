@@ -17,6 +17,7 @@ import type { ReactNode } from "react";
  *   - "meta"      — NEW / QUIT / HELP — slightly de-emphasized
  */
 export type KeyCapVariant = "direction" | "verb" | "meta";
+export type KeyCapEmphasis = "calm" | "charged" | "primary";
 
 export interface KeyCapProps {
   label: string;
@@ -24,6 +25,18 @@ export interface KeyCapProps {
   onPress: () => void;
   variant?: KeyCapVariant;
   disabled?: boolean;
+  /**
+   * Visual emphasis — drives colour + glow. Defaults to "charged" for
+   * back-compat with call sites that don't specify. See docs/UX.md §1.3
+   * and computeKeycapLayout (T50).
+   */
+  emphasis?: KeyCapEmphasis;
+  /**
+   * Direction-only: `true` means the player has traversed this exit at
+   * least once from the current room. Adds a faint trailing glow to the
+   * key. Ignored for non-direction variants.
+   */
+  traversed?: boolean;
   /** Optional shortcut hint shown beneath the label (e.g. "N", "L") */
   shortcut?: string;
   "aria-label"?: string;
@@ -35,6 +48,8 @@ export function KeyCap({
   onPress,
   variant = "verb",
   disabled = false,
+  emphasis = "charged",
+  traversed = false,
   shortcut,
   "aria-label": ariaLabel,
 }: KeyCapProps) {
@@ -43,6 +58,24 @@ export function KeyCap({
     verb: "bg-[var(--color-panel)] text-[var(--color-highlight)]",
     meta: "bg-[var(--color-panel)]/70 text-[var(--color-dim)]",
   }[variant];
+
+  // Emphasis maps to opacity + optional pulse + violet ring. `calm` keys are
+  // still clickable — fainter signals "available but not especially useful
+  // here" (docs/UX.md §1.3). `primary` adds the motion-safe pulse ring the
+  // rest of the screen uses for attention.
+  const emphasisClasses = {
+    calm: "opacity-55",
+    charged: "opacity-95",
+    primary:
+      "opacity-100 ring-1 ring-[var(--color-violet)] motion-safe:[animation:pulse-violet_2s_ease-in-out_infinite]",
+  }[emphasis];
+
+  // Direction silhouettes: disabled + already-traversed keeps the slot in
+  // layout grid (never jitters), and traversed picks up a faint pink glow.
+  const traversedRing =
+    traversed && variant === "direction"
+      ? "shadow-[inset_0_1px_1px_rgba(255,255,255,0.04),0_0_8px_rgba(255,209,250,0.25)]"
+      : "";
 
   return (
     <button
@@ -69,7 +102,9 @@ export function KeyCap({
           "active:translate-y-[1px]",
           "active:shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),inset_0_-2px_1px_-1px_rgba(122,92,255,0.6),0_0_16px_rgba(122,92,255,0.55)]",
         ],
-        disabled && "cursor-not-allowed opacity-40"
+        disabled && "cursor-not-allowed opacity-40",
+        !disabled && emphasisClasses,
+        traversedRing
       )}
     >
       {/* LED — the pink status pip on the top-right corner */}
