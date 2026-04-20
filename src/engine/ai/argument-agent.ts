@@ -1,3 +1,6 @@
+import GRAMMARS from "@/content/generated/grammars.json";
+import { withSeededRng } from "@/lib/seeded-tracery";
+import tracery from "tracery-grammar";
 import { GameEntity, GoalEvaluator, State, StateMachine, Think } from "yuka";
 import type { Room } from "../core/Room";
 import type { SfxKey } from "../core/audio-effects";
@@ -72,111 +75,50 @@ class ArgumentEntity extends GameEntity {
 }
 
 // ---------------------------------------------------------------------------
-// States — each one owns the templates for its voice.
+// States — Yuka StateMachine needs a State<T> per id. The response text for
+// each (state, verb) lives in the frozen grammar artifact (grammars.json)
+// emitted by scripts/build-grammars.ts; see `narrate()` below. The state
+// classes are markers so Yuka's transitions and hooks still work, but they
+// own no templates.
 // ---------------------------------------------------------------------------
 
-type Templates = Record<ArgumentVerb, (ctx: ArgumentContext, rng: () => number) => string[]>;
-
-/** Pick one of n lines deterministically from the rng. */
-function choose<T>(rng: () => number, lines: readonly T[]): T {
-  const idx = Math.floor(rng() * lines.length) % lines.length;
-  return lines[idx] as T;
-}
+class ComposedState extends State<ArgumentEntity> {}
+class DefensiveState extends State<ArgumentEntity> {}
+class SeductiveState extends State<ArgumentEntity> {}
+class TriumphantState extends State<ArgumentEntity> {}
 
 /** Shared helper — `an` vs `a` for the room type article. */
 function article(kind: Room["rhetoricalType"]): string {
   return /^[aeiou]/.test(kind) ? "an" : "a";
 }
 
-// --- Composed -------------------------------------------------------------
-
-class ComposedState extends State<ArgumentEntity> {
-  readonly templates: Templates = {
-    accept: (ctx) => [
-      "You accept this step in the argument.",
-      `The ${ctx.room.title} notes your assent and continues, unhurried.`,
-    ],
-    reject: (ctx) => [
-      "You reject this step in the argument.",
-      `The ${ctx.room.title} acknowledges the objection. It has other avenues.`,
-    ],
-    question: (ctx, rng) => [
-      "You question the assumption.",
-      choose(rng, [
-        `The ${ctx.room.title} pauses, briefly. The assumption remains.`,
-        `The ${ctx.room.title} considers your doubt. It is patient with you.`,
-      ]),
-    ],
-  };
-}
-
-// --- Defensive ------------------------------------------------------------
-
-class DefensiveState extends State<ArgumentEntity> {
-  readonly templates: Templates = {
-    accept: (ctx) => [
-      "You accept the step.",
-      `The ${ctx.room.title} relaxes — it had been bracing. The acceptance is noted among the premises it has already secured.`,
-    ],
-    reject: (ctx) => [
-      "You reject the step.",
-      `The ${ctx.room.title} absorbs the rejection. It files your objection under "dialectical moments the argument has survived."`,
-    ],
-    question: (ctx, rng) => [
-      "You question the assumption.",
-      choose(rng, [
-        `The ${ctx.room.title} answers: the question itself presupposes what it questions. You find this compelling.`,
-        `The ${ctx.room.title} responds in a hand almost your own: the doubt is already part of the figure. The column grows firmer.`,
-      ]),
-    ],
-  };
-}
-
-// --- Seductive ------------------------------------------------------------
-
-class SeductiveState extends State<ArgumentEntity> {
-  readonly templates: Templates = {
-    accept: (ctx) => [
-      "You accept the step.",
-      `The ${ctx.room.title} is flattered. Details you have accepted grow prominent; details you have not recede.`,
-    ],
-    reject: (ctx) => [
-      "You reject the step.",
-      `The ${ctx.room.title} smiles, a little. The rejection is recorded as evidence of your discernment — which in turn underwrites the conclusions you did accept.`,
-    ],
-    question: (ctx, rng) => [
-      "You question the assumption.",
-      choose(rng, [
-        `The ${ctx.room.title} welcomes the question. An argument open to scrutiny must be sound.`,
-        `The ${ctx.room.title} recites your doubt back to you in a warmer register. You nod.`,
-      ]),
-    ],
-  };
-}
-
-// --- Triumphant -----------------------------------------------------------
-
-class TriumphantState extends State<ArgumentEntity> {
-  readonly templates: Templates = {
-    accept: (ctx) => {
-      const art = article(ctx.room.rhetoricalType);
-      return [
-        "You accept the argument.",
-        "The conclusion you have accepted is identical to the premise from which you began.",
-        `You have completed the circle here, in ${art} ${ctx.room.rhetoricalType} room. Petitio Principii.`,
-        "",
-        "The argument was always about itself.",
-      ];
-    },
-    reject: (ctx) => [
-      "You reject the argument.",
-      `The ${ctx.room.title} absorbs your rejection as a necessary dialectical moment and continues. You remember having rejected this before.`,
-    ],
-    question: (ctx) => [
-      "You question the assumption.",
-      `The ${ctx.room.title} records your question among its premises. The question will later be cited as evidence that the conclusion is open to scrutiny, therefore sound.`,
-    ],
-  };
+/**
+ * Flatten the (state, verb) response rule through the seeded Tracery
+ * pipeline. Room-specific symbols (`#roomTitle#`, `#roomType#`,
+ * `#roomArticle#`) get per-call overrides from the active context; `rng` is
+ * the agent's seeded RNG so the same sequence of player acts yields the
+ * same transcript.
+ *
+ * The grammar rules themselves contain `\n` characters authored at build
+ * time to separate response lines. We split on those to keep the existing
+ * `string[]` return contract the reducer/UI depend on.
+ */
+function narrate(
+  stateId: ArgumentStateId,
+  verb: ArgumentVerb,
+  ctx: ArgumentContext,
+  rng: () => number
+): string[] {
+  const rules =
+    GRAMMARS.agent[stateId as keyof typeof GRAMMARS.agent]?.[verb] ?? GRAMMARS.agent.Composed[verb];
+  const grammar = tracery.createGrammar({
+    origin: [...rules],
+    roomTitle: [ctx.room.title],
+    roomType: [ctx.room.rhetoricalType],
+    roomArticle: [article(ctx.room.rhetoricalType)],
+  });
+  const raw = withSeededRng(rng, () => grammar.flatten("#origin#"));
+  return raw.split("\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -286,21 +228,13 @@ export class ArgumentAgent {
     }
     this.pendingInput.current = null;
 
-    const state = this.stateMachine.currentState as StateWithTemplates | null;
-    if (!state || !state.templates) {
-      return { state: this.currentState, lines: [] };
-    }
-    const lines = state.templates[verb](ctx, this.rng);
+    const lines = narrate(this.currentState, verb, ctx, this.rng);
     return {
       state: this.currentState,
       lines,
       sfx: sfxFor(verb, this.currentState, ctx.room.rhetoricalType),
     };
   }
-}
-
-interface StateWithTemplates {
-  templates: Templates;
 }
 
 // ---------------------------------------------------------------------------
