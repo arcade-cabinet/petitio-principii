@@ -8,362 +8,181 @@ domain: context
 # Feature: React + Capacitor MVP
 
 **Created**: 2026-04-20
-**Version**: 2.88
-**Timeframe**: 1 week (batched autonomous execution)
-**Priority**: P0 — replaces Solid scaffold, targets mobile via Capacitor
+**Version**: 2.88 (trimmed 2026-04-20)
+**Timeframe**: extended through Act II (display, keycaps, grammar, hints)
+**Priority**: P0 — mobile release via Capacitor, Pages deploy for web
 
 ## Overview
 
-Petitio Principii pivots to a React 19 + Tailwind 4 + shadcn stack with a primary target of mobile (iOS + Android via Capacitor). The game is a wall of seed-deterministic text with buttons — which means UI and motion carry the whole weight of making it feel alive. No literal CRT; a luminous display surface. No typing; keycap HUD. Phaser and RetroZone are out; Solid is out; we replace procedural Tone.js sounds with real authored audio from `/Volumes/home/assets/Audio` via Howler.
+Petitio Principii is a mind re-entering an argument it once made (see
+[docs/LORE.md](../LORE.md)). React 19 + Tailwind 4 + shadcn UI over a
+framework-agnostic engine + koota ECS + Yuka AI + Howler audio. Mobile-first
+via Capacitor; web via GitHub Pages.
 
 Canon in order of priority:
 1. **Original 17k prompt** — PRNG-driven text adventure, memory-palace-in-the-night-sky, seed-reproducible, rhetorical spaces, fallacy encounters, circular endings, framework-agnostic engine.
-2. **User amendments** — kill CRT metaphor, kill Solid, kill Phaser, kill RetroZone, kill typing input. React+Tailwind+shadcn, Capacitor, Yesteryear + VT323 typography, Howler + real audio, mobile-first.
-3. **My creative direction** — motion is the narrator, panel chrome mutates with rhetorical type, argument map visualizes the player's journey as geometry, surrealist text chaining via RiTa build-time pipeline.
+2. **User amendments** — no CRT metaphor, no Solid, no Phaser/RetroZone, no typing input. React+Tailwind+shadcn, Capacitor, Yesteryear + VT323 typography, Howler + real audio, mobile-first. Build scripts emit JSON under `src/config/generated/` or `src/content/generated/`. RiTa + Tracery pipeline is the runtime text generator. UI must remain legible — "contextual" never means "cryptic."
+3. **Creative direction** — motion is the narrator; argument-map visualizes the walk; surrealist chaining through Tracery grammars fed by RiTa's POS tags; **every random choice threads through one seed** that determinism can be proved for.
 
-## Tasks
+## Shipped (trimmed — tasks that have landed)
 
-### P1 — Stack migration (blocking everything else)
+These were previously P1–P10; keeping a compact record so the plan stays
+honest about what's already in main.
 
-- [ ] **T01** Install React 19 + Tailwind 4 + shadcn stack, remove Solid ecosystem
-- [ ] **T02** Configure Vite React plugin, Tailwind 4 plugin, tsconfig JSX react-jsx
-- [ ] **T03** Fix `scripts/build-corpus.ts` node type resolution (TS language server)
-- [ ] **T04** Rewrite `vite.config.ts` with React + Tailwind + dual vitest projects
-- [ ] **T05** Reorganize source: `src/app/`, `src/components/ui/`, `src/features/`, `src/hooks/`, `src/lib/`
+- **T01–T05** Stack migration — React 19, Tailwind 4, shadcn conventions, Vite dual-project vitest, reorganized layout (commits `77c5ff4`, `e8586c9`).
+- **T03** `scripts/build-corpus.ts` node types (commit `f587d01`).
+- **T06–T08** Visual primitives — `CrystalField`, `GlowingPanel`, `KeyCap` (commits `77c5ff4`, `e8586c9`).
+- **T09** `ArgumentMap` + **T13** `ArgumentMapOverlay` (commit `5647e0c`).
+- **T10** `NewGameIncantation` (commit `77c5ff4`).
+- **T11** `TerminalDisplay` (commit `e8586c9`; will be reworked in T41–T44).
+- **T14** `useGame` / `useWorld` / `useAudio` decomposition; pure reducer boundary (commit `e8586c9`).
+- **T16** `useAudio` with Howler — SFX pooling, BGM fade, mute persisted (commit `e8586c9`).
+- **T21** BGM encoded to `public/audio/bgm.opus` — full-length Panchout (commit `e8586c9`).
+- **T22** SFX curated — 16 Kenney CC0 effects in `public/audio/sfx/` (commit `e8586c9`).
+- **T23** `src/lib/audio-manifest.ts` — semantic `SfxKey` → asset URL (commit `e8586c9`).
+- **T24** Howler bus wired to game events via reducer (commits `e8586c9`, `4697fbb`).
+- **T25** Tone.js removed; Yuka AI argument-agent wired into reducer (commits `e8586c9`, `4697fbb`).
+- **T26** Surrealist corpus via RiTa (Carroll, Breton, Dada — public domain) (commit `f587d01`).
+- **T27** `src/content/chaining.ts` — seeded template chainer (commits `54fbdb4`, `4697fbb`).
+- **T28** `describeRoom(room, { seed, visitCount, memory })` threaded through the reducer (commit `4697fbb`).
+- **T29–T33** Capacitor scaffold — deps, `capacitor.config.ts`, `android/`, dynamic Vite base, safe-area CSS, `src/lib/mobile.ts` (commit `93a5083`).
+- **T34–T35** Docs refresh — STATE, ARCHITECTURE, DESIGN, TESTING, LORE, VOICE, STANDARDS, agentic/agent-workflows (commits `f83cadc`, `aa54e15`).
+- **T37** CI APK job in `.github/workflows/ci.yml` (commit `93a5083`).
+- **Config split** — tunables live in `src/config/{game,rhetoric}.json` with a single typed `@/config` barrel; `RHETORICAL_FREQUENCIES` and `RHETORICAL_COST` Records retired (commit `5d56695`).
 
-### P2 — Visual primitives (shadcn-style, palette-mapped)
+## Act II — remaining work
 
-- [ ] **T06** `components/ui/crystal-field.tsx` — canvas backdrop, silver strokes + violet glow + pink shatter
-- [ ] **T07** `components/ui/glowing-panel.tsx` — orbiting dot, rotating ray, corner line traces, tonal variants
-- [ ] **T08** `components/ui/keycap.tsx` — inset-shadow key with LED, variant-tonal chrome
-- [ ] **T09** `components/ui/argument-map.tsx` — breadcrumb geometry of visited rooms, colored by rhetorical type, closes visibly when circle completes
+Everything below is new or reframed from the original T-series. Numbers
+continue (T41+) so referencing earlier commits still works.
 
-### P3 — Feature compositions
+### P11 — Grammar pipeline (RiTa + Tracery actually running the show)
 
-- [ ] **T10** `features/new-game/NewGameIncantation.tsx` — landing panel with Yesteryear incantation + seed + actions
-- [ ] **T11** `features/terminal/TerminalDisplay.tsx` — in-game display with streaming output, current room as breathing hero
-- [ ] **T12** `features/terminal/KeyRow.tsx` — decomposed keycap HUD (verbs + directions), context-aware glow (ACCEPT pink in circular rooms, QUESTION glow in fallacy rooms)
-- [ ] **T13** `features/terminal/ArgumentMapOverlay.tsx` — tiny always-visible strip above display
+The goal: every piece of generated text in the runtime expands from a
+Tracery grammar fed by RiTa's POS tags, driven by a **single seeded rng**
+that determinism can be proved for.
 
-### P4 — Engine bridge
+- [ ] **T41** Verify `tracery-grammar` v2.8.4 responds to `tracery.setRng(fn)`. Confirmed API present at `node_modules/tracery-grammar/tracery.js:864`. Write a `src/lib/seeded-tracery.ts` thin wrapper:
+    - `withSeededRng(rng, fn)` — sets the process-global rng, runs `fn`, restores prior rng. Synchronous; no async inside.
+    - Guards against reentrancy (push/pop a stack if needed so nested flattens don't unseat each other).
+    - Unit test: 1000 runs with same seed → identical output; different seeds → ≥ 95% unique. **Verify**: `pnpm test` green; `grep "Math.random" src/content` shows zero hits outside of seeded-tracery.
+- [ ] **T42** Emit grammars as JSON from the build pipeline.
+    - `scripts/sources/grammars.ts` — hand-authored Tracery grammars, typed. Per `(type, act)` entry, and one `incantation` entry for the new-game phrase.
+    - Extend `scripts/build-corpus.ts` to:
+      - Read the typed grammars source.
+      - Inject POS-filtered lexicon slots (RiTa-emitted `nn` words into `#noun#`, `jj` into `#adjective#`, etc.) — the build picks which lexicon entries qualify for each slot.
+      - Inject surrealist fragments as `#fragment#` / `#phrase#` slots.
+      - Emit `src/content/generated/grammars.json` (and a small `.ts` accessor alongside `corpus.ts`/`surrealist.ts` for typed re-export).
+    - `pnpm verify-corpus` diffs `grammars.json` too.
+    - **Verify**: `pnpm build-corpus` regenerates; the JSON has `incantation` + 24 entries under `rooms.<type>.<act>` keys; each entry is a valid Tracery grammar object.
+- [ ] **T43** Replace runtime template-picking in `src/content/chaining.ts` with Tracery expansions.
+    - `chainDescription(room, { seed, visitCount, memory })` now:
+      1. Derives a per-call rng from `createSeededRandom(seed ^ hashRoomId(room.id) ^ visitCount)`.
+      2. Picks the right grammar entry by `(room.rhetoricalType, determineAct(...))`.
+      3. Calls `withSeededRng(rng, () => grammar.flatten("#origin#"))`.
+    - Memory-based acknowledgements become grammar slots (`#accepted-suffix#` → `""` or `"(Your acceptance is part of the room now.)"` depending on whether roomId ∈ memory.accepted).
+    - Delete the hardcoded `TEMPLATES` record in `chaining.ts`.
+    - **Verify**: existing chaining test still passes; new tests — (a) 1000 calls same (seed, room, visit) → identical text; (b) same seed different visit → reliably different; (c) RiTa-tagged plurals actually used when the grammar requests `#noun.plural#`.
+- [ ] **T44** `generatePhrase` (the new-game incantation) uses the `incantation` grammar.
+    - Replace the hand-written adj-adj-noun splice in `src/engine/core/NarrativeGenerator.ts` with `incantationGrammar.flatten("#phrase#")` under a seeded rng.
+    - **Verify**: existing `generatePhrase.test.ts` still passes (determinism + "three words separated by spaces" invariant preserved).
+- [ ] **T45** Agent response templates (in `src/engine/ai/argument-agent.ts`) move into the grammar JSON too.
+    - One grammar per `(ArgumentStateId, verb)` → 4 × 3 = 12 entries under `agent.<state>.<verb>`.
+    - `argument-agent.ts` loads them via the shared `@/content` accessor; `respondTo` calls `withSeededRng(this.rng, () => grammar.flatten("#origin#"))`.
+    - Still framework-agnostic — `argument-agent` imports only from `yuka`, `engine/core` types, and the grammar JSON.
+    - **Verify**: existing agent test passes; new test — same seed + same player acts = identical narration for 100 runs.
 
-- [ ] **T14** `hooks/use-game-engine.ts` — React port of createGameEngine; owns koota World lifetime; bridges BEGIN click to audio init
-- [ ] **T15** `hooks/use-haptics.ts` — Capacitor Haptics wrapper, web fallback = no-op
-- [ ] **T16** `hooks/use-audio.ts` — Howler-backed BGM + SFX bus, volume/mute state, respects prefers-reduced-motion
+### P12 — Display architecture (past / present / future)
 
-### P5 — Theatrical motion
+The transcript has been rendered as a single scrolling wall. It should
+split into *what's happening now*, *what has happened*, *what you can do*.
 
-- [ ] **T17** Panel reveal choreography — landing dissolves into in-game display as one continuous motion (Motion React)
-- [ ] **T18** Directional transitions — moving north rotates/unfurls text; directions are kinesthetic
-- [ ] **T19** Rhetorical chrome — panel mutates per-room-type (premise clean, fallacy jitter, circular stuck-orbit, meta doubled-outline)
-- [ ] **T20** Spell-cast verb feedback — ACCEPT in circular room triggers crystal-shatter-inward + text dissolve/reform
+- [ ] **T46** `docs/UX.md` — formalize the display spec.
+    - Three-projection model: present (last turn's lines, large), past (earlier turns, dim collapsible drawer), future (the keycaps themselves).
+    - Responsive breakpoints: portrait mobile (single column, past collapsed by default), landscape / tablet (two-column 65/35), desktop (same as landscape with more breathing room + always-visible past ledger).
+    - "Three concrete actions always visible" rule — keycaps don't vanish; they *telegraph* via emphasis.
+    - Onboarding hint system (below, T49).
+- [ ] **T47** `TurnMark` trait on `OutputLine` entities, so the display can project past vs present.
+    - `src/world/traits/index.ts` — add `TurnMark({ turnNumber: 0 })` trait, stamped by `appendOutput` callers when a new turn begins.
+    - `src/world/index.ts` — extend `appendOutput(world, kind, text, opts?)` with an optional `{ turnNumber }`; add `readTranscriptByTurn(world) → Map<number, TranscriptEntry[]>`.
+    - Reducer passes `state.turnCount + 1` to each append from a given verb; startGame's seed lines go under turn 0.
+    - **Verify**: unit test — a 5-turn walk yields 6 turn-keyed groups in the projection; start lines are in turn 0.
+- [ ] **T48** Rewrite `src/features/terminal/TerminalDisplay.tsx` to the past/present split.
+    - **Present pane** — `state.transcript` entries where `turnNumber === state.turnCount` (or turn 0 if nothing has happened yet). Big, VT323 @ `clamp(1.1rem, 2.6vw, 1.35rem)`, full glow. Room title is a separate hero element above.
+    - **Past drawer** — collapsed by default on portrait. A header strip: "▸ earlier — N turns". Tapping expands to a scrollable chronological list of past turns, each turn a visual block (echo + response group). Dim (`--color-dim`), 0.9rem, no glow. Collapses again on any new verb so the present is always the focus.
+    - **No always-visible exit list inside room descriptions** — "Exits: NORTH — a corridor" is redundant once the direction keycaps encode the same info. Remove from `describeRoom` output; the keycaps replace it.
+    - **Verify**: Playwright visual test (captured or written later) — on portrait viewport, past drawer is collapsed; on landscape, drawer is expanded and sits on the right.
+- [ ] **T49** Progressive onboarding hints.
+    - `src/engine/core/hints.ts` — pure function `computeHintToShow(state, memory, agent, hintsShown) → HintId | null`. Evaluates triggers in priority order (first-room → first-direction-available → first-fallacy → first-circular/meta → first-accept → first-question → first-trace-usable → first-map-≥4 → first-agent-out-of-composed → first-revisit). Priority-ordered so one hint shows at a time.
+    - `src/world/traits/index.ts` — `HintsShown({ ids: "" })` trait on the player entity (comma-separated string — koota traits can't hold `Set` directly; the reducer parses/serializes).
+    - Reducer — after each `applyCommand`, call `computeHintToShow`; if it returns an id not in `hintsShown`, mark it shown and surface on state as `state.activeHint: HintId | null`.
+    - `src/features/terminal/HintLine.tsx` — single-line DM Mono at `--color-dim`, 0.85rem. Fades in 400ms, auto-fades after 6s or on next keypress. Never blocks input. Dismissable via tap.
+    - Must NEVER hint twice for the same id in the same game; `requestNewGame` clears `HintsShown`.
+    - **Verify**: unit test — same seed + same actions produce the same hint sequence; each id fires at most once.
 
-### P6 — Audio (Howler + real assets)
+### P13 — Contextual keycaps (emphasis, not disappearance)
 
-- [ ] **T21** Encode `/Volumes/home/assets/Audio/Music/Clement Panchout _ I want to believe _ 2004.wav` → `public/audio/bgm.ogg` (ffmpeg -c:a libvorbis -q:a 5, loopable)
-- [ ] **T22** Curate SFX pack: copy selected files from `Interface Sounds/Audio/`, `UI Audio/Audio/`, `Sci-Fi Sounds/Audio/` to `public/audio/sfx/`
-- [ ] **T23** `lib/audio-manifest.ts` — typed manifest mapping game events → SFX filenames
-- [ ] **T24** Wire Howler bus: BGM starts on first user gesture (seed submit), looping at -14 LUFS; SFX layer on keypresses and rhetorical transitions
-- [ ] **T25** Remove `tone` dependency, delete `world/systems/AudioSystem.ts` Tone integration; replace with Howler-driven `useAudio` subscriber to game events
+- [ ] **T50** `src/engine/core/keycap-layout.ts` — pure function `computeKeycapLayout(state, memory, agentState, room) → { verbs: KeyDescriptor[]; directions: KeyDescriptor[] }`.
+    - `KeyDescriptor = { id, label, shortcut, emphasis: "calm" | "charged" | "primary" }`.
+    - Always returns the full rhetorical-verb set (LOOK, EXAMINE, QUESTION, ASK, ACCEPT, REJECT, TRACE). No hiding. Contextual logic only shifts `emphasis`:
+      - `fallacy` / `circular` room → QUESTION + REJECT charged
+      - `premise` / `definition` / `conclusion` → ACCEPT charged
+      - `meta` → ACCEPT + QUESTION + REJECT all charged equally
+      - `agentState === "Triumphant"` → ACCEPT becomes `primary`
+    - Always returns compass-present directions only, plus a `present: boolean` for the ones the room lacks (UI renders a *silhouette* placeholder so the layout doesn't jump, not a gap).
+    - **Verify**: table-driven test — for each (rhetoricalType, agentState) pair, assert expected emphasis distribution.
+- [ ] **T51** Refactor `src/features/terminal/TerminalDisplay.tsx` keycaps to read `computeKeycapLayout`. The emphasis is passed to a new `<KeyCap emphasis="charged" />` prop; the keycap component's `pink-LED-pulse` visual treatment upgrades to full outer glow when `charged`, and to inner-pink-fill when `primary`.
+    - Direction silhouettes: a dimmed outline variant of `<KeyCap>` for the `present: false` slots — same footprint, no touch target (aria-hidden).
+    - **Verify**: snapshot or RTL assertion per room type that the expected cap has `data-emphasis="charged"`.
 
-### P7 — Surrealist chaining (elevates the text)
+### P14 — Proof of determinism
 
-- [ ] **T26** Extend `scripts/build-corpus.ts` to include public-domain surrealist fragments (Carroll *Jabberwocky*, Breton *Manifeste du surréalisme* excerpts, Dada declarations) with POS tagging
-- [ ] **T27** `content/chaining.ts` — seeded Markov/template chainer that consumes the surrealist fragments and produces room-description variations on each visit (deterministic per seed + roomId + visitCount + traitMask). Conditions on koota traits so the generator sees what the player has accepted/rejected/questioned.
-- [ ] **T28** Thread chainer through `describeRoom(room, world, visitCount)` — room descriptions condition on `WasAccepted`/`WasRejected`/`WasQuestioned`/`WasTracedThrough` traits applied by gameplay. Same seed + same acts → same text; different plays → different reads. Memory is unstable and self-reinforcing (see LORE.md).
-- [ ] **T27b** Three-act template sets per rhetorical type — each room type has Act I / Act II / Act III template families. Act boundaries are emergent from turn count + visited rooms + accrued traits, not hardcoded. See VOICE.md for concrete examples to write toward.
-- [ ] **T27c** Per-line trait system: on `ACCEPT`, attach `WasAccepted` to the current room entity AND `IsAcceptedConsequence` to the associated transcript OutputLine entities. Mirror for REJECT/QUESTION/TRACE. This is what future room-descriptions query against.
+- [ ] **T52** `src/engine/prng/seed-audit.test.ts` — a dedicated test that imports the engine, reducer, agent, and chainer, plays 100 turns of a fixed seed with a fixed action script, captures the full transcript, and asserts byte-for-byte equality across re-runs. Any `Math.random` in user-space is a bug and this test catches it.
+    - Also grep-asserts: `grep -rn "Math.random" src/` returns only `CrystalField` (decorative).
+    - **Verify**: test passes; grep assertion passes.
 
-### P8 — Mobile (Capacitor)
+### P15 — Release-quality polish
 
-- [ ] **T29** Install `@capacitor/core @capacitor/cli @capacitor/android @capacitor/ios @capacitor/haptics @capacitor/status-bar @capacitor/splash-screen`
-- [ ] **T30** `capacitor.config.ts` + `android/` + `ios/` scaffolds via `npx cap init` + `npx cap add`
-- [ ] **T31** Vite `base: "./"` when `CAPACITOR=true` (dynamic in `vite.config.ts`)
-- [ ] **T32** Safe-area handling in `globals.css` (env(safe-area-inset-*) already present; audit every fixed-position element)
-- [ ] **T33** Status bar + splash screen configured to match ink/violet palette
-
-### P9 — Governance / CI
-
-- [ ] **T34** Update `docs/STATE.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `docs/TESTING.md`, `STANDARDS.md` to reflect the new stack (drop Solid/Phaser/RetroZone references)
-- [ ] **T35** Update `docs/agentic/agent-workflows.md` (currently says "SolidJS + Phaser", false)
-- [ ] **T36** CI workflow already mirrors local via `pnpm verify` — confirm it still passes end-to-end
-- [ ] **T37** Android debug APK job in `ci.yml` (per global standards) — upload as PR artifact
-
-### P10 — QA
-
-- [ ] **T38** Port 41+ existing unit tests (engine, world, content) unchanged — they're framework-agnostic
-- [ ] **T39** Rewrite 1 component test (`TerminalScreen.test.tsx`) for React Testing Library
-- [ ] **T40** Add Playwright smoke test: boot → seed → move → accept → completes circle → new game
+- [ ] **T53** Move `src/content/generated/{corpus,surrealist}.ts` → `src/content/generated/{corpus,surrealist}.json` + a thin `.ts` accessor that imports them. Consistency with T42's grammars.json and the config principle. Bundle shrink expected: the giant `as const` literals drop a layer.
+- [ ] **T54** Remove `src/design/gameConfig.ts` deprecation shim. Audit consumers; flip them to `@/config.GAME_CONFIG.<nested>` directly. Delete the shim.
+- [ ] **T55** `src/features/terminal/__tests__/TerminalDisplay.test.tsx` — RTL. Verifies present pane, past drawer toggling, hint visibility rules, direction keycap presence/silhouette logic.
+- [ ] **T56** Playwright E2E smoke test — boot → enter custom seed → walk 6 rooms → ACCEPT in a circular room → assert circle-closed ring + "Petitio Principii" win text. Headless Chromium.
 
 ## Dependencies
 
 ```
-T01,T02,T03,T04 (P1) → T05 (P1)
-T05 → T06,T07,T08,T09 (P2) [parallel]
-T05 → T14,T15,T16 (P4) [parallel]
-T06,T07,T08 → T10,T11,T12,T13 (P3)
-T14,T16 → T17,T18,T19,T20 (P5)
-T21,T22 → T23 → T24 → T25 (P6 serial; T21 depends on NAS mount)
-T26 → T27 → T28 (P7 serial)
-T29 → T30 → T31,T32,T33 (P8 serial)
-T01..T28 → T34,T35 (docs)
-all → T36,T37 (CI)
-T11,T12 → T39 (component test depends on final shape)
-T11,T12,T14 → T40 (E2E depends on full loop)
+T41 → T42 → T43 → T44 → T45
+T46 → T47 → T48 (T49 can land alongside T48)
+T50 → T51 (may land with T48 since both touch TerminalDisplay)
+T41..T45 completion → T52 grep assertion passes
+T53 any time (depends only on shipped content generation)
+T54 after T53
+T55 after T48+T51
+T56 after T51 + T49
 ```
 
-## Acceptance Criteria
+## Acceptance criteria summary (key ones)
 
-### T01 — Stack migration
-- `package.json` has `react@19`, `react-dom@19`, `@vitejs/plugin-react`, `tailwindcss@4`, `@tailwindcss/vite`, `tw-animate-css`, `clsx`, `tailwind-merge`, `class-variance-authority`, `lucide-react`, `motion`, `@fontsource/yesteryear`, `@fontsource/vt323`, `@fontsource/dm-mono`
-- `package.json` does NOT have `solid-js`, `vite-plugin-solid`, `@solidjs/testing-library`, `phaser`, `retrozone`, `tone`
-- `pnpm install` succeeds
-- **Verify**: `grep -E "solid-js|phaser|retrozone|tone" package.json` returns empty
+- **T41**: `setRng` verified at `node_modules/tracery-grammar/tracery.js:864`; wrapper present and tested; no `Math.random` in runtime text generation.
+- **T43**: `chainDescription` uses `grammar.flatten("#origin#")` not template-string splicing; RiTa-tagged POS info available to the grammar via generated JSON slots.
+- **T48**: portrait mobile shows past drawer collapsed; "Exits: ..." text gone from `describeRoom`; present pane dominates the viewport.
+- **T49**: hints fire at most once per id per game; `requestNewGame` resets; `pnpm test` has a determinism assertion.
+- **T51**: keycaps never vanish; `emphasis` drives visual pulse; direction silhouettes fill missing-exit slots.
+- **T52**: 100-turn replay is byte-identical; `grep "Math.random" src/` shows only decorative CrystalField hits.
+- **T56**: E2E closes the circle and asserts the closing-edge is present.
 
-### T02 — Vite + tsconfig
-- `vite.config.ts` uses `@vitejs/plugin-react` and `@tailwindcss/vite`
-- `tsconfig.json` has `"jsx": "react-jsx"`, no `"jsxImportSource"` remnant
-- **Verify**: `pnpm typecheck` passes
+## Out of scope (deferred follow-ups)
 
-### T03 — build-corpus node types
-- `scripts/build-corpus.ts` resolves `node:fs`, `node:path`, `node:url`, `process` without diagnostics in both the IDE and `tsc -p tsconfig.node.json`
-- Either add `scripts/` to the root `tsconfig.json` excludes AND ensure `tsconfig.node.json` owns it, OR merge into one tsconfig with node types at root — whichever avoids double-typing
-- **Verify**: `pnpm typecheck` passes with zero errors
-
-### T04 — vite.config.ts
-- Has dual vitest projects: `browser` (Playwright) + `scripts` (node env)
-- React and Tailwind plugins both loaded
-- `@/*` alias → `src/*`
-- **Verify**: `pnpm test` runs both projects and all tests pass
-
-### T05 — Directory layout
-- `src/app/` contains `main.tsx` + `App.tsx`
-- `src/components/ui/` contains shadcn-style primitives (crystal-field, glowing-panel, keycap, argument-map)
-- `src/features/` contains `new-game/` + `terminal/` feature compositions
-- `src/hooks/` contains React hooks
-- `src/lib/utils.ts` has `cn` helper
-- Old `src/terminal/` directory is deleted
-- `index.html` script src points at `/src/app/main.tsx`
-- **Verify**: `find src -type d` shows the expected layout; `pnpm build` succeeds
-
-### T06 — CrystalField
-- Canvas component, pointer tracks mouse, pointerdown shatters 40 shards
-- Palette: silver strokes (`hsla(240, 100%, 87%)`) with violet shadow; pink shatter shards
-- DPR-aware, resizes on window resize, passive listeners, respects `prefers-reduced-motion`
-- **Verify**: Renders, no console errors; screenshot shows crystalline strokes from cursor in Chrome DevTools
-
-### T07 — GlowingPanel
-- Orbiting dot, rotating conic-gradient ray, 4 corner line traces, interior vignette
-- `tone="active" | "calm"` prop with different speeds
-- Accepts children
-- **Verify**: Two instances (one active, one calm) visibly differ in orbit speed
-
-### T08 — KeyCap
-- Props: `label`, `icon?`, `onPress`, `variant`, `disabled`, `shortcut?`, `aria-label?`
-- Inset shadow chrome, pink LED pip top-right, VT323 label, 52px min touch target
-- Disabled state renders without shadow, 40% opacity, no-cursor
-- **Verify**: Clicking a verb key calls `onPress`; disabled key doesn't
-
-### T09 — ArgumentMap
-- Small SVG rail, one node per visited room, colored by rhetorical type
-- Connects sequential visits with faint silver line
-- When player is in a `circular` or `meta` room that matches a prior room id, the connecting edge between them draws bright pink → visible "circle closed" moment
-- **Verify**: After 6 moves in a test graph, 6 nodes show; the 6th back to room[0] → closing edge lights
-
-### T10 — NewGameIncantation
-- Yesteryear "Petitio Principii" title
-- Yesteryear phrase + VT323 seed display
-- Three actions: Begin Argument, Regenerate, Custom Seed (with numeric form)
-- `onBegin` fires the user gesture that awaits `initAudio()` before `onStart`
-- **Verify**: Tapping BEGIN on iOS Safari triggers AudioContext state === "running"
-
-### T11 — TerminalDisplay
-- Header with game title + NEW GAME button
-- Current room title as Yesteryear hero (breathing slot)
-- Output stream in VT323 with fade-in mask at top
-- Auto-scrolls to bottom on new output
-- Keyboard parity: n/s/e/w/l/x/q/t/b/arrow keys trigger onCommand
-- **Verify**: All existing commands work via both keycaps and keyboard
-
-### T12 — KeyRow
-- Verbs row (Look/Examine/Question/Ask/Accept/Reject/Trace) + directions row
-- Direction keys auto-disable when no exit in that direction exists in current room
-- In circular/meta rooms: ACCEPT keycap pink LED
-- In fallacy rooms: QUESTION keycap pink LED
-- **Verify**: Visiting a fallacy room toggles the QUESTION key's LED color
-
-### T13 — ArgumentMapOverlay
-- Renders ArgumentMap at top of the screen between header and display
-- Receives turn history from game state
-- **Verify**: After moves, the overlay reflects path
-
-### T14 — useGameEngine
-- Returns `{ state, startGame, submitCommand, requestNewGame }`
-- `startGame` awaits `initAudio()`, builds koota world, builds Yuka pathfinding cache
-- `submitCommand` routes every verb exactly as the Solid version did
-- `requestNewGame` disposes audio and resets state
-- **Verify**: All 42 engine/world tests still pass; new test for useGameEngine hook passes
-
-### T15 — useHaptics
-- Wraps `@capacitor/haptics` Impact/Notification APIs
-- Web fallback: no-op silently (check for `Capacitor.isNativePlatform()`)
-- **Verify**: Importing it in web mode doesn't throw; on Android device, button press triggers vibration
-
-### T16 — useAudio
-- Exposes `playSfx(key)`, `playBgm()`, `stopBgm()`, `toggleMute()`
-- Howler instances pooled (one `Howl` per SFX file loaded once)
-- BGM loops at -14 LUFS, fades in 2s, fades out on `requestNewGame`
-- Respects `prefers-reduced-motion` → half volume
-- **Verify**: Play/pause BGM without clicks; rapid SFX triggers don't stack beyond 3 voices
-
-### T17 — Panel reveal choreography
-- Landing → in-game is one continuous Motion transition (not a swap)
-- CrystalField briefly pulses extra shards at panel center on BEGIN
-- **Verify**: Video capture shows no flash/pop between screens
-
-### T18 — Directional transitions
-- North → output container slides from top, 200ms ease-out
-- South → slides from bottom; east/west from sides; up/down with scale
-- **Verify**: Each direction verb triggers the matching choreography in the browser
-
-### T19 — Rhetorical chrome
-- Panel data-attribute `data-rhetoric={type}` drives CSS variants:
-  - premise/conclusion/definition: calm default
-  - fallacy: panel corner lines jitter 4-6Hz
-  - circular: orbiting dot and rotating ray have locked angular velocity (visually stationary relative to each other)
-  - meta: second outline ring appears behind the panel, 4px offset
-- **Verify**: Navigating into each room type visibly changes the chrome
-
-### T20 — Spell-cast verb feedback
-- ACCEPT in circular/meta room → CrystalField shatter-inward burst (40 shards aimed at panel center) + text fade+reform
-- REJECT → panel chrome flashes pink 100ms
-- TRACE → panel outputs reverse in-place before reveal of new room
-- **Verify**: Completing the circle produces the shatter; visible in a screen recording
-
-### T21 — BGM encoding
-- `public/audio/bgm.ogg` exists, **full-length** (no trimming, no loop editing)
-- Source: `/Volumes/home/assets/Audio/Music/Clement Panchout _ I want to believe _ 2004.wav`
-- Encoded: `ffmpeg -i "<source.wav>" -c:a libvorbis -q:a 5 public/audio/bgm.ogg`
-- Duration matches source within ±50ms; bundle size is not a gating concern here
-- Looping is Howler's job at runtime (`{ loop: true }`); do not pre-concatenate
-- **Verify**: `ffprobe -i public/audio/bgm.ogg` reports Vorbis codec and duration within 50ms of the source; Howler plays it without console errors
-
-### T22 — SFX curation
-- `public/audio/sfx/` contains: `click.ogg`, `press.ogg`, `confirm.ogg`, `back.ogg`, `deny.ogg`, `reveal.ogg`, `glass.ogg`, `glitch.ogg`, `forcefield.ogg`, `compute.ogg` — exact mapping in T23
-- All files ≤ 50KB each (ogg Vorbis)
-- **Verify**: `ls public/audio/sfx/ | wc -l` ≥ 10
-
-### T23 — Audio manifest
-- `src/lib/audio-manifest.ts` exports typed `SFX_MANIFEST` mapping semantic event → asset URL
-- Event keys: `ui.press`, `ui.release`, `ui.confirm`, `ui.deny`, `ui.back`, `rhetoric.accept`, `rhetoric.reject`, `rhetoric.question`, `rhetoric.trace`, `rhetoric.examine`, `room.enter.premise`, `room.enter.fallacy`, `room.enter.circular`, `room.enter.meta`, `circle.closed`
-- **Verify**: TypeScript typecheck passes; every key maps to a file that exists under `public/audio/sfx/`
-
-### T24 — Howler bus wiring
-- `useAudio` hook subscribes to game events
-- First user gesture (BEGIN click) starts BGM + resumes AudioContext
-- Every `submitCommand` invocation triggers the right SFX from the manifest
-- Room transitions trigger `room.enter.<type>`
-- Circle-closing accept triggers `circle.closed`
-- **Verify**: Manual: play a full game with headphones, every keypress and room entry has audio feedback
-
-### T25 — Remove Tone
-- `tone` removed from `package.json`
-- `src/world/systems/AudioSystem.ts` deleted; its consumers rewired to `useAudio`
-- `@/world` barrel no longer exports audio functions
-- **Verify**: `grep -r "from \"tone\"" src/` returns empty; tests pass
-
-### T26 — Surrealist corpus
-- `scripts/build-corpus.ts` extended with a second source: `scripts/sources/surrealist-fragments.ts` containing public-domain quotes (ensure each quote has a `{source, year, publicDomain: true}` field)
-- Fragments POS-tagged and syllable-counted via RiTa
-- Emitted to `src/content/generated/surrealist.ts` alongside the existing corpus
-- **Verify**: `pnpm build-corpus` regenerates; `src/content/generated/surrealist.ts` has ≥ 20 fragments with POS tags
-
-### T27 — Chaining engine
-- `src/content/chaining.ts` exports `chainDescription(seed, roomId, visitCount)` returning a string
-- Uses a seeded Markov/template chainer over the surrealist corpus + the canonical rhetorical terms
-- Same (seed, roomId, visitCount) always produces the same output (deterministic)
-- Different visitCount for same (seed, roomId) produces different (but consistent) outputs
-- **Verify**: Unit test asserts reproducibility and variation
-
-### T28 — Thread chainer through describeRoom
-- `describeRoom(room, visitCount?)` returns either the base description or a chained one depending on visitCount
-- `useGameEngine` tracks per-room visit counts and passes through
-- **Verify**: Revisiting a room in a playthrough produces different output than the first visit
-
-### T29 — Capacitor deps
-- `package.json` has `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`, `@capacitor/haptics`, `@capacitor/status-bar`, `@capacitor/splash-screen`
-- **Verify**: `pnpm install` succeeds
-
-### T30 — Capacitor scaffolds
-- `capacitor.config.ts` at repo root with `appId: "com.arcadecabinet.petitioprincipii"`, `appName: "Petitio Principii"`, `webDir: "dist"`
-- `android/` directory created by `npx cap add android`
-- iOS may be scaffolded later (macOS-only concern, defer if iOS SDK absent)
-- **Verify**: `npx cap doctor` passes for android
-
-### T31 — Dynamic Vite base
-- `vite.config.ts`: `base: process.env.CAPACITOR === "true" ? "./" : process.env.GITHUB_PAGES === "true" ? "/petitio-principii/" : "/"`
-- **Verify**: `CAPACITOR=true pnpm build` produces a `dist/index.html` with relative asset paths
-
-### T32 — Safe-area audit
-- All fixed-position elements use `env(safe-area-inset-*)` padding
-- Test on iPhone notch simulation (Chrome DevTools device mode)
-- **Verify**: No UI elements clipped by notch/home indicator
-
-### T33 — Status bar + splash
-- Capacitor `StatusBar` configured to `Style.Dark` with background `#05010a`
-- Splash screen background `#05010a`, logo Petitio Principii in Yesteryear, 2s auto-hide
-- **Verify**: Built Android APK shows the splash and ink-colored status bar
-
-### T34-T35 — Docs refresh
-- `docs/STATE.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN.md`, `docs/TESTING.md`, `STANDARDS.md`, `docs/agentic/agent-workflows.md`, `README.md` all reference React + Tailwind 4 + shadcn + Capacitor + Howler
-- No remaining references to Solid, Phaser, RetroZone, Tone
-- All frontmatter `updated:` bumped to today's date
-- **Verify**: `grep -ri "SolidJS\|Phaser\|RetroZone\|tone\.js" docs/ STANDARDS.md README.md` returns empty
-
-### T36 — CI green
-- `pnpm verify` runs check → typecheck → test → build all green
-- **Verify**: GitHub Actions run on this branch reports success
-
-### T37 — Android APK in CI
-- `ci.yml` adds a job using `setup-java@v4` Temurin 21, `setup-android@v3`, `npx cap sync android`, `cd android && ./gradlew assembleDebug`
-- APK uploaded as artifact
-- **Verify**: CI artifact download contains `app-debug.apk`
-
-### T38 — Engine tests preserved
-- All 42+ existing tests under `src/engine/`, `src/world/`, `src/content/`, `scripts/` still pass unchanged
-- **Verify**: `pnpm test` shows 42+ tests passing
-
-### T39 — Component test rewrite
-- `src/features/terminal/__tests__/TerminalDisplay.test.tsx` uses `@testing-library/react`
-- Asserts: renders output lines, header title visible, keyboard and keycap both trigger onCommand, direction key disabled when no exit
-- **Verify**: Test passes
-
-### T40 — Playwright E2E
-- `tests/e2e/smoke.spec.ts` — boots the app, enters a custom seed, walks 6 rooms, accepts in a circular room, confirms "Petitio Principii" win text
-- Runs headless Chromium, completes in < 30s
-- **Verify**: `pnpm test:e2e` passes
-
-## Technical Notes
-
-- **Audio licensing**: confirm Clement Panchout tracks are licensed for use in this project; keep the license text alongside the encoded asset. Kenney UI packs (UI Audio, Interface Sounds, Sci-Fi Sounds) are CC0 per their `License.txt` — no issues.
-- **BGM loop seam**: `I want to believe` may not loop cleanly; run a 500ms crossfade at Howler level or pre-edit the tail in ffmpeg if audible.
-- **RiTa surrealist corpus**: ensure every fragment is explicitly public domain (pre-1929 US for safety); include source attribution in the generated file.
-- **Motion library**: using `motion` (formerly Framer Motion) for React. Alternative considered: `@motionone/react` — lighter but less composable. Go with `motion` unless bundle size forces a rethink.
-- **shadcn CLI**: we're not running `npx shadcn init` because we don't need most primitives; `components.json` is hand-written to signal the convention and enable future `shadcn add` calls.
-- **Capacitor web fallback**: the game must still work as a pure web deploy (GitHub Pages). All Capacitor APIs go through a thin wrapper that detects `Capacitor.isNativePlatform()` and no-ops on web.
+- iOS app submission (needs macOS + Xcode)
+- Save/restore beyond "seeds as the save file" (seeds + action log → full replay)
+- Multiplayer / social
+- Localization
+- Telemetry
+- Surrealist corpus v2 — richer tagging, rhyme/meter-aware grammar picks
+- Custom Yuka `SteeringBehavior` for an AI "opponent agent" that plays alongside the player (far future)
 
 ## Risks
 
-- **BGM loop seam on the full-length track** — "I want to believe" was composed as a piece, not an infinite loop, so Howler's `{ loop: true }` may produce an audible seam at the tail → head boundary. If it's jarring, handle at runtime (Howler's `fade` on `onend` to crossfade into a second `Howl` instance of the same file) rather than re-cutting the asset.
-- **Playwright in CI with Capacitor** — the E2E test targets web only; Capacitor builds are separate CI matrix rows.
-- **iOS scaffolding needs Xcode** — defer T30's iOS half until someone has a Mac with Xcode; Android covers the MVP.
-- **Surrealist chaining quality** — early chains may read as noise not surrealism; expect iteration. Keep a fallback to the hand-authored descriptions when chainer output scores below a legibility threshold.
-- **Reduced motion** — full rhetorical chrome may violate accessibility if not gated. Every motion primitive must check `prefers-reduced-motion` and degrade gracefully.
-
-## Out of scope (follow-ups)
-
-- iOS App Store submission
-- Multiplayer / social (not in brief)
-- Save/restore state (implicit; seeds are the save file)
-- Localization
-- Analytics / telemetry
+- **Tracery rng is process-global** — every `flatten()` must be wrapped in `withSeededRng`, including inside the agent and chainer. Missing one breaks determinism. The T52 audit test catches this.
+- **Grammar size** — 24 room grammars + 12 agent grammars + incantation might balloon the bundle. Keep each grammar small; rely on fragment pooling, not per-grammar inlining.
+- **Past drawer on mobile** — if the tap-to-expand UX is awkward, pivot to swipe-down-to-reveal. T48 acceptance lets us iterate.
+- **Hint priority edge cases** — a player who does three things in quick succession might see three hints consecutively. The 6s fade + queueing should handle this, but watch for noise in playtest.
