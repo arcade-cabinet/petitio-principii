@@ -1,5 +1,6 @@
 import type { RhetoricalType } from "@/content";
 import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * ArgumentMap — the visible geometry of the player's walk through the argument.
@@ -121,23 +122,18 @@ export function ArgumentMap({ visited, currentRoomId, circleClosed, className }:
           strokeOpacity={0.5}
         />
 
-        {/* Closing edge — drawn first so the nodes sit on top */}
+        {/* Closing edge — drawn first so the nodes sit on top.
+            Animates `stroke-dashoffset` from the path's length to 0 over
+            900ms when `circleClosed` flips true (T66). The animation
+            is honoured only when the user hasn't requested reduced motion;
+            otherwise the path appears instantly. */}
         {circleClosed && first && last && first.roomId !== last.roomId && (
-          <g data-testid="argument-map-closing-edge">
-            <path
-              d={`M ${PADDING_X + (last.ordinal - 1) * NODE_SPACING} ${cy}
+          <ClosingEdge
+            d={`M ${PADDING_X + (last.ordinal - 1) * NODE_SPACING} ${cy}
                   C ${width / 2} ${cy - ROW_HEIGHT * 0.6},
                     ${width / 2} ${cy - ROW_HEIGHT * 0.6},
                     ${PADDING_X + (first.ordinal - 1) * NODE_SPACING} ${cy}`}
-              stroke="var(--color-pink)"
-              strokeWidth={1.5}
-              fill="none"
-              strokeOpacity={0.9}
-              style={{
-                filter: "drop-shadow(0 0 4px var(--color-pink))",
-              }}
-            />
-          </g>
+          />
         )}
 
         {/* Segments connecting sequential visits */}
@@ -215,5 +211,56 @@ export function ArgumentMap({ visited, currentRoomId, circleClosed, className }:
         })}
       </svg>
     </div>
+  );
+}
+
+/**
+ * ClosingEdge — animated SVG path that draws itself in over 900ms via
+ * stroke-dashoffset. Honours `prefers-reduced-motion`: when set, the
+ * path appears instantly with no transition.
+ *
+ * Implementation: measure the path's total length on mount, set
+ * stroke-dasharray = length, stroke-dashoffset starts at length and
+ * transitions to 0 on the next frame. CSS handles the animation; React
+ * just toggles the offset value via state.
+ */
+function ClosingEdge({ d }: { readonly d: string }) {
+  const ref = useRef<SVGPathElement>(null);
+  const [length, setLength] = useState<number | null>(null);
+  const [drawn, setDrawn] = useState(false);
+  const reducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const len = node.getTotalLength();
+    setLength(len);
+    // Trigger the transition on the next frame so the initial dashoffset
+    // is committed first. requestAnimationFrame keeps it deterministic.
+    const id = requestAnimationFrame(() => setDrawn(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  return (
+    <g data-testid="argument-map-closing-edge">
+      <path
+        ref={ref}
+        d={d}
+        stroke="var(--color-pink)"
+        strokeWidth={1.5}
+        fill="none"
+        strokeOpacity={0.9}
+        strokeDasharray={length ?? undefined}
+        strokeDashoffset={reducedMotion || drawn || length === null ? 0 : length}
+        style={{
+          filter: "drop-shadow(0 0 4px var(--color-pink))",
+          transition: reducedMotion ? "none" : "stroke-dashoffset 900ms ease-out",
+        }}
+        data-testid="argument-map-closing-edge-path"
+        data-drawn={drawn ? "true" : "false"}
+      />
+    </g>
   );
 }

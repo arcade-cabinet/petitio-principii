@@ -19,6 +19,7 @@ import {
   MoveDiagonal,
   RotateCcw,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
@@ -275,18 +276,36 @@ export function TerminalDisplay({
           aria-atomic="true"
           data-testid="present-zone"
         >
-          {currentRoom && (
-            <div
-              className="pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
-              style={{
-                textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
-              }}
-            >
-              {currentRoom.title}
-            </div>
-          )}
+          {/* Room title — crossfade on movement (T66, 300ms). The
+              AnimatePresence wraps a single keyed motion.div so each new
+              room's title fades in while the previous one fades out.
+              prefers-reduced-motion is respected automatically by Motion. */}
+          <AnimatePresence mode="wait">
+            {currentRoom && (
+              <motion.div
+                key={currentRoom.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
+                style={{
+                  textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
+                }}
+                data-testid="present-room-title"
+              >
+                {currentRoom.title}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {/* Present body — crossfade on new turn (T66, 180ms). Keyed by
+              the present turnId so a new turn replaces, not appends. */}
           {present && (
-            <div
+            <motion.div
+              key={`turn-${present.turnId}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
               className={`
                 font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
                 leading-[1.55] text-[var(--color-silver)]
@@ -323,7 +342,7 @@ export function TerminalDisplay({
                   </div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
           {/* Active onboarding hint — fades in/out via Motion One. T63. */}
           <HintLine hint={state.activeHint} onDismiss={onHintDismiss} />
