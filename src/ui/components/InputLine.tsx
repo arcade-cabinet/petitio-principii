@@ -1,36 +1,38 @@
-import { type KeyboardEvent, useState } from "react";
+import { createSignal } from "solid-js";
+import type { Component } from "solid-js";
 
 interface InputLineProps {
   onSubmit: (value: string) => void;
   disabled?: boolean;
 }
 
-export function InputLine({ onSubmit, disabled = false }: InputLineProps) {
-  const [value, setValue] = useState("");
+export const InputLine: Component<InputLineProps> = (props) => {
+  const [value, setValue] = createSignal("");
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" && value.trim()) {
-      onSubmit(value.trim());
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === "Enter" && value().trim()) {
+      props.onSubmit(value().trim());
       setValue("");
     }
   }
 
   return (
-    <div className="input-line">
-      <span className="prompt-symbol">{">"}</span>
+    <div class="input-line">
+      <span class="prompt-symbol">{">"}</span>
       <input
-        className="terminal-input"
+        class="terminal-input"
         type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
+        value={value()}
+        onInput={(e) => setValue(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
-        disabled={disabled}
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
+        disabled={props.disabled ?? false}
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck={false}
         aria-label="Command input"
+        autofocus
       />
-      <span className="cursor-blink" aria-hidden="true" />
+      <span class="cursor-blink" aria-hidden="true" />
     </div>
   );
-}
+};

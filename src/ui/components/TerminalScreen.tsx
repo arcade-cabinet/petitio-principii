@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { createEffect, For } from "solid-js";
+import type { Component } from "solid-js";
 import { InputLine } from "./InputLine";
 import { TextLine } from "./TextLine";
 
@@ -8,42 +9,38 @@ interface TerminalScreenProps {
   onNewGame: () => void;
 }
 
-export function TerminalScreen({ lines, onCommand, onNewGame }: TerminalScreenProps) {
-  const outputRef = useRef<HTMLDivElement>(null);
+export const TerminalScreen: Component<TerminalScreenProps> = (props) => {
+  let outputRef!: HTMLDivElement;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom when lines change; outputRef.current is not a reactive value
-  useEffect(() => {
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight;
-    }
-  }, [lines]);
+  createEffect(() => {
+    // Track props.lines so the effect re-runs whenever lines change
+    void props.lines;
+    if (outputRef) outputRef.scrollTop = outputRef.scrollHeight;
+  });
 
   function handleCommand(input: string) {
     if (input.toLowerCase() === "new game" || input.toLowerCase() === "new") {
-      onNewGame();
+      props.onNewGame();
       return;
     }
-    onCommand(input);
+    props.onCommand(input);
   }
 
   return (
-    <div className="terminal-wrapper">
-      <div className="terminal-panel crt-effect">
-        <div className="terminal-header">
-          <span className="terminal-title">PETITIO PRINCIPII</span>
-          <button className="new-game-btn" onClick={onNewGame} type="button">
+    <div class="terminal-wrapper">
+      <div class="terminal-panel crt-effect">
+        <div class="terminal-header">
+          <span class="terminal-title">PETITIO PRINCIPII</span>
+          <button class="new-game-btn" onClick={props.onNewGame} type="button">
             NEW GAME
           </button>
         </div>
-        <div className="terminal-output" ref={outputRef}>
-          <div className="scanlines" aria-hidden="true" />
-          {lines.map((line, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: terminal lines have no stable IDs
-            <TextLine key={i} text={line} />
-          ))}
+        <div class="terminal-output" ref={outputRef}>
+          <div class="scanlines" aria-hidden="true" />
+          <For each={props.lines}>{(line) => <TextLine text={line} />}</For>
         </div>
         <InputLine onSubmit={handleCommand} />
       </div>
     </div>
   );
-}
+};

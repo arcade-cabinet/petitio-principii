@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      retrozone:
+        specifier: github:TheMarco/retrozone
+        version: https://codeload.github.com/TheMarco/retrozone/tar.gz/b7bc446e6f8419d1022bfc2dddd9d38a114f7c56(phaser@4.0.0)
       solid-js:
         specifier: ^1.9.12
         version: 1.9.12
@@ -670,6 +673,15 @@ packages:
   postcss@8.5.10:
     resolution: {integrity: sha512-pMMHxBOZKFU6HgAZ4eyGnwXF/EvPGGqUr0MnZ5+99485wwW41kW91A4LOGxSHhgugZmSChL5AlElNdwlNgcnLQ==}
     engines: {node: ^10 || ^12 || >=14}
+
+  retrozone@https://codeload.github.com/TheMarco/retrozone/tar.gz/b7bc446e6f8419d1022bfc2dddd9d38a114f7c56:
+    resolution: {tarball: https://codeload.github.com/TheMarco/retrozone/tar.gz/b7bc446e6f8419d1022bfc2dddd9d38a114f7c56}
+    version: 1.0.0
+    peerDependencies:
+      phaser: '>=3.60.0'
+    peerDependenciesMeta:
+      phaser:
+        optional: true
 
   rollup@4.60.2:
     resolution: {integrity: sha512-J9qZyW++QK/09NyN/zeO0dG/1GdGfyp9lV8ajHnRVLfo/uFsbji5mHnDgn/qYdUHyCkM2N+8VyspgZclfAh0eQ==}
@@ -1349,6 +1361,10 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  retrozone@https://codeload.github.com/TheMarco/retrozone/tar.gz/b7bc446e6f8419d1022bfc2dddd9d38a114f7c56(phaser@4.0.0):
+    optionalDependencies:
+      phaser: 4.0.0
 
   rollup@4.60.2:
     dependencies:

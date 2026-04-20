@@ -1,17 +1,21 @@
+import type { Component } from "solid-js";
+
 interface TextLineProps {
   text: string;
-  className?: string;
+  class?: string;
 }
 
-export function TextLine({ text, className = "" }: TextLineProps) {
-  if (text === "") {
-    return <div className={`text-line empty ${className}`}>&nbsp;</div>;
+export const TextLine: Component<TextLineProps> = (props) => {
+  const extra = () => props.class ?? "";
+
+  if (props.text === "") {
+    return <div class={`text-line empty ${extra()}`}>&nbsp;</div>;
   }
-  if (text.startsWith("---") && text.endsWith("---")) {
-    return <div className={`text-line room-title ${className}`}>{text}</div>;
+  if (props.text.startsWith("---") && props.text.endsWith("---")) {
+    return <div class={`text-line room-title ${extra()}`}>{props.text}</div>;
   }
-  if (text.startsWith(">")) {
-    return <div className={`text-line user-input ${className}`}>{text}</div>;
+  if (props.text.startsWith(">")) {
+    return <div class={`text-line user-input ${extra()}`}>{props.text}</div>;
   }
-  return <div className={`text-line ${className}`}>{text}</div>;
-}
+  return <div class={`text-line ${extra()}`}>{props.text}</div>;
+};

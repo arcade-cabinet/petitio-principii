@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Show, createMemo, createSignal } from "solid-js";
+import type { Component } from "solid-js";
 import { generatePhrase } from "../../engine/core/NarrativeGenerator";
 import { generateSeed } from "../../engine/prng/seedRandom";
 
@@ -6,12 +7,12 @@ interface ModalNewGameProps {
   onStart: (seed: number) => void;
 }
 
-export function ModalNewGame({ onStart }: ModalNewGameProps) {
-  const [seed, setSeed] = useState<number>(() => generateSeed());
-  const [customSeedInput, setCustomSeedInput] = useState("");
-  const [showCustomSeed, setShowCustomSeed] = useState(false);
+export const ModalNewGame: Component<ModalNewGameProps> = (props) => {
+  const [seed, setSeed] = createSignal<number>(generateSeed());
+  const [customSeedInput, setCustomSeedInput] = createSignal("");
+  const [showCustomSeed, setShowCustomSeed] = createSignal(false);
 
-  const phrase = generatePhrase(seed);
+  const phrase = createMemo(() => generatePhrase(seed()));
 
   function handleRegenerate() {
     setSeed(generateSeed());
@@ -20,7 +21,7 @@ export function ModalNewGame({ onStart }: ModalNewGameProps) {
   }
 
   function handleCustomSeedSubmit() {
-    const parsed = Number.parseInt(customSeedInput, 10);
+    const parsed = Number.parseInt(customSeedInput(), 10);
     if (!Number.isNaN(parsed)) {
       setSeed(parsed >>> 0);
       setShowCustomSeed(false);
@@ -28,58 +29,54 @@ export function ModalNewGame({ onStart }: ModalNewGameProps) {
     }
   }
 
-  function handleStart() {
-    onStart(seed);
-  }
-
   return (
-    <div className="modal-overlay">
+    <div class="modal-overlay">
       {/* biome-ignore lint/a11y/useSemanticElements: custom overlay requires div wrapper for backdrop */}
-      <div className="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h1 id="modal-title" className="modal-title">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h1 id="modal-title" class="modal-title">
           PETITIO PRINCIPII
         </h1>
-        <p className="modal-subtitle">A text adventure through a self-justifying argument.</p>
+        <p class="modal-subtitle">A text adventure through a self-justifying argument.</p>
 
-        <div className="modal-seed-section">
-          <div className="modal-phrase">{phrase}</div>
-          <div className="modal-seed-label">
-            Seed: <span className="modal-seed-value">{seed}</span>
+        <div class="modal-seed-section">
+          <div class="modal-phrase">{phrase()}</div>
+          <div class="modal-seed-label">
+            Seed: <span class="modal-seed-value">{seed()}</span>
           </div>
         </div>
 
-        <div className="modal-actions">
-          <button className="modal-btn primary" onClick={handleStart} type="button">
+        <div class="modal-actions">
+          <button class="modal-btn primary" onClick={() => props.onStart(seed())} type="button">
             BEGIN ARGUMENT
           </button>
-          <button className="modal-btn secondary" onClick={handleRegenerate} type="button">
+          <button class="modal-btn secondary" onClick={handleRegenerate} type="button">
             REGENERATE
           </button>
           <button
-            className="modal-btn tertiary"
-            onClick={() => setShowCustomSeed(!showCustomSeed)}
+            class="modal-btn tertiary"
+            onClick={() => setShowCustomSeed(!showCustomSeed())}
             type="button"
           >
             CUSTOM SEED
           </button>
         </div>
 
-        {showCustomSeed && (
-          <div className="modal-custom-seed">
+        <Show when={showCustomSeed()}>
+          <div class="modal-custom-seed">
             <input
               type="number"
-              className="seed-input"
-              value={customSeedInput}
-              onChange={(e) => setCustomSeedInput(e.target.value)}
+              class="seed-input"
+              value={customSeedInput()}
+              onInput={(e) => setCustomSeedInput(e.currentTarget.value)}
               placeholder="Enter numeric seed..."
               aria-label="Custom seed input"
             />
-            <button className="modal-btn secondary" onClick={handleCustomSeedSubmit} type="button">
+            <button class="modal-btn secondary" onClick={handleCustomSeedSubmit} type="button">
               APPLY
             </button>
           </div>
-        )}
+        </Show>
       </div>
     </div>
   );
-}
+};

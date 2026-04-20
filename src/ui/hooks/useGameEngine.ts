@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { createSignal } from "solid-js";
 import { generateArgumentGraph } from "../../engine/core/ArgumentGraph";
 import type { GameState } from "../../engine/core/GameState";
 import { createInitialGameState } from "../../engine/core/GameState";
@@ -6,16 +6,20 @@ import { describeRoom, generatePhrase, getHelpText } from "../../engine/core/Nar
 import { parseCommand } from "../../engine/core/Parser";
 import type { Direction } from "../../engine/core/Room";
 
-export interface GameEngineHook {
-  gameState: GameState;
+export interface GameEngineResult {
+  gameState: () => GameState;
   startGame: (seed: number) => void;
   submitCommand: (input: string) => void;
 }
 
-export function useGameEngine(): GameEngineHook {
-  const [gameState, setGameState] = useState<GameState>(createInitialGameState);
+/**
+ * SolidJS-native game engine primitive.
+ * Returns a signal getter `gameState()` so consumers track reactivity correctly.
+ */
+export function createGameEngine(): GameEngineResult {
+  const [gameState, setGameState] = createSignal<GameState>(createInitialGameState());
 
-  const startGame = useCallback((seed: number) => {
+  function startGame(seed: number): void {
     const graph = generateArgumentGraph(seed);
     const phrase = generatePhrase(seed);
     const startRoom = graph.rooms.get(graph.startRoomId);
@@ -40,9 +44,9 @@ export function useGameEngine(): GameEngineHook {
       started: true,
       phrase,
     });
-  }, []);
+  }
 
-  const submitCommand = useCallback((input: string) => {
+  function submitCommand(input: string): void {
     if (!input.trim()) return;
 
     setGameState((prev) => {
@@ -73,11 +77,10 @@ export function useGameEngine(): GameEngineHook {
         if (exit) {
           const nextRoom = prev.rooms.get(exit.targetRoomId);
           if (nextRoom) {
-            const description = describeRoom(nextRoom);
             return {
               ...prev,
               currentRoomId: exit.targetRoomId,
-              output: [...newOutput, `You move ${dir}.`, "", ...description],
+              output: [...newOutput, `You move ${dir}.`, "", ...describeRoom(nextRoom)],
               turnCount: prev.turnCount + 1,
             };
           }
@@ -101,12 +104,8 @@ export function useGameEngine(): GameEngineHook {
           };
         }
         case "examine": {
-          const examinedRoom = {
-            ...currentRoom,
-            examined: true,
-          };
           const newRooms = new Map(prev.rooms);
-          newRooms.set(currentRoom.id, examinedRoom);
+          newRooms.set(currentRoom.id, { ...currentRoom, examined: true });
           return {
             ...prev,
             rooms: newRooms,
@@ -115,7 +114,13 @@ export function useGameEngine(): GameEngineHook {
               `You examine the ${currentRoom.title} more closely.`,
               currentRoom.description,
               "",
-              `This is a ${currentRoom.rhetoricalType} space. The argument pauses here to ${currentRoom.rhetoricalType === "premise" ? "assert something as given" : currentRoom.rhetoricalType === "conclusion" ? "draw a conclusion" : "make its case"}.`,
+              `This is a ${currentRoom.rhetoricalType} space. The argument pauses here to ${
+                currentRoom.rhetoricalType === "premise"
+                  ? "assert something as given"
+                  : currentRoom.rhetoricalType === "conclusion"
+                    ? "draw a conclusion"
+                    : "make its case"
+              }.`,
             ],
             turnCount: prev.turnCount + 1,
           };
@@ -218,10 +223,7 @@ export function useGameEngine(): GameEngineHook {
           };
         }
         case "new": {
-          return {
-            ...prev,
-            output: [...newOutput, "Starting a new game..."],
-          };
+          return { ...prev, output: [...newOutput, "Starting a new game..."] };
         }
         default: {
           return {
@@ -235,7 +237,7 @@ export function useGameEngine(): GameEngineHook {
         }
       }
     });
-  }, []);
+  }
 
   return { gameState, startGame, submitCommand };
 }

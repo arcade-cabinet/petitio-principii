@@ -22,6 +22,7 @@
     "vitest": "^2.1.5"
   },
   "dependencies": {
+    "retrozone": "github:TheMarco/retrozone",
     "solid-js": "^1.9.12"
   }
 }
