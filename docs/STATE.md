@@ -20,12 +20,12 @@ Snapshot of what's shipped, what's in progress, and what's next. Bump `updated` 
 - `terminal` layer: SolidJS `TerminalScreen`, `InputLine`, `TextLine`, `ModalNewGame`, `StarfieldBackground`, composables (`createGameEngine`, `createTypewriterEffect`)
 - CI mirrors local via `pnpm verify` — single command, no drift
 - Governance: Biome (formatter + linter + import-sort), pinned pnpm, pinned GitHub Actions SHAs
+- Build-time RiTa pipeline (`scripts/build-corpus.ts`): validates every lexicon entry's part-of-speech, computes plurals and syllable counts, and emits a frozen `src/content/generated/corpus.ts` re-exported from `@/content` as `GENERATED_CORPUS`. Runs via `pnpm build-corpus` (also wired as `prebuild`); stale output is caught by `pnpm verify-corpus` diffing the artifact. Runtime never imports `rita`.
 
 ## In progress
 
 - Wire `world` into `createGameEngine` so audio actually plays on room transition
 - Connect TRACE command to Yuka Dijkstra pathfinding
-- Build-time RiTa pipeline: lint lexicon entries for POS/pluralization, emit frozen corpus under `src/content/generated/`
 
 ## Next up
 

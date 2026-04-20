@@ -8,3 +8,9 @@ export { LOCAL_CORPUS, type FallacyEntry } from "./corpus/localCorpus";
 export { fetchPhilosophyEntry, type PhilosophyEntry } from "./corpus/philosophyApiClient";
 export { fetchFallacyArticle, type WikipediaArticle } from "./corpus/wikipediaClient";
 export { createGrammar, generateAbsurdArgument, type GeneratedNarrative } from "./grammar";
+export {
+  GENERATED_CORPUS,
+  type GeneratedAdjective,
+  type GeneratedCorpus,
+  type GeneratedNoun,
+} from "./generated/corpus";

@@ -8,7 +8,7 @@ export const NOUNS: readonly string[] = [
   "inference",
   "paradox",
   "assertion",
-  "postulate",
+  "maxim",
   "theorem",
   "lemma",
   "corollary",

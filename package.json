@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "build-corpus": "tsx scripts/build-corpus.ts",
+    "verify-corpus": "tsx scripts/build-corpus.ts && git diff --exit-code -- src/content/generated/corpus.ts",
+    "prebuild": "pnpm build-corpus",
     "build": "pnpm typecheck && vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -25,8 +28,8 @@
     "@vitest/browser": "^4.1.4",
     "@vitest/browser-playwright": "^4.1.4",
     "jsdom": "^29.0.2",
-    "phaser": "^4.0.0",
     "playwright": "^1.59.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.6.3",
     "vite": "^8.0.9",
     "vite-plugin-solid": "^2.11.12",
@@ -34,7 +37,6 @@
   },
   "dependencies": {
     "koota": "^0.6.6",
-    "retrozone": "github:TheMarco/retrozone",
     "rita": "^3.2.11",
     "solid-js": "^1.9.12",
     "tone": "^15.1.22",
