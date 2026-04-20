@@ -58,3 +58,40 @@ export const OutputLine = trait({
   kind: "narration" as "narration" | "echo" | "title" | "spacer",
   text: "",
 });
+
+/**
+ * Per-room tallies of rhetorical acts. Counter traits on the Room entity
+ * itself — incremented each time the player performs the corresponding
+ * verb in that room. The argument agent reads these (projected through
+ * `readArgumentMemory`) to decide how to narrate.
+ *
+ * Counters rather than tags because a room may be questioned twice, and
+ * "the room trembles slightly more the second time" is a story we want
+ * to be able to tell later.
+ */
+export const WasAccepted = trait({ count: 0 });
+export const WasRejected = trait({ count: 0 });
+export const WasQuestioned = trait({ count: 0 });
+
+/**
+ * Visit ordinal stamped on a room entity the first time the player enters
+ * it. Zero means "not visited." Non-zero values form the argument-map
+ * geometry: "the shape of the argument as remembered."
+ *
+ * We record the *first* arrival only — the map cares about turn order of
+ * first contact, not revisit counts. Revisits live in the transcript and
+ * the per-verb counters above.
+ */
+export const Visited = trait({
+  ordinal: 0,
+});
+
+/**
+ * Tag trait: the circle has closed. Set when the player ACCEPTs in a
+ * circular or meta room — the moment when `petitio principii` stops being
+ * a thing happening *in* the game and becomes the shape *of* the game.
+ *
+ * One-shot: once set, it persists until a new world is built. The
+ * ArgumentMap reads this to draw the closing edge in bright pink.
+ */
+export const CircleClosed = trait();

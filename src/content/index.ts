@@ -14,3 +14,14 @@ export {
   type GeneratedCorpus,
   type GeneratedNoun,
 } from "./generated/corpus";
+export {
+  SURREALIST_CORPUS,
+  type GeneratedSurrealistCorpus,
+  type GeneratedSurrealistFragment,
+  type TaggedWord,
+} from "./generated/surrealist";
+export {
+  chainDescription,
+  type ChainingMemory,
+  type ChainingOptions,
+} from "./chaining";
