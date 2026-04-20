@@ -14,7 +14,6 @@ import {
 } from "./traits";
 
 export * from "./traits";
-export { disposeAudio, initAudio, updateAudio } from "./systems/AudioSystem";
 export {
   buildRhetoricalGraph,
   shortestRhetoricalPath,
