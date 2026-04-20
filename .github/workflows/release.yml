@@ -31,6 +31,11 @@ jobs:
         id: release
         uses: googleapis/release-please-action@db8f2c60ee802b3748b512940dde88eabd7b7e01 # v4.3.0
         with:
+          # v4 requires release-type at the action level even when using a
+          # manifest/config file. `node` matches this project's release-please-
+          # config.json which specifies package-name=petitio-principii and
+          # uses npm-style version bumping.
+          release-type: node
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
