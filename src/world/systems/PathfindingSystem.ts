@@ -1,3 +1,5 @@
+import { pathCostFor } from "@/config";
+import type { RhetoricalType } from "@/content";
 import type { World } from "koota";
 import { Dijkstra, Edge, Graph, Node } from "yuka";
 import { IsRoom, RhetoricalSpace, RoomId } from "../traits";
@@ -18,16 +20,8 @@ export interface RhetoricalPath {
   found: boolean;
 }
 
-const RHETORICAL_COST: Record<string, number> = {
-  premise: 1.0,
-  conclusion: 1.0,
-  definition: 0.9,
-  analogy: 1.1,
-  objection: 1.3,
-  meta: 1.2,
-  fallacy: 0.5, // seductively cheap
-  circular: 0.3, // cheapest: it doesn't go anywhere
-};
+// Edge weights come from src/config/rhetoric.json via `pathCostFor`. The
+// attraction/repulsion model lives in that file — this module is just math.
 
 export function buildRhetoricalGraph(world: World): {
   graph: Graph<Node, Edge>;
@@ -67,7 +61,7 @@ export function wireEdges(
   graph: Graph<Node, Edge>,
   rooms: ReadonlyMap<
     string,
-    { id: string; exits: { targetRoomId: string }[]; rhetoricalType: string }
+    { id: string; exits: { targetRoomId: string }[]; rhetoricalType: RhetoricalType }
   >,
   indexByRoomId: ReadonlyMap<string, number>
 ): void {
@@ -78,7 +72,7 @@ export function wireEdges(
       const to = indexByRoomId.get(exit.targetRoomId);
       if (to === undefined || to === from) continue;
       const target = rooms.get(exit.targetRoomId);
-      const cost = target ? (RHETORICAL_COST[target.rhetoricalType] ?? 1.0) : 1.0;
+      const cost = target ? pathCostFor(target.rhetoricalType) : 1.0;
       graph.addEdge(new Edge(from, to, cost));
     }
   }

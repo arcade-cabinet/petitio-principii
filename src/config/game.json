@@ -1,0 +1,24 @@
+{
+  "$schema": "./game.schema.json",
+  "typewriter": {
+    "charsPerSecond": 30,
+    "enabled": true
+  },
+  "output": {
+    "maxLines": 1000
+  },
+  "argumentGraph": {
+    "startingRoomCount": 6,
+    "circularConnectionProbability": 0.3
+  },
+  "audio": {
+    "masterVolumeDefault": 0.6,
+    "masterVolumeReducedMotion": 0.25,
+    "bgmFadeInMs": 2000,
+    "bgmFadeOutMs": 800
+  },
+  "map": {
+    "nodeRadius": 4,
+    "nodeSpacing": 24
+  }
+}

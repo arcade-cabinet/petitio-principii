@@ -633,7 +633,7 @@ export const SURREALIST_CORPUS = {
       ],
     },
   ],
-  lastBuilt: "2026-04-20T20:56:35.138Z",
+  lastBuilt: "2026-04-20T21:00:26.045Z",
 } as const;
 
 export type GeneratedSurrealistCorpus = typeof SURREALIST_CORPUS;
