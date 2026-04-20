@@ -5,6 +5,7 @@ import { parseCommand } from "@/engine";
 import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
+import { useViewport } from "@/hooks/use-viewport";
 import type { WorldHandle } from "@/hooks/use-world";
 import { isCircleClosed } from "@/world";
 import {
@@ -17,7 +18,7 @@ import {
   MoveDiagonal,
   RotateCcw,
 } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * TerminalDisplay — the in-game view.
@@ -73,6 +74,18 @@ function groupByTurn(
 
 export function TerminalDisplay({ state, world, onCommand, onNewGame }: TerminalDisplayProps) {
   const pastRef = useRef<HTMLDivElement>(null);
+  const viewport = useViewport();
+  // PAST zone collapses on portrait by default; landscape always expanded.
+  // Local-only state — never persisted; opening the drawer is a deliberate
+  // act on the current screen, not a setting.
+  const [pastExpanded, setPastExpanded] = useState<boolean>(viewport === "landscape");
+
+  // When the viewport changes (rotation, browser resize), re-evaluate the
+  // default. Keeps the contract docs/UX.md §3 promises: portrait → collapsed,
+  // landscape → expanded, regardless of how the user got there.
+  useEffect(() => {
+    setPastExpanded(viewport === "landscape");
+  }, [viewport]);
 
   const currentRoom = useMemo(
     () => state.rooms.get(state.currentRoomId),
@@ -189,33 +202,61 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
         {/* Argument map — geometry of the walk so far. Always visible. */}
         <ArgumentMapOverlay state={state} world={world} />
 
-        {/* PAST zone — compacted turn summaries, scrollable, dim */}
+        {/* PAST zone — compacted turn summaries.
+            Portrait: collapsed-by-default header, tap to expand.
+            Landscape: always-visible scrollable rail.
+            Per docs/UX.md §1.1 + §3 (T62). */}
         {compactedPast.length > 0 && (
-          <div
-            ref={pastRef}
-            className={`
-              max-h-[30%] overflow-y-auto overflow-x-hidden
-              px-6 py-2 border-b border-[var(--color-panel-edge)]/30
-              font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3]
-              text-[var(--color-dim)]
-              [scrollbar-width:thin] [scrollbar-color:var(--color-panel-edge)_transparent]
-            `}
-            aria-label="Turn history"
-            data-testid="past-zone"
-          >
-            {compactedPast.map((c) => (
-              <div
-                key={c.turnId}
-                className="truncate"
-                title={c.full}
-                data-testid="past-entry"
-                data-turn-id={c.turnId}
+          <>
+            {/* Portrait-only collapse toggle. Always rendered in DOM (so
+                screen readers can navigate), hidden via CSS at landscape
+                breakpoints to keep the layout consistent there. */}
+            {viewport === "portrait" && (
+              <button
+                type="button"
+                onClick={() => setPastExpanded((v) => !v)}
+                className="px-6 py-2 border-b border-[var(--color-panel-edge)]/30 text-left font-[family-name:var(--font-display)] text-[0.85rem] text-[var(--color-muted)] hover:text-[var(--color-highlight)]"
+                aria-expanded={pastExpanded}
+                aria-controls="past-zone-list"
+                data-testid="past-zone-toggle"
               >
-                <span className="inline-block w-[1.2em] text-[var(--color-muted)]">{c.glyph}</span>
-                <span>{c.label}</span>
+                {pastExpanded ? "▾" : "▸"} earlier — {compactedPast.length}{" "}
+                {compactedPast.length === 1 ? "turn" : "turns"}
+              </button>
+            )}
+            {/* Entry list — visible on landscape always, on portrait only
+                when expanded. */}
+            {pastExpanded && (
+              <div
+                id="past-zone-list"
+                ref={pastRef}
+                className={`
+                  max-h-[30%] overflow-y-auto overflow-x-hidden
+                  px-6 py-2 border-b border-[var(--color-panel-edge)]/30
+                  font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3]
+                  text-[var(--color-dim)]
+                  [scrollbar-width:thin] [scrollbar-color:var(--color-panel-edge)_transparent]
+                `}
+                aria-label="Turn history"
+                data-testid="past-zone"
+              >
+                {compactedPast.map((c) => (
+                  <div
+                    key={c.turnId}
+                    className="truncate"
+                    title={c.full}
+                    data-testid="past-entry"
+                    data-turn-id={c.turnId}
+                  >
+                    <span className="inline-block w-[1.2em] text-[var(--color-muted)]">
+                      {c.glyph}
+                    </span>
+                    <span>{c.label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* PRESENT zone — current room title + description + latest response */}
