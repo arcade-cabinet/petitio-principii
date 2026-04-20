@@ -7,93 +7,145 @@ domain: technical
 
 # Architecture
 
-Petitio Principii is a single-page browser game organized as layered packages under `src/`. Each layer has a public barrel (`index.ts`) and internals that other layers never import directly.
+Petitio Principii is a single-page game organized as layered packages under `src/`. Each layer has a public barrel (`index.ts`) and internals that other layers never import directly. The UI is a thin React shell over a framework-agnostic game engine.
 
 ## Layer map
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ src/main.tsx  →  mounts <App/> on #root                      │
-│ src/App.tsx   →  wires terminal + starfield via @/terminal   │
-└────────────────────────┬─────────────────────────────────────┘
-                         │
-       ┌─────────────────┴─────────────────┐
-       │                                   │
-┌──────▼─────────┐                 ┌───────▼─────────┐
-│ @/terminal     │                 │ @/render        │
-│                │                 │                 │
-│ Solid UI:      │                 │ Phaser scenes + │
-│ TerminalScreen │                 │ RetroZone CRT   │
-│ ModalNewGame   │                 │ overlay         │
-│ composables/   │                 │                 │
-└──────┬─────────┘                 └─────────────────┘
-       │
-       │  consumes
-       ▼
-┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
-│ @/engine         │   │ @/world          │   │ @/content        │
-│                  │   │                  │   │                  │
-│ Pure game logic: │   │ koota ECS:       │   │ Lexicon,         │
-│ ArgumentGraph    │   │ traits, systems  │◄──│ templates,       │
-│ Parser           │   │ (Audio, Path)    │   │ corpus, grammar  │
-│ Narrative        │◄──│ buildWorld(graph)│   │                  │
-│ GameState        │   │                  │   │                  │
-└────────▲─────────┘   └──────────────────┘   └──────────────────┘
-         │                                           │
-         └───────────────────────────────────────────┘
-                     engine consumes content
+┌───────────────────────────────────────────────────────────────┐
+│ src/app/main.tsx  →  React root mounts <App/> into #root      │
+│ src/app/App.tsx   →  useGame() composition + CrystalField bg  │
+└─────────────────────────────┬─────────────────────────────────┘
+                              │
+             ┌────────────────┴─────────────────┐
+             │                                  │
+   ┌─────────▼──────────┐                ┌──────▼─────────────┐
+   │ @/features/…       │                │ @/components/ui/…  │
+   │                    │                │                    │
+   │ NewGameIncantation │                │ CrystalField       │
+   │ TerminalDisplay    │                │ GlowingPanel       │
+   │ ArgumentMapOverlay │                │ KeyCap             │
+   │                    │                │ ArgumentMap        │
+   └─────────┬──────────┘                └────────────────────┘
+             │
+             │   consumes
+             ▼
+   ┌────────────────────┐
+   │ @/hooks/…          │
+   │                    │
+   │ useGame            │  wires engine + world + audio
+   │ useWorld           │  owns koota + yuka lifecycle
+   │ useAudio           │  Howler bus
+   └──────┬─────────────┘
+          │  calls  @/engine/applyCommand(state, raw, bridge, audio)
+          │         which is framework-agnostic (WorldBridge + AudioSink)
+          ▼
+   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+   │ @/engine         │   │ @/world          │   │ @/content        │
+   │                  │   │                  │   │                  │
+   │ reducer          │   │ koota ECS        │   │ lexicon,         │
+   │ ArgumentGraph    │   │ traits + systems │◄──│ templates,       │
+   │ Parser           │   │ (PathfindingSys) │   │ corpus, grammar, │
+   │ Narrative        │◄──│ buildWorld       │   │ GENERATED_CORPUS │
+   │ GameState        │   │ appendOutput     │   │                  │
+   │ audio-effects    │   │ readTranscript   │   │                  │
+   │ AI agent         │   │                  │   │                  │
+   └────────▲─────────┘   └──────────────────┘   └──────────────────┘
 
-┌──────────────────┐
-│ @/design         │   Design tokens + CSS.
-│                  │   Imported by main.tsx (css) and terminal
-│ THEME, TYPOGRAPHY│   (tokens). No other layer depends on design.
-│ GAME_CONFIG      │
-└──────────────────┘
+   ┌────────────────────┐   ┌────────────────────────────────────┐
+   │ @/design           │   │ @/lib                              │
+   │                    │   │                                    │
+   │ globals.css        │   │ cn(), audio-manifest (SfxKey→URL)  │
+   │ design tokens      │   │ mobile.ts (Capacitor boot)         │
+   └────────────────────┘   └────────────────────────────────────┘
 ```
 
-Arrow = "may import from". Cycles are disallowed and will be caught by a future lint rule.
+Arrow = "may import from." Cycles are disallowed.
 
 ## Layer responsibilities
 
 ### `@/engine` — pure game logic
 
-No DOM, no Phaser, no Tone, no Solid. Deterministic given a seed. Everything here is a pure function or a plain data type. Tests are synchronous unit tests.
+No DOM, no React, no Howler, no koota. Deterministic given a seed. Everything is a pure function or a plain data type.
 
-Exports: `generateArgumentGraph`, `parseCommand`, `describeRoom`, `describeFallacy`, `generatePhrase`, `getHelpText`, `createInitialGameState`, `createSeededRandom`, `generateSeed`, `pickRandom`, `shuffleArray`, and the domain types (`Room`, `Exit`, `Direction`, `Passage`, `GameState`, `CommandVerb`, `ParsedCommand`).
+- **`applyCommand(state, raw, bridge, audio) → GameState`** — the verb reducer. Takes a `WorldBridge` (move player, append transcript line, find trace target) and an `AudioSink` (playSfx). Never touches koota or Howler directly — the hook that wires it (`useGame`) provides the bridges.
+- **`ArgumentGraph`**, **`Parser`**, **`NarrativeGenerator`**, **`GameState`**, **`TranscriptEntry`**, PRNG (`createSeededRandom` / Mulberry32).
+- **`audio-effects`**: the `SfxKey` intent vocabulary — engine emits semantic keys; UI's audio manifest maps them to files.
+- **`ai/argument-agent`** (in progress): Yuka-backed `StateMachine` for the argument-as-opponent — replaces hardcoded response text with state-conditioned narration.
 
 ### `@/content` — data + text generators
 
-The canonical source of nouns, adjectives, rhetorical terms, room/passage/fallacy templates, and tracery grammars. Lexicon is data-only; grammar is a tracery-based generator seeded by the PRNG.
+Canonical nouns, adjectives, rhetorical terms, room/passage/fallacy templates, tracery grammars. The **build-time RiTa pipeline** (`scripts/build-corpus.ts`) POS-validates the lexicon, pluralizes, computes syllables, and emits a frozen `src/content/generated/corpus.ts` re-exported as `GENERATED_CORPUS`. Runtime never imports `rita`.
 
-When content needs live POS or morphology work (pluralization, rhyming, syllable counting), that happens at **build time** via a `scripts/` runner using RiTa, emitting a frozen artifact under `src/content/generated/`. Runtime never calls into RiTa — shipping bundles stay small and deterministic.
+Surrealist chaining (in progress) adds a second generated corpus of public-domain fragments and a runtime seeded Markov chainer threaded through `describeRoom`.
 
 ### `@/world` — koota ECS
 
-Owns the runtime world. `buildWorld(graph)` spawns one entity per room (`IsRoom` + `RoomId` + `RhetoricalSpace` + `AudioTheme`) plus the player (`IsPlayer` + `Position`). Systems:
+Owns the runtime world.
 
-- **`AudioSystem`** — Tone.js PolySynth that plays a chord derived from the current room's `AudioTheme`, triggered on room transition.
-- **`PathfindingSystem`** — Yuka `Graph` + `Dijkstra` for shortest-path queries over the rhetorical graph. Edge weights come from the destination room's rhetorical type: fallacies and circular passages are *cheap* (rhetorically seductive), honest argumentation is expensive.
+- `buildWorld(graph)` spawns one entity per room (`IsRoom` + `RoomId` + `RhetoricalSpace` + `AudioTheme`) plus the player (`IsPlayer` + `Position`).
+- `appendOutput(world, kind, text)` spawns an `OutputLine` entity per transcript line — React keys on the koota entity id, making lines addressable gameplay state.
+- `readTranscript(world)` projects OutputLine entities (sorted by ordinal) to a plain array for the UI.
+- `PathfindingSystem` — Yuka `Graph` + `Dijkstra` for shortest-path queries over the rhetorical graph. Edge weights come from destination rhetorical type: fallacies and circular passages are *cheap* (rhetorically seductive), honest argumentation is expensive.
 
-### `@/render` — Phaser layer
+### `@/hooks` — React lifetime
 
-Phaser 4 game that renders the starfield backdrop. RetroZone applies a CRT shader overlay. `createPhaserGame(parent)` returns a `PhaserBundle` with a `destroy()` cleanup. The Solid terminal sits over this via CSS z-index.
+- **`useGame`** — composition: holds `GameState`, delegates to the engine's `applyCommand`, translates the reducer's `WorldBridge` calls into `useWorld` operations and `SfxKey` emissions into `useAudio` calls. Thin.
+- **`useWorld`** — owns the koota World + Yuka pathfinding cache across startGame / requestNewGame. Implements the engine's `WorldBridge` interface.
+- **`useAudio`** — Howler-backed bus. Module-level `Howl` cache for SFX, singleton BGM with fade-in, mute preference in localStorage, prefers-reduced-motion damping.
 
-### `@/terminal` — SolidJS UI
+### `@/components/ui` — shadcn-style primitives
 
-The actual teletype. `createGameEngine` is a Solid composable (not a hook) that owns game state, wires input through `parseCommand`, and runs the verb switch. `TerminalScreen` renders output with the typewriter effect; `ModalNewGame` handles seed selection.
+- **`CrystalField`** — full-screen canvas. Silver strokes from the pointer, violet shadow, pink shatter shards on pointerdown. Palette-mapped. DPR-aware, respects prefers-reduced-motion.
+- **`GlowingPanel`** — the reusable luminous surface (orbiting pink dot, rotating violet ray, silver corner lines, inner vignette). `tone="active"|"calm"` varies the orbit speed.
+- **`KeyCap`** — the HUD key primitive (inset shadow chrome, pink LED pip, VT323 label, 52px touch target). Variants: `direction` / `verb` / `meta`. Disabled state renders without shadow at 40% opacity.
+- **`ArgumentMap`** (in progress) — SVG rail of visited rooms colored by rhetorical type; closes visibly when the circle closes.
+
+### `@/features` — compositions
+
+- **`NewGameIncantation`** — landing panel. Yesteryear title + phrase, VT323 seed; three actions (Begin / Regenerate / Custom seed).
+- **`TerminalDisplay`** — in-game view. GlowingPanel(active) wraps header + room title + streaming output. Below it, two rows of `KeyCap`s (rhetorical verbs + directions, directions auto-disable based on current exits).
 
 ### `@/design` — tokens + CSS
 
-Theme colors, typography scales, and the `GAME_CONFIG` constants. Plus the `theme.css` and `crt.css` stylesheets. No logic — just values.
+`globals.css` defines the full palette (ink / panel / silver / violet / pink), font families (Yesteryear / VT323 / DM Mono), glow vocabulary, keyframes, safe-area handling via `#root` padding. No logic.
+
+### `@/lib`
+
+- **`cn()`** — tailwind class merge helper
+- **`audio-manifest.ts`** — semantic `SfxKey` → asset URL map + `sfxForVerb` / `sfxForRhetoricalType` resolvers
+- **`mobile.ts`** — Capacitor boot (status-bar + splash), no-op on web
 
 ## The path alias
 
-Only one alias: `@/*` → `src/*`. That's the boundary. `@/engine` is the engine barrel; never reach for `@/engine/core/ArgumentGraph` from outside the engine.
+Only one: `@/*` → `src/*`. Cross-layer imports go through `@/<layer>` barrels; internals stay private to their layer.
 
 ## Determinism
 
-Seeded PRNG is threaded through every generator. The one exception is `StarfieldScene`, which uses `Math.random()` for twinkle positions — the stars are decoration, not argument state, and letting them vary per boot matches the "looking at the sky" aesthetic.
+Every random choice threads through `createSeededRandom(seed)`. The one exception is `CrystalField`, which uses `Math.random()` for strokes and shards — they're decorative, not game state.
+
+## Audio path
+
+Semantic key is the contract between engine and UI:
+
+```
+engine.applyCommand()              audio.playSfx("rhetoric.accept")
+        │                                      │
+        ▼                                      ▼
+ AudioSink (engine interface)         useAudio (React hook)
+        │                                      │
+        └──────── wired by useGame ────────────┘
+                                               │
+                                               ▼
+                           audio-manifest.SFX_MANIFEST["rhetoric.accept"]
+                                       → "/audio/sfx/rhetoric-accept.ogg"
+                                               │
+                                               ▼
+                                   Howler plays a pooled instance
+```
+
+The engine never sees a filename. Swapping SFX = editing one map.
 
 ## Why this layout
 
-PR #1 initially had a React-era `app/` vs `src/` split that duplicated responsibilities (`src/engine/content/lexicon/*` and `src/content/corpus/*` were both "content"). The current layout collapses that: **one game, one tree, one alias, clear layers**. See [docs/LORE.md](LORE.md) for the domain vocabulary these layers model.
+PR #1 initially shipped a SolidJS scaffold with Phaser + RetroZone for the backdrop. That stack carried too much weight for what is fundamentally a UI-driven text adventure. The pivot (see `docs/plans/react-mobile-mvp.prq.md`) replaced Solid with React, Phaser with a direct canvas component (`CrystalField`), RetroZone with Tailwind CSS tokens, Tone with Howler + authored audio. The layered `@/*` structure survived; the UI below it is new.
