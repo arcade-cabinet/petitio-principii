@@ -1,3 +1,4 @@
+import { selectHint } from "@/features/terminal/hints";
 import type { ArgumentAgent } from "../ai/argument-agent";
 import type { ArgumentMemory } from "../ai/argument-traits";
 import type { CommandVerb, ParsedCommand } from "./Command";
@@ -48,6 +49,10 @@ export interface WorldBridge {
    * logical turn (see TurnMark trait + readTranscriptByTurn projection).
    */
   beginTurn: () => void;
+  /** Read the set of onboarding hint ids already shown this game. */
+  readHintsShown: () => ReadonlySet<string>;
+  /** Mark a hint id as shown — idempotent, attaches HintsShown trait on first call. */
+  markHintShown: (id: string) => void;
   /** Ask Yuka for the next hop toward the nearest circular/meta room. */
   findNextHopToCircle: (fromRoomId: string) => string | null;
   /** Stamp the Visited trait on the room entity for the ArgumentMap. */
@@ -98,11 +103,52 @@ export function applyCommand(
   }
 
   // Movement verbs
+  let nextState: GameState;
   if (MOVEMENT.includes(parsed.verb as Direction)) {
-    return applyMovement(state, parsed, currentRoom, world, audio);
+    nextState = applyMovement(state, parsed, currentRoom, world, audio);
+  } else {
+    nextState = applyRhetoricalVerb(state, parsed, raw, currentRoom, world, audio);
   }
 
-  return applyRhetoricalVerb(state, parsed, raw, currentRoom, world, audio);
+  maybeEmitHint(nextState, parsed.verb, world);
+  return nextState;
+}
+
+/**
+ * After a turn's main content has been emitted, fire the first eligible
+ * onboarding hint if one exists and hasn't already been shown. See
+ * docs/UX.md §6 and src/features/terminal/hints.ts for the catalogue.
+ */
+function maybeEmitHint(state: GameState, lastVerb: CommandVerb, world: WorldBridge): void {
+  const room = state.rooms.get(state.currentRoomId);
+  if (!room) return;
+  const usedVerbs = collectUsedVerbs(state);
+  const hint = selectHint({
+    room,
+    turnCount: state.turnCount,
+    usedVerbs,
+    shown: world.readHintsShown(),
+    lastVerb,
+  });
+  if (!hint) return;
+  world.markHintShown(hint.id);
+  world.appendLine("narration", hint.text);
+}
+
+/**
+ * Derive the set of verbs the player has actually used this game from the
+ * transcript's echo lines. Cheap and avoids a parallel world-level counter:
+ * the transcript is already authoritative, and the set is small (< 12).
+ */
+function collectUsedVerbs(state: GameState): Set<CommandVerb> {
+  const used = new Set<CommandVerb>();
+  for (const entry of state.transcript) {
+    if (entry.kind !== "echo") continue;
+    const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
+    const parsed = parseCommand(raw);
+    used.add(parsed.verb);
+  }
+  return used;
 }
 
 function applyMovement(

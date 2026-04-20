@@ -109,3 +109,17 @@ export const Visited = trait({
  * ArgumentMap reads this to draw the closing edge in bright pink.
  */
 export const CircleClosed = trait();
+
+/**
+ * Tracks which onboarding hint ids have already been surfaced to the
+ * player in this game. Attached to the player entity. The hint system
+ * (`src/features/terminal/hints.ts`) checks membership before emitting —
+ * so every hint fires at most once per run.
+ *
+ * koota schemas accept factories but not Set literals, so the trait
+ * stores ids as a thunk-initialised Set. Mutate via `world/hints`
+ * helpers — never reach in from outside that module.
+ */
+export const HintsShown = trait({
+  ids: () => new Set<string>(),
+});

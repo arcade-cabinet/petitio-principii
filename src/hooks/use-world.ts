@@ -11,11 +11,13 @@ import {
   buildRhetoricalGraph,
   buildWorld,
   markCircleClosed,
+  markHintShown,
   markRoomAccepted,
   markRoomQuestioned,
   markRoomRejected,
   markVisited,
   readArgumentMemory,
+  readHintsShown,
   readVisitHistory,
   shortestRhetoricalPath,
   wireEdges,
@@ -46,6 +48,8 @@ export interface WorldHandle {
   bumpVisitCount: (roomId: string) => void;
   visitCount: (roomId: string) => number;
   readMemory: (turnCount: number) => ArgumentMemory;
+  readHintsShown: () => ReadonlySet<string>;
+  markHintShown: (id: string) => void;
   findNextHopToCircle: (fromRoomId: string) => string | null;
   /** Exposed for the argument-map overlay and tests. */
   getWorld: () => World | null;
@@ -150,6 +154,18 @@ export function useWorld(): WorldHandle {
     return visitCountsRef.current.get(roomId) ?? 0;
   }, []);
 
+  const readHintsShownCb = useCallback((): ReadonlySet<string> => {
+    const world = worldRef.current;
+    if (!world) return new Set();
+    return readHintsShown(world);
+  }, []);
+
+  const markHintShownCb = useCallback((id: string) => {
+    const world = worldRef.current;
+    if (!world) return;
+    markHintShown(world, id);
+  }, []);
+
   const readMemoryCb = useCallback((turnCount: number): ArgumentMemory => {
     const world = worldRef.current;
     if (!world) {
@@ -219,6 +235,8 @@ export function useWorld(): WorldHandle {
     bumpVisitCount,
     visitCount,
     readMemory: readMemoryCb,
+    readHintsShown: readHintsShownCb,
+    markHintShown: markHintShownCb,
     findNextHopToCircle,
     getWorld,
     readVisitHistory: readHistoryCb,

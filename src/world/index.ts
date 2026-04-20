@@ -8,6 +8,7 @@ import {
   AudioTheme,
   CircleClosed,
   Exit as ExitTrait,
+  HintsShown,
   IsPlayer,
   IsRoom,
   OutputLine,
@@ -319,3 +320,33 @@ export function isCircleClosed(world: World): boolean {
   }
   return false;
 }
+
+// ---------------------------------------------------------------------------
+// Onboarding hints (HintsShown trait) — see src/features/terminal/hints.ts
+// for the catalogue and `selectHint` logic.
+// ---------------------------------------------------------------------------
+
+/** Read the set of hint ids already shown. Returns an empty set if none yet. */
+export function readHintsShown(world: World): ReadonlySet<string> {
+  for (const entity of world.query(IsPlayer)) {
+    if (!entity.has(HintsShown)) return EMPTY_STRING_SET;
+    const trait = entity.get(HintsShown);
+    return trait?.ids ?? EMPTY_STRING_SET;
+  }
+  return EMPTY_STRING_SET;
+}
+
+/** Mark a hint id as shown. Idempotent; first call lazily adds the trait. */
+export function markHintShown(world: World, id: string): void {
+  for (const entity of world.query(IsPlayer)) {
+    if (!entity.has(HintsShown)) {
+      entity.add(HintsShown({ ids: new Set([id]) }));
+      return;
+    }
+    const current = entity.get(HintsShown);
+    if (current) current.ids.add(id);
+    return;
+  }
+}
+
+const EMPTY_STRING_SET: ReadonlySet<string> = new Set();

@@ -66,6 +66,8 @@ export function useGame(): GameHandle {
       },
       appendLine: (kind, text) => world.appendLine(kind, text),
       beginTurn: () => world.beginTurn(),
+      readHintsShown: () => world.readHintsShown(),
+      markHintShown: (id) => world.markHintShown(id),
       findNextHopToCircle: (fromRoomId) => world.findNextHopToCircle(fromRoomId),
       markVisited: (roomId) => world.markVisited(roomId),
       markRoomAccepted: (roomId) => world.markAccepted(roomId),
