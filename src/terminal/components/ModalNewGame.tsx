@@ -1,4 +1,5 @@
 import { generatePhrase, generateSeed } from "@/engine";
+import { initAudio } from "@/world";
 import { Show, createMemo, createSignal } from "solid-js";
 import type { Component } from "solid-js";
 
@@ -51,7 +52,16 @@ export const ModalNewGame: Component<ModalNewGameProps> = (props) => {
         </div>
 
         <div class="modal-actions">
-          <button class="modal-btn primary" onClick={() => props.onStart(seed())} type="button">
+          <button
+            class="modal-btn primary"
+            onClick={async () => {
+              // Tone's AudioContext MUST start inside a user-gesture handler;
+              // the BEGIN ARGUMENT click is the first guaranteed gesture.
+              await initAudio();
+              props.onStart(seed());
+            }}
+            type="button"
+          >
             BEGIN ARGUMENT
           </button>
           <button class="modal-btn secondary" onClick={handleRegenerate} type="button">

@@ -8,10 +8,26 @@ import {
   getHelpText,
   parseCommand,
 } from "@/engine";
+import {
+  IsPlayer,
+  IsRoom,
+  Position,
+  RhetoricalSpace,
+  RoomId,
+  type World,
+  buildRhetoricalGraph,
+  buildWorld,
+  disposeAudio,
+  shortestRhetoricalPath,
+  updateAudio,
+  wireEdges,
+} from "@/world";
 import { createSignal } from "solid-js";
+import type { Edge, Graph, Node } from "yuka";
 
 export interface GameEngineResult {
   gameState: () => GameState;
+  world: () => World | null;
   startGame: (seed: number) => void;
   submitCommand: (input: string) => void;
 }
@@ -27,13 +43,81 @@ const MOVEMENT: readonly Direction[] = [
   "forward",
 ];
 
+interface PathfindingCache {
+  graph: Graph<Node, Edge>;
+  indexByRoomId: Map<string, number>;
+  roomIdByIndex: Map<number, string>;
+}
+
 export function createGameEngine(): GameEngineResult {
   const [gameState, setGameState] = createSignal<GameState>(createInitialGameState());
+  const [world, setWorld] = createSignal<World | null>(null);
+  let pathCache: PathfindingCache | null = null;
+
+  function setPlayerPosition(w: World, nextRoomId: string): void {
+    w.query(IsPlayer, Position)
+      .select(Position)
+      .updateEach(([position]) => {
+        position.roomId = nextRoomId;
+      });
+    updateAudio(w);
+  }
+
+  /**
+   * Find the nearest rhetorical "win-condition" room (circular or meta) and
+   * return the next room id on the shortest path toward it. Returns null if
+   * no such target exists or if the current room is already one.
+   */
+  function nextHopTowardCircle(w: World, currentRoomId: string): string | null {
+    if (!pathCache) return null;
+
+    const candidates: string[] = [];
+    w.query(IsRoom, RoomId, RhetoricalSpace)
+      .select(RoomId, RhetoricalSpace)
+      .readEach(([id, space]) => {
+        if (space.type === "circular" || space.type === "meta") {
+          candidates.push(id.value);
+        }
+      });
+
+    let bestNext: string | null = null;
+    let bestLen = Number.POSITIVE_INFINITY;
+    for (const targetId of candidates) {
+      if (targetId === currentRoomId) continue;
+      const path = shortestRhetoricalPath(
+        pathCache.graph,
+        pathCache.indexByRoomId,
+        pathCache.roomIdByIndex,
+        currentRoomId,
+        targetId
+      );
+      if (path.found && path.rooms.length > 1 && path.rooms.length < bestLen) {
+        bestLen = path.rooms.length;
+        bestNext = path.rooms[1] ?? null;
+      }
+    }
+    return bestNext;
+  }
 
   function startGame(seed: number): void {
+    // Tear down any prior world/audio so new game starts clean.
+    disposeAudio();
+
     const graph = generateArgumentGraph(seed);
     const phrase = generatePhrase(seed);
     const startRoom = graph.rooms.get(graph.startRoomId);
+
+    const nextWorld = buildWorld(graph);
+    const { graph: yukaGraph, indexByRoomId, roomIdByIndex } = buildRhetoricalGraph(nextWorld);
+    wireEdges(yukaGraph, graph.rooms, indexByRoomId);
+    pathCache = { graph: yukaGraph, indexByRoomId, roomIdByIndex };
+    setWorld(nextWorld);
+
+    // Prime audio for the starting room. initAudio() must have been called
+    // from a user-gesture handler *before* startGame, otherwise updateAudio
+    // is a no-op — Tone.start() requires the gesture; we don't call it here.
+    updateAudio(nextWorld);
+
     const initialOutput: string[] = [
       "Petitio Principii",
       `Seed: ${seed} — "${phrase}"`,
@@ -57,6 +141,11 @@ export function createGameEngine(): GameEngineResult {
     });
   }
 
+  function moveTo(nextRoomId: string): void {
+    const w = world();
+    if (w) setPlayerPosition(w, nextRoomId);
+  }
+
   function submitCommand(input: string): void {
     if (!input.trim()) return;
 
@@ -78,6 +167,7 @@ export function createGameEngine(): GameEngineResult {
         if (exit) {
           const nextRoom = prev.rooms.get(exit.targetRoomId);
           if (nextRoom) {
+            moveTo(exit.targetRoomId);
             return {
               ...prev,
               currentRoomId: exit.targetRoomId,
@@ -190,11 +280,33 @@ export function createGameEngine(): GameEngineResult {
             turnCount: prev.turnCount + 1,
           };
         case "trace": {
+          const w = world();
+          if (w) {
+            const nextId = nextHopTowardCircle(w, currentRoom.id);
+            if (nextId) {
+              const nextRoom = prev.rooms.get(nextId);
+              if (nextRoom) {
+                moveTo(nextId);
+                return {
+                  ...prev,
+                  currentRoomId: nextId,
+                  output: [
+                    ...newOutput,
+                    "You trace the shortest rhetorical path toward the circle.",
+                    "",
+                    ...describeRoom(nextRoom),
+                  ],
+                  turnCount: prev.turnCount + 1,
+                };
+              }
+            }
+          }
           const exits = currentRoom.exits;
           if (exits.length > 0) {
             const backExit = exits.find((e) => e.direction === "back") ?? exits[exits.length - 1];
             const backRoom = backExit ? prev.rooms.get(backExit.targetRoomId) : undefined;
             if (backRoom && backExit) {
+              moveTo(backExit.targetRoomId);
               return {
                 ...prev,
                 currentRoomId: backExit.targetRoomId,
@@ -244,5 +356,5 @@ export function createGameEngine(): GameEngineResult {
     });
   }
 
-  return { gameState, startGame, submitCommand };
+  return { gameState, world, startGame, submitCommand };
 }

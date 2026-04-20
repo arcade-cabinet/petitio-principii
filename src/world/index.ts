@@ -1,5 +1,7 @@
 import type { ArgumentGraph } from "@/engine";
 import { type World, createWorld } from "koota";
+
+export type { World } from "koota";
 import {
   AudioTheme,
   Exit as ExitTrait,
@@ -11,6 +13,13 @@ import {
 } from "./traits";
 
 export * from "./traits";
+export { disposeAudio, initAudio, updateAudio } from "./systems/AudioSystem";
+export {
+  buildRhetoricalGraph,
+  shortestRhetoricalPath,
+  wireEdges,
+  type RhetoricalPath,
+} from "./systems/PathfindingSystem";
 
 /** Frequency pool — each rhetorical type has a signature tonal centre. */
 const RHETORICAL_FREQUENCIES: Record<RhetoricalSpaceType, { base: number; dissonance: number }> = {
