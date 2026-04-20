@@ -1,6 +1,8 @@
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { KeyCap } from "@/components/ui/keycap";
 import type { GameState } from "@/engine";
+import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
+import type { WorldHandle } from "@/hooks/use-world";
 import {
   ArrowDown,
   ArrowLeft,
@@ -25,6 +27,7 @@ import { useEffect, useMemo, useRef } from "react";
  */
 export interface TerminalDisplayProps {
   state: GameState;
+  world: WorldHandle;
   onCommand: (raw: string) => void;
   onNewGame: () => void;
 }
@@ -39,7 +42,7 @@ const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string; hint?: stri
   { label: "Trace Back", verb: "trace back", hint: "T" },
 ];
 
-export function TerminalDisplay({ state, onCommand, onNewGame }: TerminalDisplayProps) {
+export function TerminalDisplay({ state, world, onCommand, onNewGame }: TerminalDisplayProps) {
   const outputRef = useRef<HTMLDivElement>(null);
 
   const currentRoom = useMemo(
@@ -112,6 +115,9 @@ export function TerminalDisplay({ state, onCommand, onNewGame }: TerminalDisplay
             New Game
           </button>
         </div>
+
+        {/* Argument map — geometry of the walk so far. Always visible. */}
+        <ArgumentMapOverlay state={state} world={world} />
 
         {/* Current room title — the breathing slot */}
         {currentRoom && (

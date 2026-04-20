@@ -13,7 +13,7 @@ import { sfxForRhetoricalType } from "@/lib/audio-manifest";
 import { readTranscript } from "@/world";
 import { useCallback, useRef, useState } from "react";
 import { useAudio } from "./use-audio";
-import { useWorld } from "./use-world";
+import { type WorldHandle, useWorld } from "./use-world";
 
 /**
  * Composition hook — wires React state, the koota world handle, the pure
@@ -26,6 +26,7 @@ import { useWorld } from "./use-world";
  */
 export interface GameHandle {
   state: GameState;
+  world: WorldHandle;
   startGame: (seed: number) => Promise<void>;
   submitCommand: (raw: string) => void;
   requestNewGame: () => void;
@@ -146,6 +147,7 @@ export function useGame(): GameHandle {
 
   return {
     state,
+    world,
     startGame,
     submitCommand,
     requestNewGame,

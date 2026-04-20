@@ -22,6 +22,7 @@ export function App() {
       {game.state.started ? (
         <TerminalDisplay
           state={game.state}
+          world={game.world}
           onCommand={game.submitCommand}
           onNewGame={game.requestNewGame}
         />
