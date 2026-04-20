@@ -24,5 +24,6 @@
   "dependencies": {
     "retrozone": "github:TheMarco/retrozone",
     "solid-js": "^1.9.12"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }
