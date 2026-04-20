@@ -7,7 +7,7 @@
     "dev": "vite",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "build-corpus": "tsx scripts/build-corpus.ts",
-    "verify-corpus": "tsx scripts/build-corpus.ts && git diff --exit-code -- src/content/generated/corpus.ts src/content/generated/surrealist.ts",
+    "verify-corpus": "tsx scripts/build-corpus.ts && git diff --exit-code -- src/content/generated/",
     "prebuild": "pnpm build-corpus",
     "build": "pnpm typecheck && vite build",
     "preview": "vite preview",

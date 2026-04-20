@@ -27,6 +27,11 @@ export default defineConfig({
     // entire React graph unified across direct imports and test-lib's peers.
     dedupe: ["react", "react-dom"],
   },
+  // Pre-bundle these so the vitest-browser runner doesn't trigger a dynamic
+  // re-optimization mid-test (which aborts the in-flight test file import).
+  optimizeDeps: {
+    include: ["@testing-library/react", "@testing-library/user-event", "@testing-library/jest-dom"],
+  },
   build: {
     target: "esnext",
   },
