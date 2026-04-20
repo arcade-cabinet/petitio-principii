@@ -1,0 +1,2130 @@
+{
+  "fragments": [
+    {
+      "id": "carroll-jabberwocky-01",
+      "text": "the slithy toves did gyre and gimble in the wabe",
+      "source": "Lewis Carroll, Jabberwocky (Through the Looking-Glass)",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "the",
+        "slithy",
+        "toves",
+        "did",
+        "gyre",
+        "and",
+        "gimble",
+        "in",
+        "the",
+        "wabe"
+      ],
+      "tags": [
+        {
+          "word": "slithy",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "toves",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "did",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "gyre",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "gimble",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "wabe",
+          "pos": "nn",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-jabberwocky-02",
+      "text": "all mimsy were the borogoves, and the mome raths outgrabe",
+      "source": "Lewis Carroll, Jabberwocky",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "all",
+        "mimsy",
+        "were",
+        "the",
+        "borogoves",
+        "and",
+        "the",
+        "mome",
+        "raths",
+        "outgrabe"
+      ],
+      "tags": [
+        {
+          "word": "mimsy",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "were",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "borogoves",
+          "pos": "nns",
+          "syllables": 3
+        },
+        {
+          "word": "mome",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "raths",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "outgrabe",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "carroll-jabberwocky-03",
+      "text": "beware the jabberwock, my son, the jaws that bite, the claws that catch",
+      "source": "Lewis Carroll, Jabberwocky",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "beware",
+        "the",
+        "jabberwock",
+        "my",
+        "son",
+        "the",
+        "jaws",
+        "that",
+        "bite",
+        "the",
+        "claws",
+        "that",
+        "catch"
+      ],
+      "tags": [
+        {
+          "word": "beware",
+          "pos": "vb",
+          "syllables": 2
+        },
+        {
+          "word": "jabberwock",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "son",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "jaws",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "bite",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "claws",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "catch",
+          "pos": "vb",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-jabberwocky-04",
+      "text": "he took his vorpal sword in hand, long time the manxome foe he sought",
+      "source": "Lewis Carroll, Jabberwocky",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "he",
+        "took",
+        "his",
+        "vorpal",
+        "sword",
+        "in",
+        "hand",
+        "long",
+        "time",
+        "the",
+        "manxome",
+        "foe",
+        "he",
+        "sought"
+      ],
+      "tags": [
+        {
+          "word": "took",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "vorpal",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "sword",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "hand",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "long",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "time",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "manxome",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "foe",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "sought",
+          "pos": "vbd",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-jabberwocky-05",
+      "text": "and as in uffish thought he stood, the jabberwock came whiffling through the tulgey wood",
+      "source": "Lewis Carroll, Jabberwocky",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "and",
+        "as",
+        "in",
+        "uffish",
+        "thought",
+        "he",
+        "stood",
+        "the",
+        "jabberwock",
+        "came",
+        "whiffling",
+        "through",
+        "the",
+        "tulgey",
+        "wood"
+      ],
+      "tags": [
+        {
+          "word": "uffish",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "thought",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "stood",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "jabberwock",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "came",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "whiffling",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "tulgey",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "wood",
+          "pos": "nn",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-01",
+      "text": "sometimes I have believed as many as six impossible things before breakfast",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "sometimes",
+        "I",
+        "have",
+        "believed",
+        "as",
+        "many",
+        "as",
+        "six",
+        "impossible",
+        "things",
+        "before",
+        "breakfast"
+      ],
+      "tags": [
+        {
+          "word": "sometimes",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "have",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "believed",
+          "pos": "vbd",
+          "syllables": 2
+        },
+        {
+          "word": "many",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "impossible",
+          "pos": "jj",
+          "syllables": 4
+        },
+        {
+          "word": "things",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "breakfast",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-02",
+      "text": "when I use a word it means just what I choose it to mean, neither more nor less",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "when",
+        "I",
+        "use",
+        "a",
+        "word",
+        "it",
+        "means",
+        "just",
+        "what",
+        "I",
+        "choose",
+        "it",
+        "to",
+        "mean",
+        "neither",
+        "more",
+        "nor",
+        "less"
+      ],
+      "tags": [
+        {
+          "word": "use",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "word",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "means",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "just",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "choose",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "mean",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "more",
+          "pos": "jjr",
+          "syllables": 1
+        },
+        {
+          "word": "nor",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "less",
+          "pos": "jjs",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-03",
+      "text": "the question is which is to be master, that is all",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "the",
+        "question",
+        "is",
+        "which",
+        "is",
+        "to",
+        "be",
+        "master",
+        "that",
+        "is",
+        "all"
+      ],
+      "tags": [
+        {
+          "word": "question",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "be",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "master",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-04",
+      "text": "it takes all the running you can do to keep in the same place",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "it",
+        "takes",
+        "all",
+        "the",
+        "running",
+        "you",
+        "can",
+        "do",
+        "to",
+        "keep",
+        "in",
+        "the",
+        "same",
+        "place"
+      ],
+      "tags": [
+        {
+          "word": "takes",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "running",
+          "pos": "vbg",
+          "syllables": 2
+        },
+        {
+          "word": "do",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "keep",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "same",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "place",
+          "pos": "nn",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-05",
+      "text": "the rule is jam tomorrow and jam yesterday but never jam today",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "the",
+        "rule",
+        "is",
+        "jam",
+        "tomorrow",
+        "and",
+        "jam",
+        "yesterday",
+        "but",
+        "never",
+        "jam",
+        "today"
+      ],
+      "tags": [
+        {
+          "word": "rule",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "jam",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "tomorrow",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "jam",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "yesterday",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "never",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "jam",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "today",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "carroll-looking-glass-06",
+      "text": "it is a poor sort of memory that only works backwards",
+      "source": "Lewis Carroll, Through the Looking-Glass",
+      "year": 1871,
+      "derivative": false,
+      "tokens": [
+        "it",
+        "is",
+        "a",
+        "poor",
+        "sort",
+        "of",
+        "memory",
+        "that",
+        "only",
+        "works",
+        "backwards"
+      ],
+      "tags": [
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "poor",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "sort",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "memory",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "only",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "works",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "backwards",
+          "pos": "rb",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "carroll-wonderland-01",
+      "text": "curiouser and curiouser, cried alice",
+      "source": "Lewis Carroll, Alice's Adventures in Wonderland",
+      "year": 1865,
+      "derivative": false,
+      "tokens": [
+        "curiouser",
+        "and",
+        "curiouser",
+        "cried",
+        "alice"
+      ],
+      "tags": [
+        {
+          "word": "curiouser",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "curiouser",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "cried",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "alice",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "carroll-wonderland-02",
+      "text": "we are all mad here, I am mad, you are mad",
+      "source": "Lewis Carroll, Alice's Adventures in Wonderland",
+      "year": 1865,
+      "derivative": false,
+      "tokens": [
+        "we",
+        "are",
+        "all",
+        "mad",
+        "here",
+        "I",
+        "am",
+        "mad",
+        "you",
+        "are",
+        "mad"
+      ],
+      "tags": [
+        {
+          "word": "are",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "mad",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "here",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "am",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "mad",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "are",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "mad",
+          "pos": "jj",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-wonderland-03",
+      "text": "begin at the beginning and go on till you come to the end, then stop",
+      "source": "Lewis Carroll, Alice's Adventures in Wonderland",
+      "year": 1865,
+      "derivative": false,
+      "tokens": [
+        "begin",
+        "at",
+        "the",
+        "beginning",
+        "and",
+        "go",
+        "on",
+        "till",
+        "you",
+        "come",
+        "to",
+        "the",
+        "end",
+        "then",
+        "stop"
+      ],
+      "tags": [
+        {
+          "word": "begin",
+          "pos": "vb",
+          "syllables": 2
+        },
+        {
+          "word": "beginning",
+          "pos": "vbg",
+          "syllables": 3
+        },
+        {
+          "word": "go",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "come",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "end",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "then",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "stop",
+          "pos": "vb",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "carroll-wonderland-04",
+      "text": "if everybody minded their own business the world would go round a deal faster than it does",
+      "source": "Lewis Carroll, Alice's Adventures in Wonderland",
+      "year": 1865,
+      "derivative": false,
+      "tokens": [
+        "if",
+        "everybody",
+        "minded",
+        "their",
+        "own",
+        "business",
+        "the",
+        "world",
+        "would",
+        "go",
+        "round",
+        "a",
+        "deal",
+        "faster",
+        "than",
+        "it",
+        "does"
+      ],
+      "tags": [
+        {
+          "word": "everybody",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "minded",
+          "pos": "vbd",
+          "syllables": 2
+        },
+        {
+          "word": "own",
+          "pos": "jj",
+          "syllables": 1
+        },
+        {
+          "word": "business",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "world",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "go",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "round",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "deal",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "faster",
+          "pos": "rbr",
+          "syllables": 2
+        },
+        {
+          "word": "does",
+          "pos": "nns",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "stein-tender-buttons-01",
+      "text": "a kind in glass and a cousin, a spectacle and nothing strange",
+      "source": "Gertrude Stein, Tender Buttons",
+      "year": 1914,
+      "derivative": false,
+      "tokens": [
+        "a",
+        "kind",
+        "in",
+        "glass",
+        "and",
+        "a",
+        "cousin",
+        "a",
+        "spectacle",
+        "and",
+        "nothing",
+        "strange"
+      ],
+      "tags": [
+        {
+          "word": "kind",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "glass",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "cousin",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "spectacle",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "nothing",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "strange",
+          "pos": "jj",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "stein-tender-buttons-02",
+      "text": "a single hurt color and an arrangement in a system to pointing",
+      "source": "Gertrude Stein, Tender Buttons",
+      "year": 1914,
+      "derivative": false,
+      "tokens": [
+        "a",
+        "single",
+        "hurt",
+        "color",
+        "and",
+        "an",
+        "arrangement",
+        "in",
+        "a",
+        "system",
+        "to",
+        "pointing"
+      ],
+      "tags": [
+        {
+          "word": "single",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "hurt",
+          "pos": "vbn",
+          "syllables": 1
+        },
+        {
+          "word": "color",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "arrangement",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "system",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "pointing",
+          "pos": "vbg",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "stein-tender-buttons-03",
+      "text": "all this and not ordinary, not unordered in not resembling",
+      "source": "Gertrude Stein, Tender Buttons",
+      "year": 1914,
+      "derivative": false,
+      "tokens": [
+        "all",
+        "this",
+        "and",
+        "not",
+        "ordinary",
+        "not",
+        "unordered",
+        "in",
+        "not",
+        "resembling"
+      ],
+      "tags": [
+        {
+          "word": "not",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "ordinary",
+          "pos": "jj",
+          "syllables": 4
+        },
+        {
+          "word": "not",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "unordered",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "not",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "resembling",
+          "pos": "vbg",
+          "syllables": 4
+        }
+      ]
+    },
+    {
+      "id": "stein-tender-buttons-04",
+      "text": "the difference is spreading",
+      "source": "Gertrude Stein, Tender Buttons",
+      "year": 1914,
+      "derivative": false,
+      "tokens": [
+        "the",
+        "difference",
+        "is",
+        "spreading"
+      ],
+      "tags": [
+        {
+          "word": "difference",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "spreading",
+          "pos": "vbg",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "stein-tender-buttons-05",
+      "text": "a little called anything shows shudders",
+      "source": "Gertrude Stein, Tender Buttons",
+      "year": 1914,
+      "derivative": false,
+      "tokens": [
+        "a",
+        "little",
+        "called",
+        "anything",
+        "shows",
+        "shudders"
+      ],
+      "tags": [
+        {
+          "word": "little",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "called",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "anything",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "shows",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "shudders",
+          "pos": "vbz",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "stein-sacred-emily",
+      "text": "a rose is a rose is a rose is a rose",
+      "source": "Gertrude Stein, Sacred Emily",
+      "year": 1913,
+      "derivative": false,
+      "tokens": [
+        "a",
+        "rose",
+        "is",
+        "a",
+        "rose",
+        "is",
+        "a",
+        "rose",
+        "is",
+        "a",
+        "rose"
+      ],
+      "tags": [
+        {
+          "word": "rose",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "rose",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "rose",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "rose",
+          "pos": "vbd",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "tzara-manifesto-01",
+      "text": "dada means nothing, if one finds it futile and wastes no time over a word that means nothing",
+      "source": "Tristan Tzara, Dada Manifesto 1918",
+      "year": 1918,
+      "derivative": false,
+      "tokens": [
+        "dada",
+        "means",
+        "nothing",
+        "if",
+        "one",
+        "finds",
+        "it",
+        "futile",
+        "and",
+        "wastes",
+        "no",
+        "time",
+        "over",
+        "a",
+        "word",
+        "that",
+        "means",
+        "nothing"
+      ],
+      "tags": [
+        {
+          "word": "dada",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "means",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "nothing",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "finds",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "futile",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "wastes",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "time",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "word",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "means",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "nothing",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "tzara-manifesto-02",
+      "text": "thought is made in the mouth",
+      "source": "Tristan Tzara, Dada Manifesto 1918",
+      "year": 1918,
+      "derivative": false,
+      "tokens": [
+        "thought",
+        "is",
+        "made",
+        "in",
+        "the",
+        "mouth"
+      ],
+      "tags": [
+        {
+          "word": "thought",
+          "pos": "vbd",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "made",
+          "pos": "vbn",
+          "syllables": 1
+        },
+        {
+          "word": "mouth",
+          "pos": "nn",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "tzara-manifesto-03",
+      "text": "I write a manifesto and I want nothing, yet I say certain things and in principle I am against manifestoes",
+      "source": "Tristan Tzara, Dada Manifesto 1918",
+      "year": 1918,
+      "derivative": false,
+      "tokens": [
+        "I",
+        "write",
+        "a",
+        "manifesto",
+        "and",
+        "I",
+        "want",
+        "nothing",
+        "yet",
+        "I",
+        "say",
+        "certain",
+        "things",
+        "and",
+        "in",
+        "principle",
+        "I",
+        "am",
+        "against",
+        "manifestoes"
+      ],
+      "tags": [
+        {
+          "word": "write",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "manifesto",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "want",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "nothing",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "yet",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "say",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "certain",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "things",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "principle",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "am",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "manifestoes",
+          "pos": "nns",
+          "syllables": 4
+        }
+      ]
+    },
+    {
+      "id": "tzara-manifesto-04",
+      "text": "logic is a complication, logic is always wrong",
+      "source": "Tristan Tzara, Dada Manifesto 1918",
+      "year": 1918,
+      "derivative": false,
+      "tokens": [
+        "logic",
+        "is",
+        "a",
+        "complication",
+        "logic",
+        "is",
+        "always",
+        "wrong"
+      ],
+      "tags": [
+        {
+          "word": "logic",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "complication",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "logic",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "always",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "wrong",
+          "pos": "jj",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "tzara-manifesto-05",
+      "text": "order equals disorder, I equals not-I, affirmation equals negation",
+      "source": "Tristan Tzara, Dada Manifesto 1918",
+      "year": 1918,
+      "derivative": false,
+      "tokens": [
+        "order",
+        "equals",
+        "disorder",
+        "I",
+        "equals",
+        "not-I",
+        "affirmation",
+        "equals",
+        "negation"
+      ],
+      "tags": [
+        {
+          "word": "order",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "equals",
+          "pos": "nns",
+          "syllables": 2
+        },
+        {
+          "word": "disorder",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "equals",
+          "pos": "nns",
+          "syllables": 2
+        },
+        {
+          "word": "not-i",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "affirmation",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "equals",
+          "pos": "nns",
+          "syllables": 2
+        },
+        {
+          "word": "negation",
+          "pos": "nn",
+          "syllables": 3
+        }
+      ]
+    },
+    {
+      "id": "ball-dada-01",
+      "text": "the word and the image are one, the painter and the poet belong together",
+      "source": "Hugo Ball, Flight Out of Time (Dada Diary)",
+      "year": 1916,
+      "derivative": false,
+      "tokens": [
+        "the",
+        "word",
+        "and",
+        "the",
+        "image",
+        "are",
+        "one",
+        "the",
+        "painter",
+        "and",
+        "the",
+        "poet",
+        "belong",
+        "together"
+      ],
+      "tags": [
+        {
+          "word": "word",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "image",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "are",
+          "pos": "vbp",
+          "syllables": 1
+        },
+        {
+          "word": "painter",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "poet",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "belong",
+          "pos": "vb",
+          "syllables": 2
+        },
+        {
+          "word": "together",
+          "pos": "rb",
+          "syllables": 3
+        }
+      ]
+    },
+    {
+      "id": "ball-dada-02",
+      "text": "gadji beri bimba glandridi laula lonni cadori",
+      "source": "Hugo Ball, Karawane (sound poem)",
+      "year": 1916,
+      "derivative": false,
+      "tokens": [
+        "gadji",
+        "beri",
+        "bimba",
+        "glandridi",
+        "laula",
+        "lonni",
+        "cadori"
+      ],
+      "tags": [
+        {
+          "word": "gadji",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "beri",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "bimba",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "glandridi",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "laula",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "lonni",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "cadori",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "breton-derivative-01",
+      "text": "the marvelous is always beautiful, anything marvelous is beautiful, in fact only the marvelous is beautiful",
+      "source": "pastiche in the idiom of Breton, Manifeste du surréalisme",
+      "year": 1924,
+      "derivative": true,
+      "tokens": [
+        "the",
+        "marvelous",
+        "is",
+        "always",
+        "beautiful",
+        "anything",
+        "marvelous",
+        "is",
+        "beautiful",
+        "in",
+        "fact",
+        "only",
+        "the",
+        "marvelous",
+        "is",
+        "beautiful"
+      ],
+      "tags": [
+        {
+          "word": "marvelous",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "always",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "beautiful",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "anything",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "marvelous",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "beautiful",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "fact",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "only",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "marvelous",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "beautiful",
+          "pos": "jj",
+          "syllables": 3
+        }
+      ]
+    },
+    {
+      "id": "breton-derivative-02",
+      "text": "the simplest surrealist act consists of going down into the street and firing at random into the crowd of ideas",
+      "source": "pastiche in the idiom of Breton, Second Manifeste",
+      "year": 1929,
+      "derivative": true,
+      "tokens": [
+        "the",
+        "simplest",
+        "surrealist",
+        "act",
+        "consists",
+        "of",
+        "going",
+        "down",
+        "into",
+        "the",
+        "street",
+        "and",
+        "firing",
+        "at",
+        "random",
+        "into",
+        "the",
+        "crowd",
+        "of",
+        "ideas"
+      ],
+      "tags": [
+        {
+          "word": "simplest",
+          "pos": "jjs",
+          "syllables": 2
+        },
+        {
+          "word": "surrealist",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "act",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "consists",
+          "pos": "vbz",
+          "syllables": 2
+        },
+        {
+          "word": "going",
+          "pos": "vbg",
+          "syllables": 2
+        },
+        {
+          "word": "down",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "street",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "firing",
+          "pos": "vbg",
+          "syllables": 2
+        },
+        {
+          "word": "random",
+          "pos": "jj",
+          "syllables": 2
+        },
+        {
+          "word": "crowd",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "ideas",
+          "pos": "nns",
+          "syllables": 3
+        }
+      ]
+    },
+    {
+      "id": "breton-derivative-03",
+      "text": "I believe in the future resolution of the states of dream and reality, seemingly so contradictory, into a kind of absolute reality",
+      "source": "pastiche in the idiom of Breton, Manifeste du surréalisme",
+      "year": 1924,
+      "derivative": true,
+      "tokens": [
+        "I",
+        "believe",
+        "in",
+        "the",
+        "future",
+        "resolution",
+        "of",
+        "the",
+        "states",
+        "of",
+        "dream",
+        "and",
+        "reality",
+        "seemingly",
+        "so",
+        "contradictory",
+        "into",
+        "a",
+        "kind",
+        "of",
+        "absolute",
+        "reality"
+      ],
+      "tags": [
+        {
+          "word": "believe",
+          "pos": "vbp",
+          "syllables": 2
+        },
+        {
+          "word": "future",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "resolution",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "states",
+          "pos": "nns",
+          "syllables": 1
+        },
+        {
+          "word": "dream",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "reality",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "seemingly",
+          "pos": "rb",
+          "syllables": 3
+        },
+        {
+          "word": "so",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "contradictory",
+          "pos": "jj",
+          "syllables": 5
+        },
+        {
+          "word": "kind",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "absolute",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "reality",
+          "pos": "nn",
+          "syllables": 4
+        }
+      ]
+    },
+    {
+      "id": "breton-derivative-04",
+      "text": "beauty will be convulsive or it will not be at all",
+      "source": "pastiche in the idiom of Breton, Nadja",
+      "year": 1928,
+      "derivative": true,
+      "tokens": [
+        "beauty",
+        "will",
+        "be",
+        "convulsive",
+        "or",
+        "it",
+        "will",
+        "not",
+        "be",
+        "at",
+        "all"
+      ],
+      "tags": [
+        {
+          "word": "beauty",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "be",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "convulsive",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "not",
+          "pos": "rb",
+          "syllables": 1
+        },
+        {
+          "word": "be",
+          "pos": "vb",
+          "syllables": 1
+        }
+      ]
+    },
+    {
+      "id": "breton-derivative-05",
+      "text": "existence is elsewhere, and the proof of it is the fact of my continually looking for it",
+      "source": "pastiche in the idiom of Breton, Manifeste du surréalisme",
+      "year": 1924,
+      "derivative": true,
+      "tokens": [
+        "existence",
+        "is",
+        "elsewhere",
+        "and",
+        "the",
+        "proof",
+        "of",
+        "it",
+        "is",
+        "the",
+        "fact",
+        "of",
+        "my",
+        "continually",
+        "looking",
+        "for",
+        "it"
+      ],
+      "tags": [
+        {
+          "word": "existence",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "elsewhere",
+          "pos": "rb",
+          "syllables": 2
+        },
+        {
+          "word": "proof",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "fact",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "continually",
+          "pos": "rb",
+          "syllables": 5
+        },
+        {
+          "word": "looking",
+          "pos": "vbg",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "lautreamont-derivative-01",
+      "text": "as beautiful as the chance meeting of a sewing machine and an umbrella on a dissecting table",
+      "source": "pastiche in the idiom of Lautréamont, Les Chants de Maldoror",
+      "year": 1869,
+      "derivative": true,
+      "tokens": [
+        "as",
+        "beautiful",
+        "as",
+        "the",
+        "chance",
+        "meeting",
+        "of",
+        "a",
+        "sewing",
+        "machine",
+        "and",
+        "an",
+        "umbrella",
+        "on",
+        "a",
+        "dissecting",
+        "table"
+      ],
+      "tags": [
+        {
+          "word": "beautiful",
+          "pos": "jj",
+          "syllables": 3
+        },
+        {
+          "word": "chance",
+          "pos": "nn",
+          "syllables": 1
+        },
+        {
+          "word": "meeting",
+          "pos": "vbg",
+          "syllables": 2
+        },
+        {
+          "word": "sewing",
+          "pos": "vbg",
+          "syllables": 2
+        },
+        {
+          "word": "machine",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "umbrella",
+          "pos": "nn",
+          "syllables": 3
+        },
+        {
+          "word": "dissecting",
+          "pos": "vbg",
+          "syllables": 3
+        },
+        {
+          "word": "table",
+          "pos": "nn",
+          "syllables": 2
+        }
+      ]
+    },
+    {
+      "id": "lautreamont-derivative-02",
+      "text": "arithmetic is a marvellous science that has nothing to do with numbers",
+      "source": "pastiche in the idiom of Lautréamont, Les Chants de Maldoror",
+      "year": 1869,
+      "derivative": true,
+      "tokens": [
+        "arithmetic",
+        "is",
+        "a",
+        "marvellous",
+        "science",
+        "that",
+        "has",
+        "nothing",
+        "to",
+        "do",
+        "with",
+        "numbers"
+      ],
+      "tags": [
+        {
+          "word": "arithmetic",
+          "pos": "nn",
+          "syllables": 4
+        },
+        {
+          "word": "is",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "marvellous",
+          "pos": "nns",
+          "syllables": 3
+        },
+        {
+          "word": "science",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "has",
+          "pos": "vbz",
+          "syllables": 1
+        },
+        {
+          "word": "nothing",
+          "pos": "nn",
+          "syllables": 2
+        },
+        {
+          "word": "do",
+          "pos": "vb",
+          "syllables": 1
+        },
+        {
+          "word": "numbers",
+          "pos": "nns",
+          "syllables": 2
+        }
+      ]
+    }
+  ],
+  "lastBuilt": "2026-04-20T22:02:33.087Z"
+}

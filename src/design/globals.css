@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@import "@fontsource/yesteryear/400.css";
+@import "@fontsource/vt323/400.css";
+@import "@fontsource/dm-mono/400.css";
+@import "@fontsource/dm-mono/500.css";
+
+/**
+ * Petitio Principii — design tokens.
+ *
+ * Canon from the 17k prompt:
+ *   "Memory palace in the night sky. Twinkling silver stars.
+ *    Deep purples and blacks. Soft, fuzzy, slightly out-of-focus typography."
+ *
+ * We lean into that by treating the UI as a luminous display surface —
+ * not a CRT monitor. Three type cuts:
+ *   - Yesteryear: the incantation (landing modal). Handwritten, intimate.
+ *   - VT323: the display text + keycap labels. Terminal-coded but soft.
+ *   - DM Mono: the commandline echo + seed numerics.
+ */
+
+@theme {
+  /* Palette — exact values from the original brief */
+  --color-ink: #05010a;
+  --color-panel: #12051f;
+  --color-panel-edge: #2a1a4a;
+  --color-silver: #c0c0ff;
+  --color-highlight: #f5f0ff;
+  --color-violet: #7a5cff;
+  --color-violet-bright: #9b7fff;
+  --color-pink: #ffd1fa;
+  --color-dim: #7070aa;
+  --color-muted: #4a4a7a;
+
+  /* Fonts */
+  --font-incantation: "Yesteryear", serif;
+  --font-display: "VT323", "DM Mono", monospace;
+  --font-mono: "DM Mono", "IBM Plex Mono", monospace;
+
+  /* Glow vocabulary */
+  --shadow-glow-silver: 0 0 4px #c0c0ff, 0 0 12px #7a5cff;
+  --shadow-glow-silver-soft: 0 0 2px #c0c0ff66;
+  --shadow-glow-violet: 0 0 6px #7a5cff, 0 0 18px #7a5cff88;
+  --shadow-glow-pink: 0 0 6px #ffd1fa, 0 0 16px #ffd1facc;
+
+  /* Motion */
+  --animate-drift: drift 20s ease-in-out infinite;
+  --animate-pulse-violet: pulse-violet 3s ease-in-out infinite;
+  --animate-dot-orbit: dot-orbit 8s linear infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes pulse-violet {
+  0%,
+  100% {
+    opacity: 0.6;
+    box-shadow: 0 0 8px #7a5cff66;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px #7a5cff, 0 0 40px #7a5cff55;
+  }
+}
+
+@keyframes dot-orbit {
+  0%,
+  100% {
+    top: 8%;
+    right: 8%;
+  }
+  25% {
+    top: 8%;
+    right: calc(100% - 12px);
+  }
+  50% {
+    top: calc(100% - 8px);
+    right: calc(100% - 12px);
+  }
+  75% {
+    top: calc(100% - 8px);
+    right: 8%;
+  }
+}
+
+@keyframes ray-sweep {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shatter {
+  0% {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--color-ink);
+  color: var(--color-silver);
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+
+body {
+  /* Slightly-out-of-focus typography per the brief */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Mobile safe-area handling.
+ *
+ * On notched devices (iPhone 14+ class, Android with cutouts) and devices
+ * with a home indicator, edge-anchored UI must be inset by the platform-
+ * reported safe-area values. `viewport-fit=cover` in index.html opts us
+ * in to the full screen; these rules keep our content clear of the
+ * notch/indicator on native and on iOS Safari installed as a PWA.
+ *
+ * The full-screen shell React renders is `#root > div.relative` (see
+ * `src/app/App.tsx`). We add safe-area insets as *additional* padding
+ * on that container so the landing incantation, terminal header, and
+ * keycap row never collide with the notch. On desktop the env() values
+ * resolve to 0 and nothing changes visually.
+ *
+ * `svh`/`dvh` inside the container already handle keyboard appearance;
+ * the safe-area insets are orthogonal to that.
+ */
+#root > div {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "./rhetoric.schema.json",
+  "$description": "Per-rhetorical-type tunables. Each key is a RhetoricalType. `tonalCentre.hz` is the audio pitch of this room type's chord root. `dissonance` in [0,1] shifts the chord from major triad toward minor-second cluster in @/world/systems (not currently used; will be if procedural audio returns). `pathCost` is the Yuka Dijkstra edge weight for passages *into* this room type — lower = rhetorically more attractive (fallacies and circular rooms pull the player).",
+  "types": {
+    "premise": {
+      "tonalCentre": { "hz": 220.0, "note": "A3" },
+      "dissonance": 0.0,
+      "pathCost": 1.0
+    },
+    "conclusion": {
+      "tonalCentre": { "hz": 329.63, "note": "E4" },
+      "dissonance": 0.0,
+      "pathCost": 1.0
+    },
+    "definition": {
+      "tonalCentre": { "hz": 261.63, "note": "C4" },
+      "dissonance": 0.05,
+      "pathCost": 0.9
+    },
+    "analogy": {
+      "tonalCentre": { "hz": 293.66, "note": "D4" },
+      "dissonance": 0.1,
+      "pathCost": 1.1
+    },
+    "fallacy": {
+      "tonalCentre": { "hz": 233.08, "note": "Bb3" },
+      "dissonance": 0.5,
+      "pathCost": 0.5,
+      "$comment": "Seductively cheap — fallacies pull the player in."
+    },
+    "circular": {
+      "tonalCentre": { "hz": 246.94, "note": "B3" },
+      "dissonance": 0.7,
+      "pathCost": 0.3,
+      "$comment": "Cheapest of all — the circular room is the attractor."
+    },
+    "objection": {
+      "tonalCentre": { "hz": 277.18, "note": "C#4" },
+      "dissonance": 0.4,
+      "pathCost": 1.3
+    },
+    "meta": {
+      "tonalCentre": { "hz": 415.3, "note": "G#4" },
+      "dissonance": 0.3,
+      "pathCost": 1.2
+    }
+  }
+}
