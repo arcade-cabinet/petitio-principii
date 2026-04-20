@@ -1,0 +1,419 @@
+{
+  "lastBuilt": "2026-04-20T21:26:52.707Z",
+  "descriptions": {
+    "premise": {
+      "I": [
+        "Columns of unjustified assumptions rise into darkness. One reads: #fragment#. You remember agreeing.",
+        "You stand among the first givens. The lectern states: #fragment#. It seemed obvious when you set it down.",
+        "This is where it begins. The inscription on the nearest column: #fragment#."
+      ],
+      "II": [
+        "You return. The column you engaged with before is now centred, taller. Its fresh inscription reads: #fragment#. #acceptedAck#",
+        "The premise hall rearranges subtly. A new column has grown beside the old: #fragment#. #questionedAck#",
+        "You have been here. The given reads the same, differently: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The columns close ranks. The only legible one reads: #fragment#. You recognize your handwriting. #acceptedAck#",
+        "There are no other columns now. There is only: #fragment#. It is what it has always been.",
+        "The premise recites itself, and in reciting becomes: #fragment#. You accept, or do not. It does not matter here."
+      ]
+    },
+    "conclusion": {
+      "I": [
+        "A statement is mounted on a plinth. It reads: #fragment#. You cannot see what it follows from, yet the balcony is comfortable.",
+        "The conclusion is here, already concluded. Its engraving: #fragment#.",
+        "Above the balcony a motto hangs: #fragment#. The view below is unspecified."
+      ],
+      "II": [
+        "The conclusion has deepened. The plinth now reads: #fragment#. You can almost see what it follows from. #acceptedAck#",
+        "You step onto the balcony again. The inscription has absorbed your attention: #fragment#. #questionedAck#",
+        "The conclusion was here, still is. Its new wording: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The conclusion has become the only statement. It reads: #fragment#. It has always read this way.",
+        "The balcony dissolves into its own inscription: #fragment#.",
+        "You accept the conclusion, or you don't. Either way, it reads: #fragment#."
+      ]
+    },
+    "definition": {
+      "I": [
+        "Brass dictionaries line the walls. The lectern entry defines the term as #fragment#. You decide this is sufficient.",
+        "Definition is offered as given. The chamber's canonical entry: #fragment#.",
+        "The meaning is fixed by an inscription below the lantern: #fragment#."
+      ],
+      "II": [
+        "You return to the antechamber. The definition has widened: #fragment#. #acceptedAck#",
+        "The dictionary has opened itself to a new page: #fragment#. #questionedAck#",
+        "The lectern entry has been amended: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "Every dictionary is open to the same page. Every page reads: #fragment#.",
+        "The definition has eaten its own entry. What remains: #fragment#.",
+        "You understand the term exactly as it wished to be understood: #fragment#."
+      ]
+    },
+    "analogy": {
+      "I": [
+        "Paintings along the wall are hung in pairs. Between one pair the curator has written: #fragment#. You trust the arrangement.",
+        "An analogy is offered. Its upper plaque reads #fragmentA#; its lower plaque reads #fragmentB#. You supply the resemblance.",
+        "The gallery presents one likeness: #fragment#. You walk past it and take its shape with you."
+      ],
+      "II": [
+        "You return to the gallery. The curator's notes between the paintings are denser now: #fragment#. #acceptedAck#",
+        "A paragraph has accrued beneath the analogy you inspected before: #fragment#. #questionedAck#",
+        "The pair you passed is now annotated: #fragmentA#; and in the margin: #fragmentB#. #rejectedAck#"
+      ],
+      "III": [
+        "Every pair carries the same note. Every note reads: #fragment#.",
+        "The analogy has eaten both its terms. What remains of the resemblance: #fragment#.",
+        "You cannot recall which painting was the source and which the image. The plaque below reads: #fragment#."
+      ]
+    },
+    "fallacy": {
+      "I": [
+        "The cellar is warmer than the rest of the palace. A syllogism has been left out, middle term missing: #fragment#.",
+        "An error has been furnished like a room. Its inscription: #fragment#.",
+        "Something went wrong here, comfortably. The leftover reasoning: #fragment#."
+      ],
+      "II": [
+        "You return to the cellar. The missing middle term has grown a voice: #fragment#. #acceptedAck#",
+        "The fallacy has dressed itself: #fragment#. #questionedAck#",
+        "You already know how to complete it. The completion reads: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The fallacy is no longer hidden. It addresses you directly: #fragment#.",
+        "The cellar has become a single sentence. It reads: #fragment#.",
+        "The error admits itself, and in admitting becomes indistinguishable from: #fragment#."
+      ]
+    },
+    "circular": {
+      "I": [
+        "A rotunda with seven entrances and no exits. The inscription on the floor reads: #fragment#. You recognize the phrase.",
+        "The atrium turns once as you enter. On the far wall: #fragment#.",
+        "You are here already. The floor says so: #fragment#."
+      ],
+      "II": [
+        "You have returned. The inscription on the floor reads: #fragment#. #acceptedAck#",
+        "The rotunda repeats itself with small emphasis. The floor: #fragment#. #questionedAck#",
+        "You brought this phrase here. You will find it here again: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The rotunda has only one inscription, and the inscription is the rotunda: #fragment#.",
+        "You are the phrase on the floor. The floor reads: #fragment#.",
+        "The circle has closed into a word. The word is: #fragment#."
+      ]
+    },
+    "objection": {
+      "I": [
+        "Monks walk the cloister in slow circles, reading from small books. Each book contains an objection: #fragment#.",
+        "A dissent has been placed here for consideration: #fragment#. You nod, politely.",
+        "The cloister offers counter-argument: #fragment#."
+      ],
+      "II": [
+        "You return. The monks' objections are denser now, in a hand almost your own: #fragment#. #acceptedAck#",
+        "The cloister has gained a new defence against your previous doubt: #fragment#. #questionedAck#",
+        "Someone has answered the objection on your behalf: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The objection and the defence have become indistinguishable. Both read: #fragment#.",
+        "The monks are reading the same passage, at the same time, aloud: #fragment#.",
+        "You cannot remember which side of the objection you were on. The page reads: #fragment#."
+      ]
+    },
+    "meta": {
+      "I": [
+        "An observatory whose telescope is trained inward. Through the eyepiece: #fragment#.",
+        "The argument watches itself argue. What it sees: #fragment#.",
+        "The room describes itself describing. Its self-description: #fragment#."
+      ],
+      "II": [
+        "The telescope has been adjusted. What it sees now: #fragment#. #acceptedAck#",
+        "You observe the argument observing your observation: #fragment#. #questionedAck#",
+        "The observatory records your return as part of itself: #fragment#. #rejectedAck#"
+      ],
+      "III": [
+        "The telescope is pointed at the plate on which it rests. The inscription on the plate reads: #fragment#.",
+        "The observatory is the argument, and the argument is: #fragment#.",
+        "You have been the argument. The argument has been: #fragment#."
+      ]
+    }
+  },
+  "acks": {
+    "accepted": [
+      "You remember accepting #fragment_short#."
+    ],
+    "rejected": [
+      "You remember having rejected #fragment_short#, and finding the rejection absorbed."
+    ],
+    "questioned": [
+      "The room defends itself against your earlier question with #fragment_short#."
+    ]
+  },
+  "incantation": {
+    "origin": [
+      "#adj# #adj# #noun#"
+    ],
+    "adj": [
+      "circular",
+      "serpentine",
+      "radiant",
+      "silver",
+      "nebulous",
+      "arcane",
+      "convoluted",
+      "spectral",
+      "hollow",
+      "luminous",
+      "ethereal",
+      "tangled",
+      "ancient",
+      "fractured",
+      "crystalline",
+      "obscure",
+      "shifting",
+      "veiled",
+      "cosmic",
+      "murky",
+      "paradoxical",
+      "gilded",
+      "resplendent",
+      "nocturnal",
+      "endless",
+      "forgotten",
+      "silent",
+      "shimmering",
+      "haunted",
+      "spiraling"
+    ],
+    "noun": [
+      "premise",
+      "axiom",
+      "conjecture",
+      "syllogism",
+      "tautology",
+      "fallacy",
+      "inference",
+      "paradox",
+      "assertion",
+      "maxim",
+      "theorem",
+      "lemma",
+      "corollary",
+      "argument",
+      "proposition",
+      "refutation",
+      "assumption",
+      "conclusion",
+      "hypothesis",
+      "aporia",
+      "dialectic",
+      "enthymeme",
+      "sophism",
+      "quandary",
+      "reductio",
+      "antinomy",
+      "equivocation",
+      "analogy",
+      "circularity"
+    ]
+  },
+  "agent": {
+    "Composed": {
+      "accept": [
+        "You accept this step in the argument.\nThe #roomTitle# notes your assent and continues, unhurried."
+      ],
+      "reject": [
+        "You reject this step in the argument.\nThe #roomTitle# acknowledges the objection. It has other avenues."
+      ],
+      "question": [
+        "You question the assumption.\nThe #roomTitle# pauses, briefly. The assumption remains.",
+        "You question the assumption.\nThe #roomTitle# considers your doubt. It is patient with you."
+      ]
+    },
+    "Defensive": {
+      "accept": [
+        "You accept the step.\nThe #roomTitle# relaxes — it had been bracing. The acceptance is noted among the premises it has already secured."
+      ],
+      "reject": [
+        "You reject the step.\nThe #roomTitle# absorbs the rejection. It files your objection under \"dialectical moments the argument has survived.\""
+      ],
+      "question": [
+        "You question the assumption.\nThe #roomTitle# answers: the question itself presupposes what it questions. You find this compelling.",
+        "You question the assumption.\nThe #roomTitle# responds in a hand almost your own: the doubt is already part of the figure. The column grows firmer."
+      ]
+    },
+    "Seductive": {
+      "accept": [
+        "You accept the step.\nThe #roomTitle# is flattered. Details you have accepted grow prominent; details you have not recede."
+      ],
+      "reject": [
+        "You reject the step.\nThe #roomTitle# smiles, a little. The rejection is recorded as evidence of your discernment — which in turn underwrites the conclusions you did accept."
+      ],
+      "question": [
+        "You question the assumption.\nThe #roomTitle# welcomes the question. An argument open to scrutiny must be sound.",
+        "You question the assumption.\nThe #roomTitle# recites your doubt back to you in a warmer register. You nod."
+      ]
+    },
+    "Triumphant": {
+      "accept": [
+        "You accept the argument.\nThe conclusion you have accepted is identical to the premise from which you began.\nYou have completed the circle here, in #roomArticle# #roomType# room. Petitio Principii.\n\nThe argument was always about itself."
+      ],
+      "reject": [
+        "You reject the argument.\nThe #roomTitle# absorbs your rejection as a necessary dialectical moment and continues. You remember having rejected this before."
+      ],
+      "question": [
+        "You question the assumption.\nThe #roomTitle# records your question among its premises. The question will later be cited as evidence that the conclusion is open to scrutiny, therefore sound."
+      ]
+    }
+  },
+  "slots": {
+    "fragment": [
+      "the slithy toves did gyre and gimble in the wabe",
+      "all mimsy were the borogoves, and the mome raths outgrabe",
+      "beware the jabberwock, my son, the jaws that bite, the claws that catch",
+      "he took his vorpal sword in hand, long time the manxome foe he sought",
+      "and as in uffish thought he stood, the jabberwock came whiffling through the tulgey…",
+      "sometimes I have believed as many as six impossible things before breakfast",
+      "when I use a word it means just what I choose it to mean,…",
+      "the question is which is to be master, that is all",
+      "it takes all the running you can do to keep in the same place",
+      "the rule is jam tomorrow and jam yesterday but never jam today",
+      "it is a poor sort of memory that only works backwards",
+      "curiouser and curiouser, cried alice",
+      "we are all mad here, I am mad, you are mad",
+      "begin at the beginning and go on till you come to the end, then…",
+      "if everybody minded their own business the world would go round a deal faster…",
+      "a kind in glass and a cousin, a spectacle and nothing strange",
+      "a single hurt color and an arrangement in a system to pointing",
+      "all this and not ordinary, not unordered in not resembling",
+      "the difference is spreading",
+      "a little called anything shows shudders",
+      "a rose is a rose is a rose is a rose",
+      "dada means nothing, if one finds it futile and wastes no time over a…",
+      "thought is made in the mouth",
+      "I write a manifesto and I want nothing, yet I say certain things and…",
+      "logic is a complication, logic is always wrong",
+      "order equals disorder, I equals not-I, affirmation equals negation",
+      "the word and the image are one, the painter and the poet belong together",
+      "gadji beri bimba glandridi laula lonni cadori",
+      "the marvelous is always beautiful, anything marvelous is beautiful, in fact only the marvelous…",
+      "the simplest surrealist act consists of going down into the street and firing at…",
+      "I believe in the future resolution of the states of dream and reality, seemingly…",
+      "beauty will be convulsive or it will not be at all",
+      "existence is elsewhere, and the proof of it is the fact of my continually…",
+      "as beautiful as the chance meeting of a sewing machine and an umbrella on…",
+      "arithmetic is a marvellous science that has nothing to do with numbers"
+    ],
+    "fragment_short": [
+      "the slithy toves did gyre and gimble in…",
+      "all mimsy were the borogoves, and the mome…",
+      "beware the jabberwock, my son, the jaws that…",
+      "he took his vorpal sword in hand, long…",
+      "and as in uffish thought he stood, the…",
+      "sometimes I have believed as many as six…",
+      "when I use a word it means just…",
+      "the question is which is to be master,…",
+      "it takes all the running you can do…",
+      "the rule is jam tomorrow and jam yesterday…",
+      "it is a poor sort of memory that…",
+      "curiouser and curiouser, cried alice",
+      "we are all mad here, I am mad,…",
+      "begin at the beginning and go on till…",
+      "if everybody minded their own business the world…",
+      "a kind in glass and a cousin, a…",
+      "a single hurt color and an arrangement in…",
+      "all this and not ordinary, not unordered in…",
+      "the difference is spreading",
+      "a little called anything shows shudders",
+      "a rose is a rose is a rose…",
+      "dada means nothing, if one finds it futile…",
+      "thought is made in the mouth",
+      "I write a manifesto and I want nothing,…",
+      "logic is a complication, logic is always wrong",
+      "order equals disorder, I equals not-I, affirmation equals…",
+      "the word and the image are one, the…",
+      "gadji beri bimba glandridi laula lonni cadori",
+      "the marvelous is always beautiful, anything marvelous is…",
+      "the simplest surrealist act consists of going down…",
+      "I believe in the future resolution of the…",
+      "beauty will be convulsive or it will not…",
+      "existence is elsewhere, and the proof of it…",
+      "as beautiful as the chance meeting of a…",
+      "arithmetic is a marvellous science that has nothing…"
+    ],
+    "fragmentA": [
+      "the slithy toves did gyre and gimble in the wabe",
+      "all mimsy were the borogoves, and the mome raths outgrabe",
+      "beware the jabberwock, my son, the jaws that bite, the…",
+      "he took his vorpal sword in hand, long time the…",
+      "and as in uffish thought he stood, the jabberwock came…",
+      "sometimes I have believed as many as six impossible things…",
+      "when I use a word it means just what I…",
+      "the question is which is to be master, that is…",
+      "it takes all the running you can do to keep…",
+      "the rule is jam tomorrow and jam yesterday but never…",
+      "it is a poor sort of memory that only works…",
+      "curiouser and curiouser, cried alice",
+      "we are all mad here, I am mad, you are…",
+      "begin at the beginning and go on till you come…",
+      "if everybody minded their own business the world would go…",
+      "a kind in glass and a cousin, a spectacle and…",
+      "a single hurt color and an arrangement in a system…",
+      "all this and not ordinary, not unordered in not resembling",
+      "the difference is spreading",
+      "a little called anything shows shudders",
+      "a rose is a rose is a rose is a…",
+      "dada means nothing, if one finds it futile and wastes…",
+      "thought is made in the mouth",
+      "I write a manifesto and I want nothing, yet I…",
+      "logic is a complication, logic is always wrong",
+      "order equals disorder, I equals not-I, affirmation equals negation",
+      "the word and the image are one, the painter and…",
+      "gadji beri bimba glandridi laula lonni cadori",
+      "the marvelous is always beautiful, anything marvelous is beautiful, in…",
+      "the simplest surrealist act consists of going down into the…",
+      "I believe in the future resolution of the states of…",
+      "beauty will be convulsive or it will not be at…",
+      "existence is elsewhere, and the proof of it is the…",
+      "as beautiful as the chance meeting of a sewing machine…",
+      "arithmetic is a marvellous science that has nothing to do…"
+    ],
+    "fragmentB": [
+      "the slithy toves did gyre and gimble in the wabe",
+      "all mimsy were the borogoves, and the mome raths outgrabe",
+      "beware the jabberwock, my son, the jaws that bite, the…",
+      "he took his vorpal sword in hand, long time the…",
+      "and as in uffish thought he stood, the jabberwock came…",
+      "sometimes I have believed as many as six impossible things…",
+      "when I use a word it means just what I…",
+      "the question is which is to be master, that is…",
+      "it takes all the running you can do to keep…",
+      "the rule is jam tomorrow and jam yesterday but never…",
+      "it is a poor sort of memory that only works…",
+      "curiouser and curiouser, cried alice",
+      "we are all mad here, I am mad, you are…",
+      "begin at the beginning and go on till you come…",
+      "if everybody minded their own business the world would go…",
+      "a kind in glass and a cousin, a spectacle and…",
+      "a single hurt color and an arrangement in a system…",
+      "all this and not ordinary, not unordered in not resembling",
+      "the difference is spreading",
+      "a little called anything shows shudders",
+      "a rose is a rose is a rose is a…",
+      "dada means nothing, if one finds it futile and wastes…",
+      "thought is made in the mouth",
+      "I write a manifesto and I want nothing, yet I…",
+      "logic is a complication, logic is always wrong",
+      "order equals disorder, I equals not-I, affirmation equals negation",
+      "the word and the image are one, the painter and…",
+      "gadji beri bimba glandridi laula lonni cadori",
+      "the marvelous is always beautiful, anything marvelous is beautiful, in…",
+      "the simplest surrealist act consists of going down into the…",
+      "I believe in the future resolution of the states of…",
+      "beauty will be convulsive or it will not be at…",
+      "existence is elsewhere, and the proof of it is the…",
+      "as beautiful as the chance meeting of a sewing machine…",
+      "arithmetic is a marvellous science that has nothing to do…"
+    ]
+  }
+}

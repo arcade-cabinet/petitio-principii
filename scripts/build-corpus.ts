@@ -18,6 +18,7 @@ import { RiTa } from "rita";
 
 import { ADJECTIVES } from "../src/content/lexicon/adjectives.ts";
 import { NOUNS } from "../src/content/lexicon/nouns.ts";
+import { buildGrammars, renderStableGrammarsJson } from "./build-grammars.ts";
 import { SURREALIST_FRAGMENTS, type SurrealistFragment } from "./sources/surrealist-fragments.ts";
 
 export interface GeneratedNoun {
@@ -388,6 +389,23 @@ function main(): void {
   console.log(
     `[build-corpus] wrote ${surrealist.fragments.length} surrealist fragments to ${path.relative(process.cwd(), surrealistTarget)}`
   );
+
+  // Grammar artifact — the Tracery/RNG-driven source of truth the runtime
+  // expands at flatten-time. Same deterministic/stable-render discipline as
+  // the corpus modules above.
+  const grammars = buildGrammars();
+  const grammarsTarget = resolveGrammarsOutputPath();
+  const grammarsPrev = existsSync(grammarsTarget) ? readFileSync(grammarsTarget, "utf8") : null;
+  const grammarsOut = renderStableGrammarsJson(grammars, grammarsPrev);
+  writeFileSync(grammarsTarget, grammarsOut, "utf8");
+  console.log(
+    `[build-corpus] wrote grammars.json to ${path.relative(process.cwd(), grammarsTarget)}`
+  );
+}
+
+function resolveGrammarsOutputPath(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(here, "..", "src", "content", "generated", "grammars.json");
 }
 
 // Run as CLI unless imported for testing. tsx sets import.meta.url to the
