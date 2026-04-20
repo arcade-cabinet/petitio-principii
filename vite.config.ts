@@ -1,8 +1,8 @@
-import react from "@vitejs/plugin-react";
+import solid from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [solid()],
   base: "./",
   build: {
     outDir: "dist",
