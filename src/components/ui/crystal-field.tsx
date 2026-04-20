@@ -183,10 +183,6 @@ export function CrystalField({ className }: CrystalFieldProps) {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className={cn("pointer-events-none fixed inset-0 z-0", className)}
-    />
+    <canvas ref={canvasRef} className={cn("pointer-events-none fixed inset-0 z-0", className)} />
   );
 }

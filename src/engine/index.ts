@@ -1,6 +1,10 @@
 export { generateArgumentGraph, type ArgumentGraph } from "./core/ArgumentGraph";
 export type { CommandVerb, ParsedCommand } from "./core/Command";
-export { createInitialGameState, type GameState } from "./core/GameState";
+export {
+  createInitialGameState,
+  type GameState,
+  type TranscriptEntry,
+} from "./core/GameState";
 export {
   describeExamineFor,
   describeFallacy,

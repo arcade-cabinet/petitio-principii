@@ -1,4 +1,4 @@
-import type { ArgumentGraph } from "@/engine";
+import type { ArgumentGraph, TranscriptEntry } from "@/engine";
 import { type World, createWorld } from "koota";
 
 export type { World } from "koota";
@@ -7,6 +7,7 @@ import {
   Exit as ExitTrait,
   IsPlayer,
   IsRoom,
+  OutputLine,
   Position,
   RhetoricalSpace,
   RoomId,
@@ -80,4 +81,52 @@ export function buildWorld(graph: ArgumentGraph): World {
   world.spawn(IsPlayer, Position({ roomId: graph.startRoomId }));
 
   return world;
+}
+
+/** Monotonic ordinal per world so transcript order is unambiguous. */
+const ordinalByWorld = new WeakMap<World, number>();
+
+/**
+ * Append one transcript line to the world as a dedicated entity.
+ *
+ * Each line is its own entity so React can key on its koota id and so
+ * later systems can attach per-line traits (`IsAccepted`, `IsChallenged`,
+ * relations to rooms and rhetorical moves) — the transcript becomes
+ * addressable gameplay state, not an opaque string array.
+ */
+export function appendOutput(world: World, kind: TranscriptEntry["kind"], text: string): void {
+  const next = (ordinalByWorld.get(world) ?? 0) + 1;
+  ordinalByWorld.set(world, next);
+  world.spawn(OutputLine({ ordinal: next, kind, text }));
+}
+
+/** Append a batch of lines in order. Convenience for describeRoom output. */
+export function appendOutputLines(
+  world: World,
+  entries: ReadonlyArray<{ kind: TranscriptEntry["kind"]; text: string }>
+): void {
+  for (const entry of entries) {
+    appendOutput(world, entry.kind, entry.text);
+  }
+}
+
+/**
+ * Project the world's OutputLine entities to a plain array, sorted by
+ * ordinal. The returned `id` is the stable React key for each line.
+ */
+export function readTranscript(world: World): TranscriptEntry[] {
+  const entries: TranscriptEntry[] = [];
+  world
+    .query(OutputLine)
+    .select(OutputLine)
+    .readEach(([line], entity) => {
+      entries.push({
+        id: `ol-${entity.id()}`,
+        ordinal: line.ordinal,
+        kind: line.kind,
+        text: line.text,
+      });
+    });
+  entries.sort((a, b) => a.ordinal - b.ordinal);
+  return entries;
 }

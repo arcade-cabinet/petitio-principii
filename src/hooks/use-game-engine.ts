@@ -1,6 +1,7 @@
 import {
   type Direction,
   type GameState,
+  type TranscriptEntry,
   createInitialGameState,
   describeRoom,
   generateArgumentGraph,
@@ -14,10 +15,13 @@ import {
   RhetoricalSpace,
   RoomId,
   type World,
+  appendOutput,
+  appendOutputLines,
   buildRhetoricalGraph,
   buildWorld,
   disposeAudio,
   initAudio,
+  readTranscript,
   shortestRhetoricalPath,
   updateAudio,
   wireEdges,
@@ -27,10 +31,11 @@ import { useCallback, useRef, useState } from "react";
 /**
  * React port of the framework-agnostic game engine.
  *
- * Thin shell: all of the logic lives in @/engine (pure) and @/world
- * (koota ECS). This hook's job is only to (a) hold the GameState in a
- * React state tree, (b) own the koota World lifetime, and (c) bridge
- * user gestures to initAudio() since Tone.start() needs a user click.
+ * Thin shell around @/engine (pure logic) and @/world (koota ECS).
+ * Every transcript line is a koota `OutputLine` entity — the UI keys on
+ * entity ids (stable by construction) rather than array indices, and
+ * later systems can attach per-line traits (IsAccepted, IsChallenged,
+ * relations to rooms) so the log becomes addressable gameplay state.
  *
  * If you need to change game behaviour, edit @/engine — not this file.
  */
@@ -58,10 +63,32 @@ export interface GameEngine {
   requestNewGame: () => void;
 }
 
+/** Classify a string line into a transcript kind for koota storage. */
+function classifyLine(text: string): TranscriptEntry["kind"] {
+  if (text === "") return "spacer";
+  if (text.startsWith(">")) return "echo";
+  if (text.startsWith("== ") && text.endsWith(" ==")) return "title";
+  return "narration";
+}
+
 export function useGameEngine(): GameEngine {
   const [state, setState] = useState<GameState>(createInitialGameState);
   const worldRef = useRef<World | null>(null);
   const pathCacheRef = useRef<PathCache | null>(null);
+
+  /** Rebuild GameState.output + GameState.transcript from the koota world. */
+  const project = useCallback((world: World, base: GameState): GameState => {
+    const transcript = readTranscript(world);
+    const output = transcript.map((e) => e.text);
+    return { ...base, transcript, output };
+  }, []);
+
+  const writeLines = useCallback((world: World, texts: readonly string[]): void => {
+    appendOutputLines(
+      world,
+      texts.map((text) => ({ kind: classifyLine(text), text }))
+    );
+  }, []);
 
   const moveTo = useCallback((world: World, nextRoomId: string) => {
     world
@@ -73,28 +100,26 @@ export function useGameEngine(): GameEngine {
     updateAudio(world);
   }, []);
 
-  const startGame = useCallback(async (seed: number) => {
-    disposeAudio();
-    await initAudio();
+  const startGame = useCallback(
+    async (seed: number) => {
+      disposeAudio();
+      await initAudio();
 
-    const graph = generateArgumentGraph(seed);
-    const phrase = generatePhrase(seed);
-    const startRoom = graph.rooms.get(graph.startRoomId);
+      const graph = generateArgumentGraph(seed);
+      const phrase = generatePhrase(seed);
+      const startRoom = graph.rooms.get(graph.startRoomId);
 
-    const world = buildWorld(graph);
-    worldRef.current = world;
+      const world = buildWorld(graph);
+      worldRef.current = world;
 
-    const { graph: rhetGraph, indexByRoomId, roomIdByIndex } = buildRhetoricalGraph(world);
-    wireEdges(rhetGraph, graph.rooms, indexByRoomId);
-    pathCacheRef.current = { graph: rhetGraph, indexByRoomId, roomIdByIndex };
+      const { graph: rhetGraph, indexByRoomId, roomIdByIndex } = buildRhetoricalGraph(world);
+      wireEdges(rhetGraph, graph.rooms, indexByRoomId);
+      pathCacheRef.current = { graph: rhetGraph, indexByRoomId, roomIdByIndex };
 
-    updateAudio(world);
+      updateAudio(world);
 
-    setState({
-      seed,
-      currentRoomId: graph.startRoomId,
-      rooms: graph.rooms,
-      output: [
+      // Seed the transcript via koota so the UI can key on entity ids.
+      writeLines(world, [
         "Petitio Principii",
         `Seed: ${seed} — "${phrase}"`,
         "",
@@ -102,12 +127,22 @@ export function useGameEngine(): GameEngine {
         "The premise smells faintly of tautology.",
         "",
         ...(startRoom ? describeRoom(startRoom) : ["The argument begins..."]),
-      ],
-      turnCount: 0,
-      started: true,
-      phrase,
-    });
-  }, []);
+      ]);
+
+      setState((prev) =>
+        project(world, {
+          ...prev,
+          seed,
+          currentRoomId: graph.startRoomId,
+          rooms: graph.rooms,
+          turnCount: 0,
+          started: true,
+          phrase,
+        })
+      );
+    },
+    [project, writeLines]
+  );
 
   const requestNewGame = useCallback(() => {
     disposeAudio();
@@ -123,130 +158,97 @@ export function useGameEngine(): GameEngine {
       const pathCache = pathCacheRef.current;
 
       setState((prev) => {
+        if (!world) return prev;
         const parsed = parseCommand(raw);
         const currentRoom = prev.rooms.get(prev.currentRoomId);
-        const log = [...prev.output, `> ${raw}`];
+
+        // Echo the player's input into the transcript
+        appendOutput(world, "echo", `> ${raw}`);
 
         if (!prev.started || !currentRoom) {
-          return {
-            ...prev,
-            output: [...log, "The argument has not yet begun."],
-          };
+          writeLines(world, ["The argument has not yet begun."]);
+          return project(world, prev);
         }
 
-        // Movement verbs — follow the exit if one exists in that direction
+        // Movement verbs
         if (MOVEMENT.includes(parsed.verb as Direction)) {
           const dir = parsed.verb as Direction;
           const exit = currentRoom.exits.find((e) => e.direction === dir);
           if (exit) {
             const next = prev.rooms.get(exit.targetRoomId);
             if (next) {
-              if (world) moveTo(world, next.id);
-              return {
+              moveTo(world, next.id);
+              writeLines(world, [`You move ${dir}.`, "", ...describeRoom(next)]);
+              return project(world, {
                 ...prev,
                 currentRoomId: next.id,
-                output: [...log, `You move ${dir}.`, "", ...describeRoom(next)],
                 turnCount: prev.turnCount + 1,
-              };
+              });
             }
           }
-          return {
-            ...prev,
-            output: [
-              ...log,
-              "You cannot go that way. The argument has no passage in that direction.",
-            ],
-            turnCount: prev.turnCount + 1,
-          };
+          writeLines(world, [
+            "You cannot go that way. The argument has no passage in that direction.",
+          ]);
+          return project(world, { ...prev, turnCount: prev.turnCount + 1 });
         }
+
+        const bump = (lines: readonly string[]): GameState => {
+          writeLines(world, lines);
+          return project(world, { ...prev, turnCount: prev.turnCount + 1 });
+        };
 
         switch (parsed.verb) {
           case "look":
-            return {
-              ...prev,
-              output: [...log, ...describeRoom(currentRoom)],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump(describeRoom(currentRoom));
           case "examine": {
             const rooms = new Map(prev.rooms);
             rooms.set(currentRoom.id, { ...currentRoom, examined: true });
-            return {
+            writeLines(world, [
+              `You examine the ${currentRoom.title} more closely.`,
+              currentRoom.description,
+            ]);
+            return project(world, {
               ...prev,
               rooms,
-              output: [
-                ...log,
-                `You examine the ${currentRoom.title} more closely.`,
-                currentRoom.description,
-              ],
               turnCount: prev.turnCount + 1,
-            };
+            });
           }
           case "help":
-            return {
-              ...prev,
-              output: [...log, ...getHelpText()],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump(getHelpText());
           case "question":
-            return {
-              ...prev,
-              output: [
-                ...log,
-                "You question the assumption.",
-                `The ${currentRoom.title} trembles slightly. Good question. The argument doesn't have a ready answer.`,
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              "You question the assumption.",
+              `The ${currentRoom.title} trembles slightly. Good question. The argument doesn't have a ready answer.`,
+            ]);
           case "ask":
-            return {
-              ...prev,
-              output: [
-                ...log,
-                "You ask: Why?",
-                `The ${currentRoom.title} echoes. A voice replies: "Because it follows from the premise." You note that the premise has not been justified.`,
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              "You ask: Why?",
+              `The ${currentRoom.title} echoes. A voice replies: "Because it follows from the premise." You note that the premise has not been justified.`,
+            ]);
           case "accept":
             if (
               currentRoom.rhetoricalType === "circular" ||
               currentRoom.rhetoricalType === "meta"
             ) {
-              return {
-                ...prev,
-                output: [
-                  ...log,
-                  "You accept the argument.",
-                  "The conclusion you have accepted is identical to the premise from which you began.",
-                  "You have completed the circle. Petitio Principii.",
-                  "",
-                  "The argument was always about itself.",
-                ],
-                turnCount: prev.turnCount + 1,
-              };
+              return bump([
+                "You accept the argument.",
+                "The conclusion you have accepted is identical to the premise from which you began.",
+                "You have completed the circle. Petitio Principii.",
+                "",
+                "The argument was always about itself.",
+              ]);
             }
-            return {
-              ...prev,
-              output: [
-                ...log,
-                "You accept this step in the argument.",
-                "The argument notes your acceptance and moves on, emboldened.",
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              "You accept this step in the argument.",
+              "The argument notes your acceptance and moves on, emboldened.",
+            ]);
           case "reject":
-            return {
-              ...prev,
-              output: [
-                ...log,
-                "You reject this argument.",
-                "The argument buckles but does not collapse. It has more premises.",
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              "You reject this argument.",
+              "The argument buckles but does not collapse. It has more premises.",
+            ]);
           case "trace": {
-            // Walk one step toward the nearest circular/meta room via Dijkstra
-            if (world && pathCache) {
+            if (pathCache) {
               const targets: string[] = [];
               world
                 .query(RhetoricalSpace, RoomId)
@@ -276,54 +278,35 @@ export function useGameEngine(): GameEngine {
                 const next = prev.rooms.get(nextHop);
                 if (next) {
                   moveTo(world, next.id);
-                  return {
+                  writeLines(world, [
+                    "You trace back through the argument.",
+                    "",
+                    ...describeRoom(next),
+                  ]);
+                  return project(world, {
                     ...prev,
                     currentRoomId: next.id,
-                    output: [
-                      ...log,
-                      "You trace back through the argument.",
-                      "",
-                      ...describeRoom(next),
-                    ],
                     turnCount: prev.turnCount + 1,
-                  };
+                  });
                 }
               }
             }
-            return {
-              ...prev,
-              output: [
-                ...log,
-                "You cannot trace back further. This is where the argument begins—or claims to.",
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              "You cannot trace back further. This is where the argument begins—or claims to.",
+            ]);
           }
           case "quit":
-            return {
-              ...prev,
-              output: [...log, "You cannot quit. The argument has already begun."],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump(["You cannot quit. The argument has already begun."]);
           case "inventory":
-            return {
-              ...prev,
-              output: [...log, "You are carrying nothing but your preconceptions."],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump(["You are carrying nothing but your preconceptions."]);
           default:
-            return {
-              ...prev,
-              output: [
-                ...log,
-                `The argument does not understand "${raw}". Try HELP for available commands.`,
-              ],
-              turnCount: prev.turnCount + 1,
-            };
+            return bump([
+              `The argument does not understand "${raw}". Try HELP for available commands.`,
+            ]);
         }
       });
     },
-    [moveTo]
+    [moveTo, project, writeLines]
   );
 
   return { state, startGame, submitCommand, requestNewGame };

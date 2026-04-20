@@ -43,3 +43,18 @@ export const AudioTheme = trait({
   baseFrequency: 440,
   dissonance: 0,
 });
+
+/**
+ * A single line of transcript output. Each line is its own entity so that
+ * (a) React can key on its koota entity id for stable renders, and
+ * (b) later systems can attach per-line traits (e.g. "this line is the
+ * premise being challenged", "this line was traced-back-through").
+ *
+ * `ordinal` is monotonic per game and gives the rendered order; `kind`
+ * routes styling (narration vs. player echo vs. room title vs. spacer).
+ */
+export const OutputLine = trait({
+  ordinal: 0,
+  kind: "narration" as "narration" | "echo" | "title" | "spacer",
+  text: "",
+});

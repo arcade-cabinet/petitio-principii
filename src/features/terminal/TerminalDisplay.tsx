@@ -51,12 +51,16 @@ export function TerminalDisplay({ state, onCommand, onNewGame }: TerminalDisplay
     [currentRoom]
   );
 
-  // Auto-scroll the display as output streams in
+  // Auto-scroll the display as output streams in. We depend on outputLength
+  // specifically — biome's exhaustive-deps analyzer can't see that the ref
+  // read inside the effect is a DOM live-read, not a React-tracked value.
+  const outputLength = state.output.length;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: outputLength is the trigger
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
-  }, [state.output]);
+  }, [outputLength]);
 
   // Keyboard parity — desktop users can still use the keyboard even though
   // the primary input model is taps. Movement, L, X, Q, T.
@@ -136,28 +140,44 @@ export function TerminalDisplay({ state, onCommand, onNewGame }: TerminalDisplay
           style={{ textShadow: "0 0 2px rgba(192,192,255,0.35)" }}
           aria-live="polite"
         >
-          {state.output.map((line, i) => {
-            if (line === "") {
+          {state.transcript.map((entry) => {
+            // Each line is a koota OutputLine entity — its id is its key.
+            // Traits on the entity also tell us how to style it (kind) and
+            // later can carry gameplay relations (IsAccepted, IsChallenged).
+            if (entry.kind === "spacer") {
               return (
-                <div key={`empty-${i}`} className="h-[1.55em]">
+                <div key={entry.id} className="h-[1.55em]">
                   &nbsp;
                 </div>
               );
             }
-            if (line.startsWith(">")) {
+            if (entry.kind === "echo") {
               return (
                 <div
-                  key={`in-${i}`}
+                  key={entry.id}
                   className="text-[var(--color-violet)] mt-3"
                   style={{ textShadow: "0 0 4px rgba(122,92,255,0.5)" }}
                 >
-                  {line}
+                  {entry.text}
+                </div>
+              );
+            }
+            if (entry.kind === "title") {
+              return (
+                <div
+                  key={entry.id}
+                  className="font-[family-name:var(--font-incantation)] text-[1.4rem] text-[var(--color-highlight)] mt-4 mb-1"
+                  style={{
+                    textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
+                  }}
+                >
+                  {entry.text}
                 </div>
               );
             }
             return (
-              <div key={`out-${i}`} className="whitespace-pre-wrap break-words">
-                {line}
+              <div key={entry.id} className="whitespace-pre-wrap break-words">
+                {entry.text}
               </div>
             );
           })}
