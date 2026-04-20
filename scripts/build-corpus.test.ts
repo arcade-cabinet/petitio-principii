@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { ADJECTIVES } from "../src/content/lexicon/adjectives.ts";
 import { NOUNS } from "../src/content/lexicon/nouns.ts";
-import { buildCorpus, renderCorpusModule, renderStableCorpusModule } from "./build-corpus.ts";
+import { buildCorpus, renderCorpusJson } from "./build-corpus.ts";
 
 describe("build-corpus pipeline", () => {
   const corpus = buildCorpus();
@@ -38,12 +38,17 @@ describe("build-corpus pipeline", () => {
     expect(() => buildCorpus(NOUNS, ["happily", ...ADJECTIVES])).toThrow(/non-adjectives/);
   });
 
-  it("preserves the previous lastBuilt when content is unchanged", () => {
-    const first = renderCorpusModule(corpus);
-    const later = renderStableCorpusModule(
-      { ...corpus, lastBuilt: new Date(Date.now() + 60_000).toISOString() },
-      first
-    );
-    expect(later).toBe(first);
+  it("emits stable JSON — repeated render with the same corpus is byte-identical", () => {
+    const first = renderCorpusJson(corpus);
+    const second = renderCorpusJson(corpus);
+    expect(second).toBe(first);
+  });
+
+  it("round-trips through JSON without losing data", () => {
+    const json = renderCorpusJson(corpus);
+    const parsed = JSON.parse(json);
+    expect(parsed.nouns.length).toBe(corpus.nouns.length);
+    expect(parsed.adjectives.length).toBe(corpus.adjectives.length);
+    expect(parsed.lastBuilt).toBe(corpus.lastBuilt);
   });
 });

@@ -4,6 +4,8 @@
 // Hand-edits will be overwritten and CI will flag stale output.
 // ============================================================================
 
+import data from "./corpus.json" with { type: "json" };
+
 export interface GeneratedNoun {
   readonly word: string;
   readonly plural: string;
@@ -15,71 +17,10 @@ export interface GeneratedAdjective {
   readonly syllables: number;
 }
 
-export const GENERATED_CORPUS = {
-  nouns: [
-    { word: "premise", plural: "premises", syllables: 2 },
-    { word: "axiom", plural: "axioms", syllables: 3 },
-    { word: "conjecture", plural: "conjectures", syllables: 3 },
-    { word: "syllogism", plural: "syllogism", syllables: 4 },
-    { word: "tautology", plural: "tautologies", syllables: 4 },
-    { word: "fallacy", plural: "fallacies", syllables: 3 },
-    { word: "inference", plural: "inferences", syllables: 3 },
-    { word: "paradox", plural: "paradoxes", syllables: 3 },
-    { word: "assertion", plural: "assertions", syllables: 3 },
-    { word: "maxim", plural: "maxims", syllables: 2 },
-    { word: "theorem", plural: "theorems", syllables: 2 },
-    { word: "lemma", plural: "lemmas", syllables: 2 },
-    { word: "corollary", plural: "corollaries", syllables: 4 },
-    { word: "argument", plural: "arguments", syllables: 3 },
-    { word: "proposition", plural: "propositions", syllables: 4 },
-    { word: "refutation", plural: "refutations", syllables: 4 },
-    { word: "assumption", plural: "assumptions", syllables: 3 },
-    { word: "conclusion", plural: "conclusions", syllables: 3 },
-    { word: "hypothesis", plural: "hypotheses", syllables: 4 },
-    { word: "aporia", plural: "aporias", syllables: 3 },
-    { word: "dialectic", plural: "dialectics", syllables: 4 },
-    { word: "enthymeme", plural: "enthymemes", syllables: 3 },
-    { word: "sophism", plural: "sophism", syllables: 3 },
-    { word: "quandary", plural: "quandaries", syllables: 3 },
-    { word: "reductio", plural: "reductios", syllables: 4 },
-    { word: "antinomy", plural: "antinomies", syllables: 4 },
-    { word: "equivocation", plural: "equivocations", syllables: 5 },
-    { word: "analogy", plural: "analogies", syllables: 4 },
-    { word: "circularity", plural: "circularities", syllables: 5 },
-  ],
-  adjectives: [
-    { word: "circular", syllables: 3 },
-    { word: "serpentine", syllables: 3 },
-    { word: "radiant", syllables: 3 },
-    { word: "silver", syllables: 2 },
-    { word: "nebulous", syllables: 3 },
-    { word: "arcane", syllables: 2 },
-    { word: "convoluted", syllables: 4 },
-    { word: "spectral", syllables: 2 },
-    { word: "hollow", syllables: 2 },
-    { word: "luminous", syllables: 3 },
-    { word: "ethereal", syllables: 4 },
-    { word: "tangled", syllables: 2 },
-    { word: "ancient", syllables: 2 },
-    { word: "fractured", syllables: 2 },
-    { word: "crystalline", syllables: 3 },
-    { word: "obscure", syllables: 2 },
-    { word: "shifting", syllables: 2 },
-    { word: "veiled", syllables: 1 },
-    { word: "cosmic", syllables: 2 },
-    { word: "murky", syllables: 2 },
-    { word: "paradoxical", syllables: 5 },
-    { word: "gilded", syllables: 2 },
-    { word: "resplendent", syllables: 3 },
-    { word: "nocturnal", syllables: 3 },
-    { word: "endless", syllables: 2 },
-    { word: "forgotten", syllables: 3 },
-    { word: "silent", syllables: 2 },
-    { word: "shimmering", syllables: 3 },
-    { word: "haunted", syllables: 2 },
-    { word: "spiraling", syllables: 3 },
-  ],
-  lastBuilt: "2026-04-20T19:50:56.756Z",
-} as const;
+export interface GeneratedCorpus {
+  readonly nouns: readonly GeneratedNoun[];
+  readonly adjectives: readonly GeneratedAdjective[];
+  readonly lastBuilt: string;
+}
 
-export type GeneratedCorpus = typeof GENERATED_CORPUS;
+export const GENERATED_CORPUS = data as GeneratedCorpus;

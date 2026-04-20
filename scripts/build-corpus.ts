@@ -124,18 +124,25 @@ const BANNER = [
   "// ============================================================================",
 ].join("\n");
 
-export function renderCorpusModule(corpus: GeneratedCorpus): string {
-  const nounLines = corpus.nouns
-    .map(
-      (n) =>
-        `    { word: ${JSON.stringify(n.word)}, plural: ${JSON.stringify(n.plural)}, syllables: ${n.syllables} },`
-    )
-    .join("\n");
-  const adjLines = corpus.adjectives
-    .map((a) => `    { word: ${JSON.stringify(a.word)}, syllables: ${a.syllables} },`)
-    .join("\n");
+/**
+ * Stable JSON rendering for the corpus data. The `.ts` accessor wraps this
+ * file with types so consumers never have to know whether the data is a
+ * TS module or JSON — they just import `GENERATED_CORPUS` from
+ * `@/content/generated/corpus`.
+ */
+export function renderCorpusJson(corpus: GeneratedCorpus): string {
+  return `${JSON.stringify(corpus, null, 2)}\n`;
+}
 
+/**
+ * Thin TS accessor module — types + a re-export of the JSON payload.
+ * Kept small and stable so hand-edits are unnecessary and diffs on
+ * `corpus.ts` only happen when the schema actually changes.
+ */
+export function renderCorpusAccessorModule(): string {
   return `${BANNER}
+
+import data from "./corpus.json" with { type: "json" };
 
 export interface GeneratedNoun {
   readonly word: string;
@@ -148,26 +155,32 @@ export interface GeneratedAdjective {
   readonly syllables: number;
 }
 
-export const GENERATED_CORPUS = {
-  nouns: [
-${nounLines}
-  ],
-  adjectives: [
-${adjLines}
-  ],
-  lastBuilt: ${JSON.stringify(corpus.lastBuilt)},
-} as const;
+export interface GeneratedCorpus {
+  readonly nouns: readonly GeneratedNoun[];
+  readonly adjectives: readonly GeneratedAdjective[];
+  readonly lastBuilt: string;
+}
 
-export type GeneratedCorpus = typeof GENERATED_CORPUS;
+export const GENERATED_CORPUS = data as GeneratedCorpus;
 `;
 }
 
-function resolveOutputPath(): string {
+function resolveCorpusJsonPath(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(here, "..", "src", "content", "generated", "corpus.json");
+}
+
+function resolveCorpusAccessorPath(): string {
   const here = path.dirname(fileURLToPath(import.meta.url));
   return path.resolve(here, "..", "src", "content", "generated", "corpus.ts");
 }
 
-function resolveSurrealistOutputPath(): string {
+function resolveSurrealistJsonPath(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(here, "..", "src", "content", "generated", "surrealist.json");
+}
+
+function resolveSurrealistAccessorPath(): string {
   const here = path.dirname(fileURLToPath(import.meta.url));
   return path.resolve(here, "..", "src", "content", "generated", "surrealist.ts");
 }
@@ -281,31 +294,21 @@ const SURREALIST_BANNER = [
   "// ============================================================================",
 ].join("\n");
 
-export function renderSurrealistModule(corpus: GeneratedSurrealistCorpus): string {
-  const fragLines = corpus.fragments
-    .map((frag) => {
-      const tokenJson = JSON.stringify(frag.tokens);
-      const tagLines = frag.tags
-        .map(
-          (t) =>
-            `      { word: ${JSON.stringify(t.word)}, pos: ${JSON.stringify(t.pos)}, syllables: ${t.syllables} },`
-        )
-        .join("\n");
-      return `    {
-      id: ${JSON.stringify(frag.id)},
-      text: ${JSON.stringify(frag.text)},
-      source: ${JSON.stringify(frag.source)},
-      year: ${frag.year},
-      derivative: ${frag.derivative},
-      tokens: ${tokenJson},
-      tags: [
-${tagLines}
-      ],
-    },`;
-    })
-    .join("\n");
+// Legacy `renderSurrealistModule` removed — surrealist data lives in
+// surrealist.json now, consumed via the thin accessor in surrealist.ts.
 
+/**
+ * Stable JSON for surrealist corpus — mirrors the corpus one. Consumers
+ * go through `surrealist.ts` which wraps this JSON with types.
+ */
+export function renderSurrealistJson(corpus: GeneratedSurrealistCorpus): string {
+  return `${JSON.stringify(corpus, null, 2)}\n`;
+}
+
+export function renderSurrealistAccessorModule(): string {
   return `${SURREALIST_BANNER}
+
+import data from "./surrealist.json" with { type: "json" };
 
 export interface TaggedWord {
   readonly word: string;
@@ -323,81 +326,78 @@ export interface GeneratedSurrealistFragment {
   readonly tags: readonly TaggedWord[];
 }
 
-export const SURREALIST_CORPUS = {
-  fragments: [
-${fragLines}
-  ],
-  lastBuilt: ${JSON.stringify(corpus.lastBuilt)},
-} as const;
+export interface GeneratedSurrealistCorpus {
+  readonly fragments: readonly GeneratedSurrealistFragment[];
+  readonly lastBuilt: string;
+}
 
-export type GeneratedSurrealistCorpus = typeof SURREALIST_CORPUS;
+export const SURREALIST_CORPUS = data as GeneratedSurrealistCorpus;
 `;
 }
 
-export function renderStableSurrealistModule(
-  corpus: GeneratedSurrealistCorpus,
-  previous: string | null
-): string {
-  if (previous === null) return renderSurrealistModule(corpus);
-  const candidateWithPrevStamp = renderSurrealistModule({
-    ...corpus,
-    lastBuilt: extractLastBuilt(previous) ?? corpus.lastBuilt,
-  });
-  if (candidateWithPrevStamp === previous) return previous;
-  return renderSurrealistModule(corpus);
-}
-
 /**
- * Produce the final module text for a fresh corpus, re-using the previous
- * `lastBuilt` timestamp if nothing else changed. This keeps CI diffs driven by
- * real content changes rather than wall-clock drift.
+ * Re-use the prior `lastBuilt` stamp when nothing else changed so the JSON
+ * output is byte-stable across CI runs (no wall-clock-driven diffs).
  */
-export function renderStableCorpusModule(corpus: GeneratedCorpus, previous: string | null): string {
-  if (previous === null) return renderCorpusModule(corpus);
-  const candidateWithPrevStamp = renderCorpusModule({
-    ...corpus,
-    lastBuilt: extractLastBuilt(previous) ?? corpus.lastBuilt,
+function stableJson<T extends { lastBuilt: string }>(
+  data: T,
+  previous: string | null,
+  render: (d: T) => string
+): string {
+  if (previous === null) return render(data);
+  const candidate = render({
+    ...data,
+    lastBuilt: extractJsonLastBuilt(previous) ?? data.lastBuilt,
   });
-  // If swapping in the prior timestamp reproduces the previous file exactly,
-  // nothing of substance has changed — keep the old output byte-for-byte.
-  if (candidateWithPrevStamp === previous) return previous;
-  return renderCorpusModule(corpus);
+  if (candidate === previous) return previous;
+  return render(data);
 }
 
-function extractLastBuilt(source: string): string | null {
-  const match = source.match(/lastBuilt:\s*"([^"]+)"/);
+function extractJsonLastBuilt(source: string): string | null {
+  const match = source.match(/"lastBuilt":\s*"([^"]+)"/);
   return match?.[1] ?? null;
 }
 
-function main(): void {
-  const corpus = buildCorpus();
-  const target = resolveOutputPath();
+function writeIfChanged(target: string, contents: string): boolean {
   const previous = existsSync(target) ? readFileSync(target, "utf8") : null;
-  const output = renderStableCorpusModule(corpus, previous);
-  writeFileSync(target, output, "utf8");
-  console.log(
-    `[build-corpus] wrote ${corpus.nouns.length} nouns and ${corpus.adjectives.length} adjectives to ${path.relative(process.cwd(), target)}`
-  );
+  if (previous === contents) return false;
+  writeFileSync(target, contents, "utf8");
+  return true;
+}
 
-  const surrealist = buildSurrealistCorpus();
-  const surrealistTarget = resolveSurrealistOutputPath();
-  const surrealistPrev = existsSync(surrealistTarget)
-    ? readFileSync(surrealistTarget, "utf8")
+function main(): void {
+  // ── Corpus ────────────────────────────────────────────────────────────
+  const corpus = buildCorpus();
+  const corpusJsonTarget = resolveCorpusJsonPath();
+  const corpusJsonPrev = existsSync(corpusJsonTarget)
+    ? readFileSync(corpusJsonTarget, "utf8")
     : null;
-  const surrealistOut = renderStableSurrealistModule(surrealist, surrealistPrev);
-  writeFileSync(surrealistTarget, surrealistOut, "utf8");
+  const corpusJsonOut = stableJson(corpus, corpusJsonPrev, renderCorpusJson);
+  writeIfChanged(corpusJsonTarget, corpusJsonOut);
+  writeIfChanged(resolveCorpusAccessorPath(), renderCorpusAccessorModule());
   console.log(
-    `[build-corpus] wrote ${surrealist.fragments.length} surrealist fragments to ${path.relative(process.cwd(), surrealistTarget)}`
+    `[build-corpus] wrote ${corpus.nouns.length} nouns + ${corpus.adjectives.length} adjectives → corpus.json`
   );
 
-  // Grammar artifact — the Tracery/RNG-driven source of truth the runtime
-  // expands at flatten-time. Same deterministic/stable-render discipline as
-  // the corpus modules above.
+  // ── Surrealist ────────────────────────────────────────────────────────
+  const surrealist = buildSurrealistCorpus();
+  const surrealistJsonTarget = resolveSurrealistJsonPath();
+  const surrealistJsonPrev = existsSync(surrealistJsonTarget)
+    ? readFileSync(surrealistJsonTarget, "utf8")
+    : null;
+  const surrealistJsonOut = stableJson(surrealist, surrealistJsonPrev, renderSurrealistJson);
+  writeIfChanged(surrealistJsonTarget, surrealistJsonOut);
+  writeIfChanged(resolveSurrealistAccessorPath(), renderSurrealistAccessorModule());
+  console.log(
+    `[build-corpus] wrote ${surrealist.fragments.length} surrealist fragments → surrealist.json`
+  );
+
+  // ── Grammars ──────────────────────────────────────────────────────────
   const grammars = buildGrammars();
   const grammarsTarget = resolveGrammarsOutputPath();
   const grammarsPrev = existsSync(grammarsTarget) ? readFileSync(grammarsTarget, "utf8") : null;
   const grammarsOut = renderStableGrammarsJson(grammars, grammarsPrev);
-  writeFileSync(grammarsTarget, grammarsOut, "utf8");
+  writeIfChanged(grammarsTarget, grammarsOut);
   console.log(
     `[build-corpus] wrote grammars.json to ${path.relative(process.cwd(), grammarsTarget)}`
   );
