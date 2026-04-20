@@ -142,6 +142,7 @@ vite.config.ts.timestamp-*
 tmp/
 .vitest-attachments/
 *.tsbuildinfo
+.claude/state/
 
 # Stray TypeScript declarations (generated). Hand-written ambient
 # declarations live under src/types/ and must be re-added explicitly.
