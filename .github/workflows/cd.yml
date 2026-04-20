@@ -34,8 +34,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Vite's `base` flips to `/petitio-principii/` only when GITHUB_PAGES=true
+      # (see vite.config.ts). Without it the built HTML references `/assets/...`
+      # from the domain root, which 404s when Pages serves from the project's
+      # /petitio-principii/ subpath. Confirmed via Chrome DevTools MCP on the
+      # live deploy: every asset returned 404 until this env was added.
       - name: Build
         run: pnpm build
+        env:
+          GITHUB_PAGES: "true"
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
