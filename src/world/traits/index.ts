@@ -60,6 +60,20 @@ export const OutputLine = trait({
 });
 
 /**
+ * Turn id stamped on each OutputLine entity. A "turn" is the contiguous
+ * range of output lines emitted between two player inputs — typically:
+ *   echo → title → description line(s) → response line(s) → spacer.
+ *
+ * All lines that share a `turnId` form one logical beat of play. The
+ * display projects the transcript into past/present by grouping on this
+ * field (see docs/UX.md §2, readTranscriptByTurn in src/world/index.ts).
+ *
+ * turnId 0 is reserved for system-emitted lines that precede the first
+ * player input (e.g. the opening room description).
+ */
+export const TurnMark = trait({ turnId: 0 });
+
+/**
  * Per-room tallies of rhetorical acts. Counter traits on the Room entity
  * itself — incremented each time the player performs the corresponding
  * verb in that room. The argument agent reads these (projected through

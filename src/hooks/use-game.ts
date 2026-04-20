@@ -65,6 +65,7 @@ export function useGame(): GameHandle {
         audio.playSfx(sfxForRhetoricalType(toRoomType));
       },
       appendLine: (kind, text) => world.appendLine(kind, text),
+      beginTurn: () => world.beginTurn(),
       findNextHopToCircle: (fromRoomId) => world.findNextHopToCircle(fromRoomId),
       markVisited: (roomId) => world.markVisited(roomId),
       markRoomAccepted: (roomId) => world.markAccepted(roomId),

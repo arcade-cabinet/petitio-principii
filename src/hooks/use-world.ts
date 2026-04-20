@@ -7,6 +7,7 @@ import {
   RoomId,
   type World,
   appendOutput,
+  beginTurn,
   buildRhetoricalGraph,
   buildWorld,
   markCircleClosed,
@@ -34,6 +35,8 @@ export interface WorldHandle {
   install: (graph: ArgumentGraph) => void;
   discard: () => void;
   appendLine: (kind: "narration" | "echo" | "title" | "spacer", text: string) => void;
+  /** Advance the transcript turn counter — see world/index#beginTurn. */
+  beginTurn: () => void;
   movePlayer: (roomId: string) => void;
   markVisited: (roomId: string) => void;
   markAccepted: (roomId: string) => void;
@@ -90,6 +93,12 @@ export function useWorld(): WorldHandle {
     },
     []
   );
+
+  const beginTurnCb = useCallback(() => {
+    const world = worldRef.current;
+    if (!world) return;
+    beginTurn(world);
+  }, []);
 
   const movePlayer = useCallback((roomId: string) => {
     const world = worldRef.current;
@@ -200,6 +209,7 @@ export function useWorld(): WorldHandle {
     install,
     discard,
     appendLine,
+    beginTurn: beginTurnCb,
     movePlayer,
     markVisited: markVisitedCb,
     markAccepted: markAcceptedCb,

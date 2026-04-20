@@ -17,6 +17,12 @@ export interface TranscriptEntry {
   ordinal: number;
   kind: "narration" | "echo" | "title" | "spacer";
   text: string;
+  /**
+   * Turn this line belongs to. Lines within the same turn are the
+   * contiguous output between two player inputs — see docs/UX.md §2.
+   * turnId 0 is reserved for system-emitted lines before the first input.
+   */
+  turnId: number;
 }
 
 export interface GameState {

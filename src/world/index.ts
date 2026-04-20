@@ -14,6 +14,7 @@ import {
   Position,
   RhetoricalSpace,
   RoomId,
+  TurnMark,
   Visited,
   WasAccepted,
   WasQuestioned,
@@ -76,17 +77,41 @@ export function buildWorld(graph: ArgumentGraph): World {
 const ordinalByWorld = new WeakMap<World, number>();
 
 /**
+ * Monotonic turn id per world. Incremented by `beginTurn()` at the top of
+ * every player-input handling pass; all `appendOutput` calls within that
+ * pass stamp their lines with the current turn. Turn 0 is reserved for
+ * system-emitted lines that precede the first player input.
+ */
+const turnIdByWorld = new WeakMap<World, number>();
+
+/** Advance the turn counter. Called by the reducer at the top of each input. */
+export function beginTurn(world: World): number {
+  const next = (turnIdByWorld.get(world) ?? 0) + 1;
+  turnIdByWorld.set(world, next);
+  return next;
+}
+
+/** Current turn id — 0 before the first `beginTurn`. */
+export function currentTurnId(world: World): number {
+  return turnIdByWorld.get(world) ?? 0;
+}
+
+/**
  * Append one transcript line to the world as a dedicated entity.
  *
  * Each line is its own entity so React can key on its koota id and so
  * later systems can attach per-line traits (`IsAccepted`, `IsChallenged`,
  * relations to rooms and rhetorical moves) — the transcript becomes
  * addressable gameplay state, not an opaque string array.
+ *
+ * Every line is stamped with the current `TurnMark`. See docs/UX.md §2 —
+ * the UI groups on turnId to project the transcript into past/present.
  */
 export function appendOutput(world: World, kind: TranscriptEntry["kind"], text: string): void {
   const next = (ordinalByWorld.get(world) ?? 0) + 1;
   ordinalByWorld.set(world, next);
-  world.spawn(OutputLine({ ordinal: next, kind, text }));
+  const turnId = turnIdByWorld.get(world) ?? 0;
+  world.spawn(OutputLine({ ordinal: next, kind, text }), TurnMark({ turnId }));
 }
 
 /** Append a batch of lines in order. Convenience for describeRoom output. */
@@ -106,18 +131,57 @@ export function appendOutputLines(
 export function readTranscript(world: World): TranscriptEntry[] {
   const entries: TranscriptEntry[] = [];
   world
-    .query(OutputLine)
-    .select(OutputLine)
-    .readEach(([line], entity) => {
+    .query(OutputLine, TurnMark)
+    .select(OutputLine, TurnMark)
+    .readEach(([line, turn], entity) => {
       entries.push({
         id: `ol-${entity.id()}`,
         ordinal: line.ordinal,
         kind: line.kind,
         text: line.text,
+        turnId: turn.turnId,
       });
     });
   entries.sort((a, b) => a.ordinal - b.ordinal);
   return entries;
+}
+
+/**
+ * Group the transcript by turn id.
+ *
+ * Returns one `TranscriptTurn` per logical beat of play. Lines that
+ * predate the first `beginTurn()` call land in turn 0. Turns are in
+ * play-order — turn[0] is the oldest, turn[-1] is the present.
+ *
+ * The past/present projection the display relies on (docs/UX.md §1) just
+ * takes `turns.slice(0, -1)` as the PAST and `turns.at(-1)` as the
+ * PRESENT. No further state lives in the UI — it is a pure function of
+ * the koota store's OutputLine + TurnMark traits.
+ */
+export interface TranscriptTurn {
+  readonly turnId: number;
+  readonly entries: readonly TranscriptEntry[];
+}
+
+export function readTranscriptByTurn(world: World): TranscriptTurn[] {
+  const flat = readTranscript(world);
+  const turns: TranscriptTurn[] = [];
+  let currentId: number | null = null;
+  let bucket: TranscriptEntry[] = [];
+  for (const entry of flat) {
+    if (entry.turnId !== currentId) {
+      if (bucket.length > 0 && currentId !== null) {
+        turns.push({ turnId: currentId, entries: bucket });
+      }
+      currentId = entry.turnId;
+      bucket = [];
+    }
+    bucket.push(entry);
+  }
+  if (bucket.length > 0 && currentId !== null) {
+    turns.push({ turnId: currentId, entries: bucket });
+  }
+  return turns;
 }
 
 /**

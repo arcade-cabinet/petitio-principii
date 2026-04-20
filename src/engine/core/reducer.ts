@@ -42,6 +42,12 @@ export interface WorldBridge {
   movePlayer: (roomId: string, toRoomType: Room["rhetoricalType"]) => void;
   /** Append a transcript line through the ECS so React can key on its entity id. */
   appendLine: (kind: "narration" | "echo" | "title" | "spacer", text: string) => void;
+  /**
+   * Advance the turn counter. Called once per applyCommand entry before any
+   * appendLine — so every line emitted during that call belongs to the same
+   * logical turn (see TurnMark trait + readTranscriptByTurn projection).
+   */
+  beginTurn: () => void;
   /** Ask Yuka for the next hop toward the nearest circular/meta room. */
   findNextHopToCircle: (fromRoomId: string) => string | null;
   /** Stamp the Visited trait on the room entity for the ArgumentMap. */
@@ -78,6 +84,7 @@ export function applyCommand(
   audio: AudioSink
 ): GameState {
   if (!raw.trim()) return state;
+  world.beginTurn();
 
   const parsed = parseCommand(raw);
   const currentRoom = state.rooms.get(state.currentRoomId);
