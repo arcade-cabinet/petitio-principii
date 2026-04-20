@@ -4,7 +4,19 @@ import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
+// Base path depends on deploy target:
+//   - Capacitor (native WebView): relative paths so file:// loads work.
+//   - GitHub Pages: served under /petitio-principii/.
+//   - Local dev / preview: server root.
+const base =
+  process.env.CAPACITOR === "true"
+    ? "./"
+    : process.env.GITHUB_PAGES === "true"
+      ? "/petitio-principii/"
+      : "/";
+
 export default defineConfig({
+  base,
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

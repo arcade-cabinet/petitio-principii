@@ -140,3 +140,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/**
+ * Mobile safe-area handling.
+ *
+ * On notched devices (iPhone 14+ class, Android with cutouts) and devices
+ * with a home indicator, edge-anchored UI must be inset by the platform-
+ * reported safe-area values. `viewport-fit=cover` in index.html opts us
+ * in to the full screen; these rules keep our content clear of the
+ * notch/indicator on native and on iOS Safari installed as a PWA.
+ *
+ * The full-screen shell React renders is `#root > div.relative` (see
+ * `src/app/App.tsx`). We add safe-area insets as *additional* padding
+ * on that container so the landing incantation, terminal header, and
+ * keycap row never collide with the notch. On desktop the env() values
+ * resolve to 0 and nothing changes visually.
+ *
+ * `svh`/`dvh` inside the container already handle keyboard appearance;
+ * the safe-area insets are orthogonal to that.
+ */
+#root > div {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
