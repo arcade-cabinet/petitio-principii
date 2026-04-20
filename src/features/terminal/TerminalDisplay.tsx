@@ -1,7 +1,8 @@
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { KeyCap } from "@/components/ui/keycap";
-import type { GameState } from "@/engine";
+import type { GameState, TranscriptEntry } from "@/engine";
 import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
+import { compactTurns } from "@/features/terminal/compactTurn";
 import type { WorldHandle } from "@/hooks/use-world";
 import {
   ArrowDown,
@@ -18,12 +19,16 @@ import { useEffect, useMemo, useRef } from "react";
 /**
  * TerminalDisplay — the in-game view.
  *
- * Two stacked surfaces:
- *   1. Display (GlowingPanel) — the luminous projection of the argument.
- *      Output lines stream in VT323; the current room's title is the
- *      "750k / Views" slot of the reference glowing-card — it breathes
- *      at the center of the panel.
- *   2. KeyRow (bottom) — the rhetorical action keys. No typing.
+ * Three zones (docs/UX.md):
+ *   1. PAST      — compacted turn summaries (scrollable).
+ *   2. PRESENT   — current room title + latest description + latest
+ *                  agent response. Always centered on the current turn.
+ *   3. FUTURE    — rhetorical verbs + direction keycaps.
+ *
+ * The koota world is the source of truth; state.transcript is a plain-data
+ * shadow already grouped by turnId (TranscriptEntry.turnId, added in T47).
+ * We project it client-side into past/present every render — cheap, and
+ * keeps determinism intact.
  */
 export interface TerminalDisplayProps {
   state: GameState;
@@ -42,8 +47,29 @@ const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string; hint?: stri
   { label: "Trace Back", verb: "trace back", hint: "T" },
 ];
 
+/**
+ * Group transcript entries by turnId. This is the UI-side mirror of
+ * src/world/readTranscriptByTurn — we do it here too because the
+ * TranscriptEntry[] already carries turnId per T47, and re-reading koota
+ * would cost another query and subscription.
+ */
+function groupByTurn(
+  transcript: TranscriptEntry[]
+): { turnId: number; entries: TranscriptEntry[] }[] {
+  const turns: { turnId: number; entries: TranscriptEntry[] }[] = [];
+  let current: { turnId: number; entries: TranscriptEntry[] } | null = null;
+  for (const entry of transcript) {
+    if (!current || current.turnId !== entry.turnId) {
+      current = { turnId: entry.turnId, entries: [] };
+      turns.push(current);
+    }
+    current.entries.push(entry);
+  }
+  return turns;
+}
+
 export function TerminalDisplay({ state, world, onCommand, onNewGame }: TerminalDisplayProps) {
-  const outputRef = useRef<HTMLDivElement>(null);
+  const pastRef = useRef<HTMLDivElement>(null);
 
   const currentRoom = useMemo(
     () => state.rooms.get(state.currentRoomId),
@@ -54,19 +80,21 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
     [currentRoom]
   );
 
-  // Auto-scroll the display as output streams in. We depend on outputLength
-  // specifically — biome's exhaustive-deps analyzer can't see that the ref
-  // read inside the effect is a DOM live-read, not a React-tracked value.
-  const outputLength = state.output.length;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: outputLength is the trigger
+  const turns = useMemo(() => groupByTurn(state.transcript), [state.transcript]);
+  const past = turns.slice(0, -1);
+  const present = turns.at(-1);
+  const compactedPast = useMemo(() => compactTurns(past), [past]);
+
+  // Auto-scroll the PAST rail to the bottom so the most recent compacted
+  // summary is flush against the PRESENT on every new turn.
+  const pastLength = compactedPast.length;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pastLength drives the scroll
   useEffect(() => {
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight;
-    }
-  }, [outputLength]);
+    if (pastRef.current) pastRef.current.scrollTop = pastRef.current.scrollHeight;
+  }, [pastLength]);
 
   // Keyboard parity — desktop users can still use the keyboard even though
-  // the primary input model is taps. Movement, L, X, Q, T.
+  // the primary input model is taps. Movement, L, X, Q, T, A, R, ?.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -87,6 +115,9 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
         q: "question",
         t: "trace back",
         b: "back",
+        a: "accept",
+        r: "reject",
+        "?": "ask why",
       };
       const verb = keys[e.key] ?? keys[e.key.toLowerCase()];
       if (verb) {
@@ -119,78 +150,96 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
         {/* Argument map — geometry of the walk so far. Always visible. */}
         <ArgumentMapOverlay state={state} world={world} />
 
-        {/* Current room title — the breathing slot */}
-        {currentRoom && (
+        {/* PAST zone — compacted turn summaries, scrollable, dim */}
+        {compactedPast.length > 0 && (
           <div
-            className="px-6 pt-3 pb-1 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
-            style={{
-              textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
-            }}
+            ref={pastRef}
+            className={`
+              max-h-[30%] overflow-y-auto overflow-x-hidden
+              px-6 py-2 border-b border-[var(--color-panel-edge)]/30
+              font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3]
+              text-[var(--color-dim)]
+              [scrollbar-width:thin] [scrollbar-color:var(--color-panel-edge)_transparent]
+            `}
+            aria-label="Turn history"
+            data-testid="past-zone"
           >
-            {currentRoom.title}
+            {compactedPast.map((c) => (
+              <div
+                key={c.turnId}
+                className="truncate"
+                title={c.full}
+                data-testid="past-entry"
+                data-turn-id={c.turnId}
+              >
+                <span className="inline-block w-[1.2em] text-[var(--color-muted)]">{c.glyph}</span>
+                <span>{c.label}</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Output stream */}
+        {/* PRESENT zone — current room title + description + latest response */}
         <div
-          ref={outputRef}
-          className={`
-            flex-1 min-h-0 overflow-y-auto overflow-x-hidden
-            px-6 py-4
-            font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
-            leading-[1.55] text-[var(--color-silver)]
-            [mask-image:linear-gradient(to_bottom,transparent_0%,black_4%)]
-            [scrollbar-width:thin]
-            [scrollbar-color:var(--color-panel-edge)_transparent]
-          `}
-          style={{ textShadow: "0 0 2px rgba(192,192,255,0.35)" }}
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
           aria-live="polite"
+          aria-atomic="true"
+          data-testid="present-zone"
         >
-          {state.transcript.map((entry) => {
-            // Each line is a koota OutputLine entity — its id is its key.
-            // Traits on the entity also tell us how to style it (kind) and
-            // later can carry gameplay relations (IsAccepted, IsChallenged).
-            if (entry.kind === "spacer") {
-              return (
-                <div key={entry.id} className="h-[1.55em]">
-                  &nbsp;
-                </div>
-              );
-            }
-            if (entry.kind === "echo") {
-              return (
-                <div
-                  key={entry.id}
-                  className="text-[var(--color-violet)] mt-3"
-                  style={{ textShadow: "0 0 4px rgba(122,92,255,0.5)" }}
-                >
-                  {entry.text}
-                </div>
-              );
-            }
-            if (entry.kind === "title") {
-              return (
-                <div
-                  key={entry.id}
-                  className="font-[family-name:var(--font-incantation)] text-[1.4rem] text-[var(--color-highlight)] mt-4 mb-1"
-                  style={{
-                    textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
-                  }}
-                >
-                  {entry.text}
-                </div>
-              );
-            }
-            return (
-              <div key={entry.id} className="whitespace-pre-wrap break-words">
-                {entry.text}
-              </div>
-            );
-          })}
+          {currentRoom && (
+            <div
+              className="pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
+              style={{
+                textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
+              }}
+            >
+              {currentRoom.title}
+            </div>
+          )}
+          {present && (
+            <div
+              className={`
+                font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
+                leading-[1.55] text-[var(--color-silver)]
+              `}
+              style={{ textShadow: "0 0 2px rgba(192,192,255,0.35)" }}
+            >
+              {present.entries.map((entry) => {
+                if (entry.kind === "spacer") {
+                  return (
+                    <div key={entry.id} className="h-[1.55em]">
+                      &nbsp;
+                    </div>
+                  );
+                }
+                if (entry.kind === "echo") {
+                  return (
+                    <div
+                      key={entry.id}
+                      className="text-[var(--color-violet)] mt-2"
+                      style={{ textShadow: "0 0 4px rgba(122,92,255,0.5)" }}
+                    >
+                      {entry.text}
+                    </div>
+                  );
+                }
+                if (entry.kind === "title") {
+                  // We already render the room title above; suppress the
+                  // duplicate that comes in via the transcript.
+                  return null;
+                }
+                return (
+                  <div key={entry.id} className="whitespace-pre-wrap break-words">
+                    {entry.text}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </GlowingPanel>
 
-      {/* KeyRow — rhetorical verbs first, then directions */}
+      {/* FUTURE zone — rhetorical verbs, directions */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap justify-center gap-2">
           {RHETORICAL_VERBS.map((v) => (

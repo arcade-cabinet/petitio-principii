@@ -40,16 +40,13 @@ describe("describeRoom", () => {
     expect(joined).toContain("A description of the test hall.");
   });
 
-  it("includes exits", () => {
+  it("does NOT emit an Exits: block — the keycap row owns directions now", () => {
+    // Per docs/UX.md §1.2, the prose never lists exits as a menu. Exits
+    // are communicated by the keycap silhouettes in the FUTURE zone.
     const lines = describeRoom(mockRoom);
     const joined = lines.join(" ");
-    expect(joined).toContain("NORTH");
-  });
-
-  it("handles rooms with exits list header", () => {
-    const lines = describeRoom(mockRoom);
-    const joined = lines.join(" ");
-    expect(joined).toContain("Exits:");
+    expect(joined).not.toContain("Exits:");
+    expect(joined).not.toMatch(/^NORTH -/m);
   });
 });
 

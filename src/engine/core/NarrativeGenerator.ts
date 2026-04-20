@@ -74,14 +74,11 @@ export function describeRoom(room: Room, opts?: DescribeRoomOptions): string[] {
           memory: opts.memory,
         })
       : room.description;
-  return [
-    `== ${room.title.toUpperCase()} ==`,
-    body,
-    describeExamineFor(room),
-    "",
-    "Exits:",
-    ...room.exits.map((e) => `  ${e.direction.toUpperCase()} - ${e.description}`),
-  ];
+  // Per docs/UX.md §1.2 the "Exits:" block is emitted by the keycap row
+  // (FUTURE zone) as direction silhouettes — not inline in the prose. The
+  // room's narrative can still describe exits diegetically; it just
+  // shouldn't print a literal menu of them.
+  return [`== ${room.title.toUpperCase()} ==`, body, describeExamineFor(room)];
 }
 
 export function describeFallacy(seed: number): string {
