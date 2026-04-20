@@ -9,32 +9,41 @@ import { afterEach, describe, expect, it } from "vitest";
  * artifacts (corpus.json, corpus.ts, surrealist.json, surrealist.ts,
  * grammars.json) drifts from the build-corpus output.
  *
- * We simulate drift by parsing grammars.json, adding a sentinel key, then
- * JSON.stringify-ing it back. The next build-corpus run overwrites our
- * mutation with the authoritative output, and `git diff --exit-code` on
- * the generated paths exits non-zero because the working tree differs
- * from HEAD for the duration of the test. An `afterEach` hook restores
- * the original file so the test is idempotent even if assertions throw.
+ * ### The drift gate's two failure modes
  *
- * This locks in the release gate: if someone hand-edits a generated
- * artifact without running build-corpus, CI fails loudly instead of
- * silently shipping stale JSON.
+ * The gate catches two *kinds* of drift:
  *
- * Implementation notes:
- *   - We invoke `tsx scripts/build-corpus.ts` + `git diff` directly rather
- *     than going through `pnpm verify-corpus`. The package.json script is
- *     exactly `tsx + git diff`, and going via pnpm adds a layer that's
- *     brittle across Corepack / npm-vs-pnpm-direct-invocation environments.
- *   - We mutate via `JSON.parse` + `JSON.stringify` — never via regex —
- *     so the test doesn't depend on the serializer's whitespace choices.
- *   - Both tests run `build-corpus`, which **writes to tracked paths under
- *     src/content/generated/**. That write is idempotent for the "no drift"
- *     case (bit-identical output preserves the previous file) and is
- *     reverted-then-regenerated for the "drift" case. Still, no other
- *     vitest should run in parallel against those files — they already
- *     live under the `scripts` project which is a separate worker, and
- *     we apply an explicit per-test timeout on both to keep slow CI from
- *     hanging indefinitely.
+ *   1. **Stale build output.** A lexicon / grammar source changed but
+ *      nobody ran `pnpm build-corpus`, so the committed generated files
+ *      no longer match what the build would produce. This is caught by
+ *      Step 1 — running build-corpus regenerates the files, and any real
+ *      change appears as a post-build diff.
+ *
+ *   2. **Hand-edited generated files.** Someone tweaked one of the
+ *      generated artifacts directly (thinking they were fixing a typo,
+ *      say) without updating the source that feeds into it. This is
+ *      caught by Step 2 — `git diff --exit-code` on the specific paths
+ *      flags the working tree drift versus HEAD.
+ *
+ * The tests below verify both behaviours independently. CodeRabbit's
+ * round-3 review flagged that an earlier version ran build+diff in a
+ * single `runVerifyCorpusDirect()` call and expected non-zero for a
+ * hand-edit, which failed because the build step overwrote the mutation
+ * before the diff ran. The split below fixes that.
+ *
+ * ### Implementation notes
+ *
+ *   - We invoke `tsx scripts/build-corpus.ts` and `git diff` directly
+ *     rather than going through `pnpm verify-corpus`. The package.json
+ *     script is exactly `tsx + git diff`; going via pnpm adds a layer
+ *     that's brittle across Corepack / direct-pnpm environments.
+ *   - We mutate via `JSON.parse` + `JSON.stringify` — never regex — so
+ *     the test doesn't depend on serializer whitespace choices.
+ *   - Both tests write to tracked paths under `src/content/generated/`.
+ *     An `afterEach` hook restores any file we touched, so the tests are
+ *     idempotent even if an assertion throws. The `scripts` vitest
+ *     project is a separate worker — no parallel contention with
+ *     browser-mode tests reading the same files.
  */
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -58,21 +67,15 @@ afterEach(() => {
   }
 });
 
-/**
- * Replicates what `pnpm verify-corpus` does: regenerate artifacts, then
- * diff the specific paths. Returns the combined exit code — 0 iff the
- * build ran AND nothing drifted.
- */
-function runVerifyCorpusDirect(): { exitCode: number; output: string } {
-  const env = { ...process.env };
+/** Run `tsx scripts/build-corpus.ts`. Returns { exitCode, output }. */
+function runBuildCorpus(): { exitCode: number; output: string } {
   try {
-    // Step 1 — regenerate. If this throws, propagate as non-zero.
     execFileSync("npx", ["tsx", "scripts/build-corpus.ts"], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      env,
     });
+    return { exitCode: 0, output: "" };
   } catch (err: unknown) {
     const e = err as { status?: number; stdout?: string; stderr?: string };
     return {
@@ -80,14 +83,15 @@ function runVerifyCorpusDirect(): { exitCode: number; output: string } {
       output: `build-corpus failed: ${e.stdout ?? ""}${e.stderr ?? ""}`,
     };
   }
+}
 
-  // Step 2 — diff. Non-zero exit means drift.
+/** Run `git diff --exit-code` on the generated paths only. */
+function runGitDiffGenerated(): { exitCode: number; output: string } {
   try {
     execFileSync("git", ["diff", "--exit-code", "--", ...GENERATED_PATHS], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      env,
     });
     return { exitCode: 0, output: "" };
   } catch (err: unknown) {
@@ -100,24 +104,52 @@ function runVerifyCorpusDirect(): { exitCode: number; output: string } {
 }
 
 describe("verify-corpus drift gate", () => {
-  it("exits 0 when no drift exists", () => {
-    // Baseline — grammars.json as checked in; no mutation.
-    const { exitCode } = runVerifyCorpusDirect();
-    expect(exitCode).toBe(0);
+  it("baseline: build-corpus + git diff on generated paths exits 0 when nothing has drifted", () => {
+    // This is the happy path — the committed artifacts match what the
+    // current build would produce, so neither step reports drift.
+    const build = runBuildCorpus();
+    expect(build.exitCode, build.output).toBe(0);
+    const diff = runGitDiffGenerated();
+    expect(diff.exitCode, diff.output).toBe(0);
   }, 60_000);
 
-  it("exits non-zero when grammars.json has been hand-edited", () => {
+  it("hand-edited generated file: git diff exits non-zero (without running rebuild first)", () => {
     expect(existsSync(grammarsPath)).toBe(true);
     const original = readFileSync(grammarsPath, "utf8");
     restore = () => writeFileSync(grammarsPath, original, "utf8");
 
-    // Mutate via parse/stringify — independent of file whitespace. Adding
-    // a sentinel key the build will never emit guarantees drift.
+    // Mutate via parse/stringify — independent of file whitespace.
     const parsed = JSON.parse(original) as Record<string, unknown>;
     parsed.__driftSentinel = "T61_gate_test_only";
     writeFileSync(grammarsPath, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
 
-    const { exitCode, output } = runVerifyCorpusDirect();
-    expect(exitCode, output).not.toBe(0);
+    // Diff directly — no rebuild. This is the "hand-edit" path: the
+    // release gate catches it before build-corpus runs. In CI, the gate
+    // does run build first, but that's the "stale build output" case
+    // which the next test covers.
+    const diff = runGitDiffGenerated();
+    expect(diff.exitCode, diff.output).not.toBe(0);
+  }, 60_000);
+
+  it("hand-edit + rebuild: build-corpus's stable-render detects the structural change via lastBuilt rotation", () => {
+    expect(existsSync(grammarsPath)).toBe(true);
+    const original = readFileSync(grammarsPath, "utf8");
+    restore = () => writeFileSync(grammarsPath, original, "utf8");
+
+    // Same mutation as above.
+    const parsed = JSON.parse(original) as Record<string, unknown>;
+    parsed.__driftSentinel = "T61_gate_test_only";
+    writeFileSync(grammarsPath, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
+
+    // Now rebuild. build-corpus's stable-render compares the new output
+    // against the on-disk file (which has the sentinel). Because the
+    // structure differs, the renderer emits a fresh lastBuilt timestamp
+    // and writes the clean output. The sentinel is gone but the
+    // timestamp rotated — so `git diff` against HEAD still shows drift.
+    const build = runBuildCorpus();
+    expect(build.exitCode, build.output).toBe(0);
+
+    const diff = runGitDiffGenerated();
+    expect(diff.exitCode, diff.output).not.toBe(0);
   }, 60_000);
 });
