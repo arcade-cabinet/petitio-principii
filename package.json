@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "build-corpus": "tsx scripts/build-corpus.ts",
     "verify-corpus": "tsx scripts/build-corpus.ts && git diff --exit-code -- src/content/generated/corpus.json src/content/generated/corpus.ts src/content/generated/surrealist.json src/content/generated/surrealist.ts src/content/generated/grammars.json",
+    "check-bundle": "tsx scripts/check-bundle-size.ts",
     "prebuild": "pnpm build-corpus",
     "build": "pnpm typecheck && vite build",
     "preview": "vite preview",
@@ -16,7 +17,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
-    "verify": "pnpm verify-corpus && pnpm check && pnpm test && pnpm build"
+    "verify": "pnpm verify-corpus && pnpm check && pnpm test && pnpm build && pnpm check-bundle"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
