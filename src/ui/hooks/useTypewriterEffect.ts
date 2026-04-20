@@ -19,12 +19,11 @@ export function createTypewriterEffect(
   const [displayedLines, setDisplayedLines] = createSignal<string[]>([]);
   const [isTyping, setIsTyping] = createSignal(false);
 
-  // Plain mutable variables are safe here — SolidJS components run once.
-  let prevLength = 0;
   let timer: ReturnType<typeof setInterval> | undefined;
+  let currentTarget: string[] = [];
+  let lineIndex = 0;
+  let charIndex = 0;
 
-  // Top-level cleanup: ensure the interval is cleared when the owner scope
-  // (the component that called createTypewriterEffect) is disposed.
   onCleanup(() => {
     if (timer !== undefined) {
       clearInterval(timer);
@@ -36,53 +35,50 @@ export function createTypewriterEffect(
     const lines = getLines(); // reactive tracking
 
     if (!enabled) {
+      currentTarget = lines;
       setDisplayedLines(lines);
-      prevLength = lines.length;
-      return;
-    }
-
-    if (lines.length <= prevLength) {
-      if (lines.length < prevLength) setDisplayedLines(lines);
-      prevLength = lines.length;
-      return;
-    }
-
-    const prev = lines.slice(0, prevLength);
-    const newLines = lines.slice(prevLength);
-    prevLength = lines.length;
-
-    // Clear any running interval before starting a new one
-    if (timer !== undefined) {
-      clearInterval(timer);
-      timer = undefined;
-    }
-    setIsTyping(true);
-
-    let lineIndex = 0;
-    let charIndex = 0;
-
-    timer = setInterval(() => {
-      if (lineIndex >= newLines.length) {
+      lineIndex = lines.length;
+      charIndex = 0;
+      if (timer !== undefined) {
         clearInterval(timer);
         timer = undefined;
         setIsTyping(false);
-        return;
       }
+      return;
+    }
 
-      const currentLine = newLines[lineIndex] ?? "";
-      charIndex++;
+    if (lines.length < currentTarget.length) {
+      lineIndex = lines.length;
+      charIndex = 0;
+      setDisplayedLines(lines);
+    }
 
-      setDisplayedLines([
-        ...prev,
-        ...newLines.slice(0, lineIndex),
-        currentLine.slice(0, charIndex),
-      ]);
+    currentTarget = lines;
 
-      if (charIndex >= currentLine.length) {
-        lineIndex++;
-        charIndex = 0;
-      }
-    }, 1000 / speed);
+    if (timer === undefined && lineIndex < currentTarget.length) {
+      setIsTyping(true);
+      timer = setInterval(() => {
+        if (lineIndex >= currentTarget.length) {
+          clearInterval(timer);
+          timer = undefined;
+          setIsTyping(false);
+          return;
+        }
+
+        const currentLine = currentTarget[lineIndex] ?? "";
+        charIndex++;
+
+        setDisplayedLines([
+          ...currentTarget.slice(0, lineIndex),
+          currentLine.slice(0, charIndex),
+        ]);
+
+        if (charIndex >= currentLine.length) {
+          lineIndex++;
+          charIndex = 0;
+        }
+      }, 1000 / speed);
+    }
   });
 
   return { displayedLines, isTyping };

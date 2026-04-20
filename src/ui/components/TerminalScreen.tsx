@@ -1,5 +1,6 @@
 import { For, createEffect } from "solid-js";
 import type { Component } from "solid-js";
+import { parseCommand } from "../../engine/core/Parser";
 import { InputLine } from "./InputLine";
 import { TextLine } from "./TextLine";
 
@@ -19,7 +20,8 @@ export const TerminalScreen: Component<TerminalScreenProps> = (props) => {
   });
 
   function handleCommand(input: string) {
-    if (input.toLowerCase() === "new game" || input.toLowerCase() === "new") {
+    const parsed = parseCommand(input);
+    if (parsed.verb === "new") {
       props.onNewGame();
       return;
     }

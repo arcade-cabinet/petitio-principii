@@ -1,16 +1,18 @@
+export type RhetoricalType =
+  | "premise"
+  | "conclusion"
+  | "definition"
+  | "analogy"
+  | "fallacy"
+  | "circular"
+  | "objection"
+  | "meta";
+
 export interface RoomTemplate {
   id: string;
   title: string;
   descriptions: string[];
-  rhetoricalType:
-    | "premise"
-    | "conclusion"
-    | "definition"
-    | "analogy"
-    | "fallacy"
-    | "circular"
-    | "objection"
-    | "meta";
+  rhetoricalType: RhetoricalType;
 }
 
 export const ROOM_TEMPLATES: readonly RoomTemplate[] = [

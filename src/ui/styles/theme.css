@@ -170,7 +170,7 @@ body {
   line-height: var(--line-height);
   color: var(--text-primary);
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .text-line.room-title {

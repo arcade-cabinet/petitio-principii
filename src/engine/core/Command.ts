@@ -11,6 +11,7 @@ export type CommandVerb =
   | "new"
   | "quit"
   | "inventory"
+  | "back"
   | "north"
   | "south"
   | "east"

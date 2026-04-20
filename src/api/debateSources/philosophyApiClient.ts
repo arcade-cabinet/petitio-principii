@@ -5,6 +5,11 @@ export interface PhilosophyEntry {
 }
 
 export async function fetchPhilosophyEntry(_concept: string): Promise<PhilosophyEntry | null> {
-  // TODO: Implement SEP or PhilPapers API integration
-  return null;
+  try {
+    // TODO: Implement SEP or PhilPapers API integration
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch philosophy entry:", error);
+    return null;
+  }
 }

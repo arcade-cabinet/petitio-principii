@@ -29,15 +29,17 @@ export function generateSeed(): number {
 
 /**
  * Pick a random item from an array using the provided PRNG.
+ * Returns undefined if the array is empty.
  */
-export function pickRandom<T>(arr: T[], rng: () => number): T {
-  return arr[Math.floor(rng() * arr.length)] as T;
+export function pickRandom<T>(arr: readonly T[], rng: () => number): T | undefined {
+  if (!arr || arr.length === 0) return undefined;
+  return arr[Math.floor(rng() * arr.length)];
 }
 
 /**
- * Shuffle an array in-place using Fisher-Yates with the provided PRNG.
+ * Shuffle an array without mutating the original, using Fisher-Yates and the provided PRNG.
  */
-export function shuffleArray<T>(arr: T[], rng: () => number): T[] {
+export function shuffleArray<T>(arr: readonly T[], rng: () => number): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

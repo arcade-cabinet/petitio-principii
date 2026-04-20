@@ -1,50 +1,62 @@
 import { ADJECTIVES } from "../content/lexicon/adjectives";
 import { NOUNS } from "../content/lexicon/nouns";
 import { RHETORICAL_TERMS } from "../content/lexicon/rhetoricalTerms";
-import { createSeededRandom, pickRandom } from "../prng/seedRandom";
+import { createSeededRandom, pickRandom, shuffleArray } from "../prng/seedRandom";
 import type { Room } from "./Room";
 
 export function generatePhrase(seed: number): string {
   const rng = createSeededRandom(seed);
-  const adj1 = pickRandom([...ADJECTIVES], rng);
-  const adj2 = pickRandom([...ADJECTIVES], rng);
-  const noun = pickRandom([...NOUNS], rng);
-  return `${adj1}-${adj2}-${noun}`;
+  const shuffledAdjectives = shuffleArray(ADJECTIVES, rng);
+  const adj1 = shuffledAdjectives[0];
+  const adj2 = shuffledAdjectives[1];
+  const noun = pickRandom(NOUNS, rng);
+
+  return `${adj1} ${adj2} ${noun}`;
 }
 
+export const RHETORICAL_EXAMINE: Record<Room["rhetoricalType"], string> = {
+  premise: "assert something as given",
+  conclusion: "draw a conclusion",
+  definition: "fix a meaning",
+  analogy: "reason by resemblance",
+  fallacy: "invite a mistake",
+  circular: "assume what it tries to prove",
+  objection: "consider a counter-argument",
+  meta: "describe itself",
+};
+
+export const describeExamineFor = (room: Room) =>
+  `This is a ${room.rhetoricalType} space. The argument pauses here to ${RHETORICAL_EXAMINE[room.rhetoricalType]}.`;
+
 export function describeRoom(room: Room): string[] {
-  const lines: string[] = [];
-  lines.push(`--- ${room.title} ---`);
-  lines.push(room.description);
-  lines.push("");
-  if (room.exits.length === 0) {
-    lines.push("There are no obvious exits.");
-  } else {
-    const exitList = room.exits.map((e) => e.direction.toUpperCase()).join(", ");
-    lines.push(`Exits: ${exitList}`);
-  }
-  return lines;
+  return [
+    `== ${room.title.toUpperCase()} ==`,
+    room.description,
+    describeExamineFor(room),
+    "",
+    "Exits:",
+    ...room.exits.map((e) => `  ${e.direction.toUpperCase()} - ${e.description}`),
+  ];
 }
 
 export function describeFallacy(seed: number): string {
   const rng = createSeededRandom(seed);
   const fallacies = RHETORICAL_TERMS.filter((t) => t.category === "fallacy");
+  if (fallacies.length === 0) {
+    return "You sense a logical error here, but cannot quite name it.";
+  }
   const term = pickRandom(fallacies, rng);
-  return `You sense a ${term.term} here. ${term.definition}`;
+  return `You sense a ${term?.term || "fallacy"} here. ${term?.definition || ""}`;
 }
 
 export function getHelpText(): string[] {
   return [
+    "You are navigating an argument.",
     "Available commands:",
-    "  GO <direction> / N / S / E / W / UP / DOWN — Move through the argument.",
-    "  LOOK / L                                   — Describe the current room.",
-    "  EXAMINE / X [thing]                        — Examine something closely.",
-    "  QUESTION ASSUMPTION                        — Question the current premise.",
-    "  ASK WHY                                    — Ask for justification.",
-    "  TRACE BACK                                 — Return to the previous room.",
-    "  ACCEPT                                     — Accept the current argument.",
-    "  REJECT                                     — Reject the current argument.",
-    "  HELP / ?                                   — Show this help.",
-    "  NEW GAME                                   — Start a new game.",
+    "  GO [DIRECTION] (e.g., GO NORTH) — Move to another part of the argument.",
+    "  LOOK (or L)                            — Examine your current surroundings.",
+    "  INVENTORY (or I)                       — Check your active premises (Not implemented).",
+    "  NEW GAME                               — Start a new game.",
+    "  QUIT                                   — Exit the current game.",
   ];
 }

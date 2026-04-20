@@ -35,7 +35,7 @@ export function generateArgumentGraph(seed: number): ArgumentGraph {
   const selected = shuffled.slice(0, Math.min(6, shuffled.length));
 
   for (const template of selected) {
-    const desc = pickRandom([...template.descriptions], rng);
+    const desc = pickRandom([...template.descriptions], rng) || template.descriptions[0];
     const room: Room = {
       id: template.id,
       title: template.title,
@@ -60,7 +60,7 @@ export function generateArgumentGraph(seed: number): ArgumentGraph {
     usedConnections.add(connKey);
 
     const dir = directionPool[i % directionPool.length] as Direction;
-    const passageTemplate = pickRandom([...PASSAGE_TEMPLATES], rng);
+    const passageTemplate = pickRandom([...PASSAGE_TEMPLATES], rng) || PASSAGE_TEMPLATES[0];
 
     const passage: Passage = {
       id: `${fromId}-${dir}`,
@@ -75,12 +75,15 @@ export function generateArgumentGraph(seed: number): ArgumentGraph {
     const fromRoom = rooms.get(fromId);
     const toRoom = rooms.get(toId);
     if (fromRoom && toRoom) {
-      const exit: Exit = {
-        direction: dir,
-        targetRoomId: toId,
-        description: passageTemplate.description,
-      };
-      fromRoom.exits.push(exit);
+      const hasExit = fromRoom.exits.some((e) => e.direction === dir);
+      if (!hasExit) {
+        const exit: Exit = {
+          direction: dir,
+          targetRoomId: toId,
+          description: passageTemplate.description,
+        };
+        fromRoom.exits.push(exit);
+      }
 
       const returnDir = oppositeDirection(dir);
       const returnExit: Exit = {

@@ -10,6 +10,7 @@ export const InputLine: Component<InputLineProps> = (props) => {
   const [value, setValue] = createSignal("");
 
   function handleKeyDown(e: KeyboardEvent) {
+    if (props.disabled) return;
     if (e.key === "Enter" && value().trim()) {
       props.onSubmit(value().trim());
       setValue("");

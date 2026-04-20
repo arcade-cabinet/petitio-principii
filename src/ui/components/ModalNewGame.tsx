@@ -11,19 +11,25 @@ export const ModalNewGame: Component<ModalNewGameProps> = (props) => {
   const [seed, setSeed] = createSignal<number>(generateSeed());
   const [customSeedInput, setCustomSeedInput] = createSignal("");
   const [showCustomSeed, setShowCustomSeed] = createSignal(false);
+  const [customSeedError, setCustomSeedError] = createSignal("");
 
   const phrase = createMemo(() => generatePhrase(seed()));
 
   function handleRegenerate() {
     setSeed(generateSeed());
     setCustomSeedInput("");
+    setCustomSeedError("");
     setShowCustomSeed(false);
   }
 
-  function handleCustomSeedSubmit() {
+  function handleCustomSeedSubmit(e?: Event) {
+    if (e) e.preventDefault();
     const parsed = Number.parseInt(customSeedInput(), 10);
-    if (!Number.isNaN(parsed)) {
-      setSeed(parsed >>> 0);
+    if (Number.isNaN(parsed) || parsed < 0 || parsed > 0xffffffff) {
+      setCustomSeedError("Seed must be between 0 and 4294967295");
+    } else {
+      setCustomSeedError("");
+      setSeed(parsed);
       setShowCustomSeed(false);
       setCustomSeedInput("");
     }
@@ -62,19 +68,29 @@ export const ModalNewGame: Component<ModalNewGameProps> = (props) => {
         </div>
 
         <Show when={showCustomSeed()}>
-          <div class="modal-custom-seed">
-            <input
-              type="number"
-              class="seed-input"
-              value={customSeedInput()}
-              onInput={(e) => setCustomSeedInput(e.currentTarget.value)}
-              placeholder="Enter numeric seed..."
-              aria-label="Custom seed input"
-            />
-            <button class="modal-btn secondary" onClick={handleCustomSeedSubmit} type="button">
+          <form
+            class="modal-custom-seed"
+            onSubmit={handleCustomSeedSubmit}
+          >
+            <div style={{ display: "flex", "flex-direction": "column", gap: "4px" }}>
+              <input
+                type="number"
+                class="seed-input"
+                value={customSeedInput()}
+                onInput={(e) => setCustomSeedInput(e.currentTarget.value)}
+                placeholder="Enter numeric seed..."
+                aria-label="Custom seed input"
+                min="0"
+                max="4294967295"
+              />
+              <Show when={customSeedError()}>
+                <span style={{ color: "red", "font-size": "0.8em" }}>{customSeedError()}</span>
+              </Show>
+            </div>
+            <button class="modal-btn secondary" type="submit">
               APPLY
             </button>
-          </div>
+          </form>
         </Show>
       </div>
     </div>

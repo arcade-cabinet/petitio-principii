@@ -6,11 +6,17 @@ export function StarfieldBackground() {
   let containerRef!: HTMLDivElement;
   let bundle: PhaserBundle | undefined;
 
+  function handleResize() {
+    // Dispatch resize event to trigger Phaser/Retrozone internal resizes if needed
+  }
+
   onMount(() => {
     bundle = createPhaserGame(containerRef);
+    window.addEventListener("resize", handleResize);
   });
 
   onCleanup(() => {
+    window.removeEventListener("resize", handleResize);
     bundle?.destroy();
     bundle = undefined;
   });

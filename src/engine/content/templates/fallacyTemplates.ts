@@ -34,4 +34,16 @@ export const FALLACY_TEMPLATES: readonly FallacyTemplate[] = [
       "One small concession, the argument suggests, will lead inevitably to catastrophe. The staircase looks very long from here.",
     hint: "QUESTION ASSUMPTION before descending.",
   },
+  {
+    name: "Straw Man",
+    encounter:
+      "You find a caricature of your own position propped up in the corner. It is much easier to knock down than what you actually said.",
+    hint: "EXAMINE it closely to reveal the distortion.",
+  },
+  {
+    name: "Appeal to Authority",
+    encounter:
+      "A booming voice cites a famous philosopher who once walked these halls. The name is impressive, but the reasoning is absent.",
+    hint: "ASK WHY the authority's claim is actually true.",
+  },
 ];

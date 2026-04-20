@@ -6,7 +6,9 @@ export const THEME = {
     textHighlight: "#F5F0FF",
     accentViolet: "#7A5CFF",
     accentPink: "#FFD1FA",
-    accentSilver: "#C0C0FF",
+    get accentSilver() {
+      return this.textPrimary;
+    },
   },
   fonts: {
     terminal: '"DM Mono", "IBM Plex Mono", "Courier New", monospace',

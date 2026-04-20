@@ -223,7 +223,22 @@ export function createGameEngine(): GameEngineResult {
           };
         }
         case "new": {
+          // Fallback if not intercepted by TerminalScreen
           return { ...prev, output: [...newOutput, "Starting a new game..."] };
+        }
+        case "quit": {
+          return {
+            ...prev,
+            output: [...newOutput, "You cannot quit. The argument has already begun."],
+            turnCount: prev.turnCount + 1,
+          };
+        }
+        case "inventory": {
+          return {
+            ...prev,
+            output: [...newOutput, "You are carrying nothing but your preconceptions."],
+            turnCount: prev.turnCount + 1,
+          };
         }
         default: {
           return {
