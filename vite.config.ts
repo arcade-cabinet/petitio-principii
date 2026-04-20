@@ -22,6 +22,10 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+    // Prevent RTL from spinning up a second copy of React in the browser-mode
+    // test runner (see the "useRef of null" failure mode). Dedupe keeps the
+    // entire React graph unified across direct imports and test-lib's peers.
+    dedupe: ["react", "react-dom"],
   },
   build: {
     target: "esnext",
