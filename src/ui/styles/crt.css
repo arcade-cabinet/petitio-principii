@@ -1,0 +1,77 @@
+/* ============================================================
+   CRT.CSS — CRT monitor simulation effects
+   ============================================================ */
+
+/* ---- Scanlines overlay ---- */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* ---- CRT screen effect on terminal panel ---- */
+.crt-effect {
+  position: relative;
+}
+
+.crt-effect::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(5, 1, 10, 0.4) 100%);
+}
+
+/* ---- Flicker animation ---- */
+@keyframes crt-flicker {
+  0% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.97;
+  }
+  94% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.98;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.crt-effect {
+  animation: crt-flicker 8s infinite;
+}
+
+/* ---- Text glow ---- */
+.terminal-output .text-line {
+  text-shadow: 0 0 2px rgba(192, 192, 255, 0.3);
+}
+
+.terminal-output .text-line.room-title {
+  text-shadow: 0 0 4px rgba(192, 192, 255, 0.6), 0 0 10px rgba(122, 92, 255, 0.3);
+}
+
+.terminal-output .text-line.user-input {
+  text-shadow: 0 0 4px rgba(122, 92, 255, 0.5);
+}
+
+/* ---- Phosphor fade for older output ---- */
+.terminal-output {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 5%);
+}
