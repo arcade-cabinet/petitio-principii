@@ -13,6 +13,7 @@ const DIRECTION_ALIASES: Record<string, CommandVerb> = {
   west: "west",
   up: "up",
   down: "down",
+  back: "back",
 };
 
 const VERB_ALIASES: Record<string, CommandVerb> = {
