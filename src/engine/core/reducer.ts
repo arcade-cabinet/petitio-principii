@@ -1,3 +1,5 @@
+import type { ArgumentAgent } from "../ai/argument-agent";
+import type { ArgumentMemory } from "../ai/argument-traits";
 import type { CommandVerb, ParsedCommand } from "./Command";
 import type { GameState } from "./GameState";
 import { describeRoom, getHelpText } from "./NarrativeGenerator";
@@ -42,6 +44,22 @@ export interface WorldBridge {
   appendLine: (kind: "narration" | "echo" | "title" | "spacer", text: string) => void;
   /** Ask Yuka for the next hop toward the nearest circular/meta room. */
   findNextHopToCircle: (fromRoomId: string) => string | null;
+  /** Stamp the Visited trait on the room entity for the ArgumentMap. */
+  markVisited: (roomId: string) => void;
+  /** Increment the per-room counter trait (WasAccepted / Rejected / Questioned). */
+  markRoomAccepted: (roomId: string) => void;
+  markRoomRejected: (roomId: string) => void;
+  markRoomQuestioned: (roomId: string) => void;
+  /** Flip the CircleClosed tag on the player entity; idempotent. */
+  markCircleClosed: () => void;
+  /** Read the memory projection that the argument agent and chainer consume. */
+  readMemory: (turnCount: number) => ArgumentMemory;
+  /** The argument-as-agent. Responds to accept/reject/question verbs. */
+  argument: ArgumentAgent;
+  /** The seed for the current game — threads into chained descriptions. */
+  seed: number;
+  /** How many times each room has been entered. Used by the chainer. */
+  visitCount: (roomId: string) => number;
 }
 
 export interface AudioSink {
@@ -93,7 +111,8 @@ function applyMovement(
     const next = state.rooms.get(exit.targetRoomId);
     if (next) {
       world.movePlayer(next.id, next.rhetoricalType);
-      appendLines(world, [`You move ${dir}.`, "", ...describeRoom(next)]);
+      world.markVisited(next.id);
+      appendLines(world, [`You move ${dir}.`, "", ...describeRoomChained(next, world, state)]);
       return { ...state, currentRoomId: next.id, turnCount: state.turnCount + 1 };
     }
   }
@@ -102,6 +121,64 @@ function applyMovement(
     "You cannot go that way. The argument has no passage in that direction."
   );
   return { ...state, turnCount: state.turnCount + 1 };
+}
+
+/**
+ * Wrap describeRoom with the chainer bindings — seed, visitCount, memory.
+ * The engine stays pure; the bridge provides the world projections.
+ */
+function describeRoomChained(room: Room, world: WorldBridge, state: GameState): string[] {
+  const memory = world.readMemory(state.turnCount);
+  const accepted = new Set<string>();
+  const rejected = new Set<string>();
+  const questioned = new Set<string>();
+  for (const [id, tally] of memory.byRoom) {
+    if (tally.accepted > 0) accepted.add(id);
+    if (tally.rejected > 0) rejected.add(id);
+    if (tally.questioned > 0) questioned.add(id);
+  }
+  return describeRoom(room, {
+    seed: world.seed,
+    visitCount: world.visitCount(room.id),
+    memory: { accepted, rejected, questioned },
+  });
+}
+
+/**
+ * Ask the Yuka argument agent to respond. Centralises the per-verb flow:
+ *   1. Mark the room so the memory projection reflects this act.
+ *   2. Build the context (fresh memory projection + room context).
+ *   3. respondTo(verb, ctx) — the agent's StateMachine/Think arbitrates
+ *      and returns narration + an optional sfx intent.
+ *   4. Emit audio and append narration.
+ */
+function agentRespond(
+  verb: "accept" | "reject" | "question",
+  room: Room,
+  state: GameState,
+  world: WorldBridge,
+  audio: AudioSink
+): string[] {
+  // Mark first so readMemory includes the just-issued act.
+  if (verb === "accept") world.markRoomAccepted(room.id);
+  else if (verb === "reject") world.markRoomRejected(room.id);
+  else world.markRoomQuestioned(room.id);
+
+  const memory = world.readMemory(state.turnCount + 1);
+  const response = world.argument.respondTo(verb, {
+    memory,
+    room: {
+      id: room.id,
+      title: room.title,
+      rhetoricalType: room.rhetoricalType,
+    },
+  });
+
+  if (response.sfx) audio.playSfx(response.sfx);
+  if (verb === "accept" && response.state === "Triumphant") {
+    world.markCircleClosed();
+  }
+  return response.lines;
 }
 
 function applyRhetoricalVerb(
@@ -120,7 +197,7 @@ function applyRhetoricalVerb(
   switch (parsed.verb satisfies CommandVerb) {
     case "look":
       audio.playSfx("rhetoric.examine");
-      return bump(describeRoom(currentRoom));
+      return bump(describeRoomChained(currentRoom, world, state));
 
     case "examine": {
       audio.playSfx("rhetoric.examine");
@@ -137,42 +214,16 @@ function applyRhetoricalVerb(
       return bump(getHelpText());
 
     case "question":
-      audio.playSfx("rhetoric.question");
-      return bump([
-        "You question the assumption.",
-        `The ${currentRoom.title} trembles slightly. Good question. The argument doesn't have a ready answer.`,
-      ]);
-
     case "ask":
-      audio.playSfx("rhetoric.question");
-      return bump([
-        "You ask: Why?",
-        `The ${currentRoom.title} echoes. A voice replies: "Because it follows from the premise." You note that the premise has not been justified.`,
-      ]);
+      // Routed through the Yuka agent — state (Composed/Defensive/...) picks
+      // the response. Agent returns lines + sfx; reducer only bumps turnCount.
+      return bump(agentRespond("question", currentRoom, state, world, audio));
 
     case "accept":
-      audio.playSfx("rhetoric.accept");
-      if (currentRoom.rhetoricalType === "circular" || currentRoom.rhetoricalType === "meta") {
-        audio.playSfx("circle.closed");
-        return bump([
-          "You accept the argument.",
-          "The conclusion you have accepted is identical to the premise from which you began.",
-          "You have completed the circle. Petitio Principii.",
-          "",
-          "The argument was always about itself.",
-        ]);
-      }
-      return bump([
-        "You accept this step in the argument.",
-        "The argument notes your acceptance and moves on, emboldened.",
-      ]);
+      return bump(agentRespond("accept", currentRoom, state, world, audio));
 
     case "reject":
-      audio.playSfx("rhetoric.reject");
-      return bump([
-        "You reject this argument.",
-        "The argument buckles but does not collapse. It has more premises.",
-      ]);
+      return bump(agentRespond("reject", currentRoom, state, world, audio));
 
     case "trace": {
       audio.playSfx("rhetoric.trace");
@@ -181,7 +232,12 @@ function applyRhetoricalVerb(
         const next = state.rooms.get(nextHop);
         if (next) {
           world.movePlayer(next.id, next.rhetoricalType);
-          appendLines(world, ["You trace back through the argument.", "", ...describeRoom(next)]);
+          world.markVisited(next.id);
+          appendLines(world, [
+            "You trace back through the argument.",
+            "",
+            ...describeRoomChained(next, world, state),
+          ]);
           return { ...state, currentRoomId: next.id, turnCount: state.turnCount + 1 };
         }
       }

@@ -7,19 +7,22 @@ import {
   generateArgumentGraph,
   generatePhrase,
 } from "@/engine";
+import { createSeededRandom } from "@/engine";
+import { ArgumentAgent } from "@/engine/ai/argument-agent";
 import { sfxForRhetoricalType } from "@/lib/audio-manifest";
 import { readTranscript } from "@/world";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAudio } from "./use-audio";
 import { useWorld } from "./use-world";
 
 /**
  * Composition hook — wires React state, the koota world handle, the pure
- * reducer, and the audio bus together.
+ * reducer, the audio bus, and the Yuka argument agent together.
  *
  * Game logic lives in @/engine/core/reducer.ts (pure). World state lives
- * in @/world (koota). Audio lives in useAudio (Howler). This hook is the
- * only place that knows all four exist.
+ * in @/world (koota). Audio lives in useAudio (Howler). The argument
+ * agent is a Yuka StateMachine instantiated once per game. This hook is
+ * the only place that knows all four exist.
  */
 export interface GameHandle {
   state: GameState;
@@ -34,6 +37,10 @@ export function useGame(): GameHandle {
   const [state, setState] = useState<GameState>(createInitialGameState);
   const world = useWorld();
   const audio = useAudio();
+  // One ArgumentAgent per game. Rebuilt on startGame with a seed-derived rng
+  // so the same seed + same player acts produce the same narration.
+  const agentRef = useRef<ArgumentAgent | null>(null);
+  const seedRef = useRef<number>(0);
 
   /** Rebuild state.transcript + state.output from the koota world. */
   const project = useCallback(
@@ -47,28 +54,37 @@ export function useGame(): GameHandle {
     [world]
   );
 
-  /**
-   * The reducer expects a WorldBridge — we build one per call that
-   * combines world movement with audio ambient cues. Keeping the bridge
-   * this thin means the reducer stays testable with a mock bridge.
-   */
-  const makeBridge = useCallback(
-    (roomTypes: Map<string, Parameters<typeof sfxForRhetoricalType>[0]>): WorldBridge => ({
+  const makeBridge = useCallback((): WorldBridge | null => {
+    const agent = agentRef.current;
+    if (!agent) return null;
+    return {
       movePlayer: (roomId, toRoomType) => {
         world.movePlayer(roomId);
+        world.bumpVisitCount(roomId);
         audio.playSfx(sfxForRhetoricalType(toRoomType));
-        // Cache the type so later bridges don't re-derive
-        roomTypes.set(roomId, toRoomType);
       },
       appendLine: (kind, text) => world.appendLine(kind, text),
       findNextHopToCircle: (fromRoomId) => world.findNextHopToCircle(fromRoomId),
-    }),
-    [audio, world]
-  );
+      markVisited: (roomId) => world.markVisited(roomId),
+      markRoomAccepted: (roomId) => world.markAccepted(roomId),
+      markRoomRejected: (roomId) => world.markRejected(roomId),
+      markRoomQuestioned: (roomId) => world.markQuestioned(roomId),
+      markCircleClosed: () => world.markCircleClosed(),
+      readMemory: (turnCount) => world.readMemory(turnCount),
+      argument: agent,
+      seed: seedRef.current,
+      visitCount: (roomId) => world.visitCount(roomId),
+    };
+  }, [audio, world]);
 
   const startGame = useCallback(
     async (seed: number) => {
       audio.stopBgm();
+      seedRef.current = seed;
+
+      // One Yuka argument agent per game, seeded so choice-between-variants
+      // is deterministic for (seed, player-acts).
+      agentRef.current = new ArgumentAgent({ rng: createSeededRandom(seed ^ 0x41a7) });
 
       const graph = generateArgumentGraph(seed);
       const phrase = generatePhrase(seed);
@@ -78,7 +94,6 @@ export function useGame(): GameHandle {
       audio.playBgm();
       if (startRoom) audio.playSfx(sfxForRhetoricalType(startRoom.rhetoricalType));
 
-      // Seed the transcript via koota entities
       const seedLines = [
         "Petitio Principii",
         `Seed: ${seed} — "${phrase}"`,
@@ -111,6 +126,7 @@ export function useGame(): GameHandle {
     audio.stopBgm();
     audio.playSfx("ui.back");
     world.discard();
+    agentRef.current = null;
     setState(createInitialGameState());
   }, [audio, world]);
 
@@ -119,7 +135,8 @@ export function useGame(): GameHandle {
       if (!raw.trim()) return;
       audio.playSfx("ui.press");
       setState((prev) => {
-        const bridge = makeBridge(new Map());
+        const bridge = makeBridge();
+        if (!bridge) return prev;
         const next = applyCommand(prev, raw, bridge, audio);
         return project(next);
       });
