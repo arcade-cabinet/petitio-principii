@@ -1,10 +1,10 @@
 import { createSignal } from "solid-js";
-import { generateArgumentGraph } from "../../engine/core/ArgumentGraph";
-import type { GameState } from "../../engine/core/GameState";
-import { createInitialGameState } from "../../engine/core/GameState";
-import { describeRoom, generatePhrase, getHelpText } from "../../engine/core/NarrativeGenerator";
-import { parseCommand } from "../../engine/core/Parser";
-import type { Direction } from "../../engine/core/Room";
+import { generateArgumentGraph } from "@src/engine/core/ArgumentGraph";
+import type { GameState } from "@src/engine/core/GameState";
+import { createInitialGameState } from "@src/engine/core/GameState";
+import { describeRoom, generatePhrase, getHelpText } from "@src/engine/core/NarrativeGenerator";
+import { parseCommand } from "@src/engine/core/Parser";
+import type { Direction } from "@src/engine/core/Room";
 
 export interface GameEngineResult {
   gameState: () => GameState;
@@ -73,7 +73,7 @@ export function createGameEngine(): GameEngineResult {
       ];
       if (movementDirections.includes(parsed.verb as Direction)) {
         const dir = parsed.verb as Direction;
-        const exit = currentRoom.exits.find((e) => e.direction === dir);
+        const exit = currentRoom.exits.find((e: { direction: string }) => e.direction === dir);
         if (exit) {
           const nextRoom = prev.rooms.get(exit.targetRoomId);
           if (nextRoom) {
@@ -197,12 +197,12 @@ export function createGameEngine(): GameEngineResult {
         case "trace": {
           const exits = currentRoom.exits;
           if (exits.length > 0) {
-            const backExit = exits.find((e) => e.direction === "back") ?? exits[exits.length - 1];
-            const backRoom = prev.rooms.get(backExit?.targetRoomId ?? "");
-            if (backRoom) {
+            const backExit = exits.find((e: { direction: string }) => e.direction === "back") ?? exits[exits.length - 1];
+            const backRoom = backExit ? prev.rooms.get(backExit.targetRoomId) : undefined;
+            if (backRoom && backExit) {
               return {
                 ...prev,
-                currentRoomId: backExit?.targetRoomId ?? "",
+                currentRoomId: backExit.targetRoomId,
                 output: [
                   ...newOutput,
                   "You trace back through the argument.",

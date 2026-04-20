@@ -1,6 +1,6 @@
 import { For, createEffect } from "solid-js";
 import type { Component } from "solid-js";
-import { parseCommand } from "../../engine/core/Parser";
+import { parseCommand } from "@src/engine/core/Parser";
 import { InputLine } from "./InputLine";
 import { TextLine } from "./TextLine";
 

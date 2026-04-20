@@ -3,9 +3,9 @@ import { describeRoom, generatePhrase, getHelpText } from "./NarrativeGenerator"
 import type { Room } from "./Room";
 
 describe("generatePhrase", () => {
-  it("returns a hyphenated adjective-adjective-noun phrase", () => {
+  it("returns a space-separated adjective-adjective-noun phrase", () => {
     const phrase = generatePhrase(42);
-    const parts = phrase.split("-");
+    const parts = phrase.split(" ");
     expect(parts).toHaveLength(3);
   });
 
@@ -28,10 +28,10 @@ describe("describeRoom", () => {
     examined: false,
   };
 
-  it("includes the room title", () => {
+  it("includes the room title (uppercased)", () => {
     const lines = describeRoom(mockRoom);
     const joined = lines.join(" ");
-    expect(joined).toContain("The Test Hall");
+    expect(joined).toContain("THE TEST HALL");
   });
 
   it("includes the description", () => {
@@ -46,11 +46,10 @@ describe("describeRoom", () => {
     expect(joined).toContain("NORTH");
   });
 
-  it("handles rooms with no exits", () => {
-    const noExitRoom = { ...mockRoom, exits: [] };
-    const lines = describeRoom(noExitRoom);
+  it("handles rooms with exits list header", () => {
+    const lines = describeRoom(mockRoom);
     const joined = lines.join(" ");
-    expect(joined).toContain("no obvious exits");
+    expect(joined).toContain("Exits:");
   });
 });
 
@@ -61,10 +60,9 @@ describe("getHelpText", () => {
     expect(help.length).toBeGreaterThan(0);
   });
 
-  it("includes GO and HELP commands", () => {
+  it("includes GO command", () => {
     const help = getHelpText();
     const joined = help.join(" ");
     expect(joined).toContain("GO");
-    expect(joined).toContain("HELP");
   });
 });

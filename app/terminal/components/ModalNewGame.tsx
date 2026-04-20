@@ -1,7 +1,7 @@
 import { Show, createMemo, createSignal } from "solid-js";
 import type { Component } from "solid-js";
-import { generatePhrase } from "../../engine/core/NarrativeGenerator";
-import { generateSeed } from "../../engine/prng/seedRandom";
+import { generatePhrase } from "@src/engine/core/NarrativeGenerator";
+import { generateSeed } from "@src/engine/prng/seedRandom";
 
 interface ModalNewGameProps {
   onStart: (seed: number) => void;
