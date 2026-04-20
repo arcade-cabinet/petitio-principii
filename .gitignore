@@ -137,3 +137,16 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Petitio Principii
+tmp/
+.vitest-attachments/
+*.tsbuildinfo
+
+# Stray TypeScript declarations (generated). Hand-written ambient
+# declarations live under src/types/ and must be re-added explicitly.
+/vite.config.d.ts
+/vitest.setup.d.ts
+src/**/*.d.ts
+app/**/*.d.ts
+!src/types/**/*.d.ts

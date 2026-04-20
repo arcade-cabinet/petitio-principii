@@ -9,11 +9,7 @@ test("renders lines in the terminal", async () => {
   const onNewGame = vi.fn();
 
   const { getByText } = render(() => (
-    <TerminalScreen 
-      lines={lines} 
-      onCommand={onCommand} 
-      onNewGame={onNewGame} 
-    />
+    <TerminalScreen lines={lines} onCommand={onCommand} onNewGame={onNewGame} />
   ));
 
   expect(getByText("Welcome to the Argument")).toBeInTheDocument();

@@ -1,7 +1,7 @@
 import { AUTO, Game, Scale } from "phaser";
 import type { Game as GameType } from "phaser";
 import { RetroDisplay } from "retrozone";
-import { StarfieldScene } from "./StarfieldScene";
+import { StarfieldScene } from "./scenes/StarfieldScene";
 
 export interface PhaserBundle {
   /** Tear down both the Phaser game and the RetroZone overlay. */
@@ -34,13 +34,10 @@ export function createPhaserGame(parent: HTMLElement): PhaserBundle {
     audio: { noAudio: true },
   });
 
-  // RetroZone needs the canvas to exist in the DOM before it can create its
-  // WebGL overlay — a short delay mirrors the pattern in the retrozone demo.
   setTimeout(() => {
     if (!game.canvas) return;
     display = new RetroDisplay(game.canvas, { mode: "crt" });
     if (display.overlayCanvas) {
-      // Must not intercept pointer events intended for the SolidJS overlay
       display.overlayCanvas.style.pointerEvents = "none";
       display.overlayCanvas.style.zIndex = "1";
     }

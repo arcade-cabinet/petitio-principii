@@ -1,3 +1,10 @@
+---
+title: Content Generation
+updated: 2026-04-20
+status: current
+domain: technical
+---
+
 # Content Generation System
 
 ## Overview

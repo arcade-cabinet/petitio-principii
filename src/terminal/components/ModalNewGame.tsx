@@ -1,7 +1,6 @@
+import { generatePhrase, generateSeed } from "@/engine";
 import { Show, createMemo, createSignal } from "solid-js";
 import type { Component } from "solid-js";
-import { generatePhrase } from "@src/engine/core/NarrativeGenerator";
-import { generateSeed } from "@src/engine/prng/seedRandom";
 
 interface ModalNewGameProps {
   onStart: (seed: number) => void;
@@ -68,10 +67,7 @@ export const ModalNewGame: Component<ModalNewGameProps> = (props) => {
         </div>
 
         <Show when={showCustomSeed()}>
-          <form
-            class="modal-custom-seed"
-            onSubmit={handleCustomSeedSubmit}
-          >
+          <form class="modal-custom-seed" onSubmit={handleCustomSeedSubmit}>
             <div style={{ display: "flex", "flex-direction": "column", gap: "4px" }}>
               <input
                 type="number"

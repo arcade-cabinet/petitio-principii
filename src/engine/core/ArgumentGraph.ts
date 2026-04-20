@@ -1,5 +1,4 @@
-import { PASSAGE_TEMPLATES } from "../content/templates/passageTemplates";
-import { ROOM_TEMPLATES } from "../content/templates/roomTemplates";
+import { PASSAGE_TEMPLATES, ROOM_TEMPLATES } from "@/content";
 import { createSeededRandom, pickRandom, shuffleArray } from "../prng/seedRandom";
 import type { Passage } from "./Passage";
 import type { Direction, Exit, Room } from "./Room";

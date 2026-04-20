@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RHETORICAL_TERMS } from "../../engine/content/lexicon/rhetoricalTerms";
+import { RHETORICAL_TERMS } from "../lexicon/rhetoricalTerms";
 import { LOCAL_CORPUS } from "./localCorpus";
 
 describe("LOCAL_CORPUS", () => {

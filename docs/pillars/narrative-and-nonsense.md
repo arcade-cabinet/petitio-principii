@@ -1,3 +1,10 @@
+---
+title: Narrative and Nonsense
+updated: 2026-04-20
+status: current
+domain: creative
+---
+
 # Narrative and Nonsense Generation
 
 ## Core Philosophy

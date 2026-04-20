@@ -1,3 +1,10 @@
+---
+title: Agentic Workflows
+updated: 2026-04-20
+status: current
+domain: technical
+---
+
 # Agentic Workflows
 
 ## Purpose

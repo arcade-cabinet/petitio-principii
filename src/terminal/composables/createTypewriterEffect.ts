@@ -68,10 +68,7 @@ export function createTypewriterEffect(
         const currentLine = currentTarget[lineIndex] ?? "";
         charIndex++;
 
-        setDisplayedLines([
-          ...currentTarget.slice(0, lineIndex),
-          currentLine.slice(0, charIndex),
-        ]);
+        setDisplayedLines([...currentTarget.slice(0, lineIndex), currentLine.slice(0, charIndex)]);
 
         if (charIndex >= currentLine.length) {
           lineIndex++;

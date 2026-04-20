@@ -1,6 +1,5 @@
+import { type PhaserBundle, createPhaserGame } from "@/render";
 import { onCleanup, onMount } from "solid-js";
-import type { PhaserBundle } from "@app/render/PhaserGame";
-import { createPhaserGame } from "@app/render/PhaserGame";
 
 export const StarfieldBackground = () => {
   let containerRef!: HTMLDivElement;

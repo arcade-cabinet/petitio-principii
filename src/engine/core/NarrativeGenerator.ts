@@ -1,6 +1,4 @@
-import { ADJECTIVES } from "../content/lexicon/adjectives";
-import { NOUNS } from "../content/lexicon/nouns";
-import { RHETORICAL_TERMS } from "../content/lexicon/rhetoricalTerms";
+import { ADJECTIVES, NOUNS, RHETORICAL_TERMS } from "@/content";
 import { createSeededRandom, pickRandom, shuffleArray } from "../prng/seedRandom";
 import type { Room } from "./Room";
 

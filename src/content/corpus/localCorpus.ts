@@ -1,4 +1,4 @@
-import { RHETORICAL_TERMS } from "../../engine/content/lexicon/rhetoricalTerms";
+import { RHETORICAL_TERMS } from "../lexicon/rhetoricalTerms";
 
 export interface FallacyEntry {
   id: string;

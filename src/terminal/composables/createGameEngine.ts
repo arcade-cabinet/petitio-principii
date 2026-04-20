@@ -1,10 +1,14 @@
+import {
+  type Direction,
+  type GameState,
+  createInitialGameState,
+  describeRoom,
+  generateArgumentGraph,
+  generatePhrase,
+  getHelpText,
+  parseCommand,
+} from "@/engine";
 import { createSignal } from "solid-js";
-import { generateArgumentGraph } from "@src/engine/core/ArgumentGraph";
-import type { GameState } from "@src/engine/core/GameState";
-import { createInitialGameState } from "@src/engine/core/GameState";
-import { describeRoom, generatePhrase, getHelpText } from "@src/engine/core/NarrativeGenerator";
-import { parseCommand } from "@src/engine/core/Parser";
-import type { Direction } from "@src/engine/core/Room";
 
 export interface GameEngineResult {
   gameState: () => GameState;
@@ -12,10 +16,17 @@ export interface GameEngineResult {
   submitCommand: (input: string) => void;
 }
 
-/**
- * SolidJS-native game engine primitive.
- * Returns a signal getter `gameState()` so consumers track reactivity correctly.
- */
+const MOVEMENT: readonly Direction[] = [
+  "north",
+  "south",
+  "east",
+  "west",
+  "up",
+  "down",
+  "back",
+  "forward",
+];
+
 export function createGameEngine(): GameEngineResult {
   const [gameState, setGameState] = createSignal<GameState>(createInitialGameState());
 
@@ -61,19 +72,9 @@ export function createGameEngine(): GameEngineResult {
         };
       }
 
-      const movementDirections: Direction[] = [
-        "north",
-        "south",
-        "east",
-        "west",
-        "up",
-        "down",
-        "back",
-        "forward",
-      ];
-      if (movementDirections.includes(parsed.verb as Direction)) {
+      if (MOVEMENT.includes(parsed.verb as Direction)) {
         const dir = parsed.verb as Direction;
-        const exit = currentRoom.exits.find((e: { direction: string }) => e.direction === dir);
+        const exit = currentRoom.exits.find((e) => e.direction === dir);
         if (exit) {
           const nextRoom = prev.rooms.get(exit.targetRoomId);
           if (nextRoom) {
@@ -96,13 +97,12 @@ export function createGameEngine(): GameEngineResult {
       }
 
       switch (parsed.verb) {
-        case "look": {
+        case "look":
           return {
             ...prev,
             output: [...newOutput, ...describeRoom(currentRoom)],
             turnCount: prev.turnCount + 1,
           };
-        }
         case "examine": {
           const newRooms = new Map(prev.rooms);
           newRooms.set(currentRoom.id, { ...currentRoom, examined: true });
@@ -125,14 +125,13 @@ export function createGameEngine(): GameEngineResult {
             turnCount: prev.turnCount + 1,
           };
         }
-        case "help": {
+        case "help":
           return {
             ...prev,
             output: [...newOutput, ...getHelpText()],
             turnCount: prev.turnCount + 1,
           };
-        }
-        case "question": {
+        case "question":
           return {
             ...prev,
             output: [
@@ -143,8 +142,7 @@ export function createGameEngine(): GameEngineResult {
             ],
             turnCount: prev.turnCount + 1,
           };
-        }
-        case "ask": {
+        case "ask":
           return {
             ...prev,
             output: [
@@ -154,8 +152,7 @@ export function createGameEngine(): GameEngineResult {
             ],
             turnCount: prev.turnCount + 1,
           };
-        }
-        case "accept": {
+        case "accept":
           if (currentRoom.rhetoricalType === "circular" || currentRoom.rhetoricalType === "meta") {
             return {
               ...prev,
@@ -181,8 +178,7 @@ export function createGameEngine(): GameEngineResult {
             ],
             turnCount: prev.turnCount + 1,
           };
-        }
-        case "reject": {
+        case "reject":
           return {
             ...prev,
             output: [
@@ -193,11 +189,10 @@ export function createGameEngine(): GameEngineResult {
             ],
             turnCount: prev.turnCount + 1,
           };
-        }
         case "trace": {
           const exits = currentRoom.exits;
           if (exits.length > 0) {
-            const backExit = exits.find((e: { direction: string }) => e.direction === "back") ?? exits[exits.length - 1];
+            const backExit = exits.find((e) => e.direction === "back") ?? exits[exits.length - 1];
             const backRoom = backExit ? prev.rooms.get(backExit.targetRoomId) : undefined;
             if (backRoom && backExit) {
               return {
@@ -222,25 +217,21 @@ export function createGameEngine(): GameEngineResult {
             turnCount: prev.turnCount + 1,
           };
         }
-        case "new": {
-          // Fallback if not intercepted by TerminalScreen
+        case "new":
           return { ...prev, output: [...newOutput, "Starting a new game..."] };
-        }
-        case "quit": {
+        case "quit":
           return {
             ...prev,
             output: [...newOutput, "You cannot quit. The argument has already begun."],
             turnCount: prev.turnCount + 1,
           };
-        }
-        case "inventory": {
+        case "inventory":
           return {
             ...prev,
             output: [...newOutput, "You are carrying nothing but your preconceptions."],
             turnCount: prev.turnCount + 1,
           };
-        }
-        default: {
+        default:
           return {
             ...prev,
             output: [
@@ -249,7 +240,6 @@ export function createGameEngine(): GameEngineResult {
             ],
             turnCount: prev.turnCount + 1,
           };
-        }
       }
     });
   }

@@ -1,3 +1,3 @@
-export * from "./themeConfig";
-export * from "./typographyConfig";
-export * from "./gameConfig";
+export { GAME_CONFIG } from "./gameConfig";
+export { THEME } from "./themeConfig";
+export { TYPOGRAPHY } from "./typographyConfig";

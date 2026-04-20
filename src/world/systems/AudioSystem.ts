@@ -1,31 +1,66 @@
+import type { World } from "koota";
 import * as Tone from "tone";
-import { world } from "../index";
-import { AudioTheme, Position } from "../traits";
+import { AudioTheme, IsPlayer, IsRoom, Position, RoomId } from "../traits";
 
 let synth: Tone.PolySynth | null = null;
+let lastRoomId: string | null = null;
 
-export function initAudio() {
-  synth = new Tone.PolySynth(Tone.Synth).toDestination();
-  Tone.start();
+/**
+ * Initialize the audio engine. Must be called from a user-gesture handler
+ * because browsers require a gesture before `AudioContext` can start.
+ */
+export async function initAudio(): Promise<void> {
+  if (synth) return;
+  await Tone.start();
+  synth = new Tone.PolySynth(Tone.Synth, {
+    envelope: { attack: 1.2, decay: 0.3, sustain: 0.8, release: 2.5 },
+    oscillator: { type: "sine" },
+  }).toDestination();
+  synth.volume.value = -18;
 }
 
-export function updateAudio() {
+/** Tear down the audio engine — call on game end or hot-reload. */
+export function disposeAudio(): void {
+  synth?.dispose();
+  synth = null;
+  lastRoomId = null;
+}
+
+/**
+ * Room-aware ambient pad. Queries the player's Position and the room matching
+ * that id, reading its AudioTheme to choose a chord. Triggers once per room
+ * transition so movement is what drives audio, not frame time.
+ */
+export function updateAudio(world: World): void {
   if (!synth) return;
 
-  // Simple query to find the player and the room they are in
-  let playerPosition = null;
-  for (const entity of world.query(Position)) {
-    playerPosition = entity.get(Position);
-    break;
-  }
-  
-  if (!playerPosition) return;
+  let playerRoomId = "";
+  world
+    .query(IsPlayer, Position)
+    .select(Position)
+    .readEach(([position]) => {
+      playerRoomId = position.roomId;
+    });
 
-  const currentRoomId = playerPosition.roomId;
-  const room = world.entities.find(e => e.has(AudioTheme) && (e as any).id === currentRoomId);
-  
-  if (room) {
-    room.get(AudioTheme);
-    // Logic to modulate Tone.js based on the theme
-  }
+  if (!playerRoomId || playerRoomId === lastRoomId) return;
+
+  let theme: { baseFrequency: number; dissonance: number } | null = null;
+  world
+    .query(IsRoom, RoomId, AudioTheme)
+    .select(RoomId, AudioTheme)
+    .readEach(([id, audio]) => {
+      if (id.value === playerRoomId) {
+        theme = { baseFrequency: audio.baseFrequency, dissonance: audio.dissonance };
+      }
+    });
+
+  if (!theme) return;
+
+  const { baseFrequency, dissonance } = theme;
+  const third = baseFrequency * (dissonance > 0.5 ? 1.059463 : 1.25); // m2 vs. M3
+  const fifth = baseFrequency * (dissonance > 0.3 ? Math.SQRT2 : 1.5); // tritone vs. P5
+  synth.releaseAll();
+  synth.triggerAttackRelease([baseFrequency, third, fifth], "4n");
+
+  lastRoomId = playerRoomId;
 }

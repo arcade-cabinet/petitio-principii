@@ -9,9 +9,7 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": false,
-    "emitDeclarationOnly": true,
-    "composite": true,
+    "noEmit": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "strict": true,
@@ -20,11 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@src/*": ["src/*"],
-      "@app/*": ["app/*"]
+      "@/*": ["src/*"]
     },
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "app", "scripts", "vitest.setup.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "scripts", "vitest.setup.ts"]
 }

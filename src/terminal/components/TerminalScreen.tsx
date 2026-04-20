@@ -1,6 +1,6 @@
+import { parseCommand } from "@/engine";
 import { For, createEffect } from "solid-js";
 import type { Component } from "solid-js";
-import { parseCommand } from "@src/engine/core/Parser";
 import { InputLine } from "./InputLine";
 import { TextLine } from "./TextLine";
 
@@ -14,7 +14,6 @@ export const TerminalScreen: Component<TerminalScreenProps> = (props) => {
   let outputRef!: HTMLDivElement;
 
   createEffect(() => {
-    // Track props.lines so the effect re-runs whenever lines change
     void props.lines;
     if (outputRef) outputRef.scrollTop = outputRef.scrollHeight;
   });
