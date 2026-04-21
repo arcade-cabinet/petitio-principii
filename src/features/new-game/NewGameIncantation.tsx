@@ -105,8 +105,9 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
   }, [seed]);
 
   const handleRegenerate = () => {
-    setSeed(generateSeed());
-    setIsArgumentOfDay(false);
+    const nextSeed = generateSeed();
+    setSeed(nextSeed);
+    setIsArgumentOfDay(nextSeed === todaySeedValue);
     setCustomInput("");
     setCustomError("");
     setCustomOpen(false);
@@ -239,7 +240,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
           <button
             type="button"
             onClick={handleShare}
-            aria-label="Copy shareable link to this seed"
+            aria-label={t("landing.share_seed_aria")}
             className={`
               min-h-[40px] rounded-[5px]
               border border-transparent
@@ -264,7 +265,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               value={customInput}
               onChange={(e) => setCustomInput(e.currentTarget.value)}
               placeholder={t("landing.seed_input_placeholder")}
-              aria-label="Custom seed"
+              aria-label={t("landing.seed_input_aria")}
               min={0}
               max={0xffffffff}
               className={`
@@ -302,7 +303,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
         {/* T82/T83 language switcher */}
         <fieldset
           className="mt-3 flex items-center justify-center gap-2 border-0 m-0 p-0"
-          aria-label="Language"
+          aria-label={t("landing.language_switcher_aria")}
         >
           {SUPPORTED_LANGUAGES.map((lang) => (
             <button

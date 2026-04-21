@@ -7,16 +7,21 @@
     "regenerate": "Régénérer",
     "custom_seed": "Graine Personnalisée",
     "share_seed": "Partager cette graine",
-    "share_copied": "Lien copié !",
+    "share_seed_aria": "Copier le lien partageable pour cette graine",
+    "share_copied": "Lien copié !",
     "share_error": "Échec de la copie — réessayez",
     "seed_input_placeholder": "entrez une graine numérique…",
+    "seed_input_aria": "Graine personnalisée",
     "seed_input_apply": "Appliquer",
     "seed_error": "La graine doit être comprise entre 0 et 4294967295",
+    "language_switcher_aria": "Langue",
     "argument_of_day_label": "L'Argument du Jour",
     "argument_of_day_note": "Tous les joueurs d'aujourd'hui partagent cette graine."
   },
   "settings": {
     "dyslexic_font": "Police Dyslexique",
+    "dyslexic_font_aria": "Activer la police adaptée à la dyslexie",
+    "display_settings_label": "Paramètres d'affichage",
     "text_size_label": "Taille du texte",
     "text_size_small": "P",
     "text_size_medium": "M",
@@ -28,9 +33,9 @@
   "share_card": {
     "share": "Partager votre argument",
     "sharing": "Partage en cours…",
-    "shared": "Partagé !",
+    "shared": "Partagé !",
     "error": "Échec du partage",
-    "alt": "Carte de l'argument pour la graine {{seed}} : {{phrase}}. {{turns}} tours."
+    "alt": "Carte de l'argument pour la graine {{seed}} : {{phrase}}. {{turns}} tours."
   },
   "terminal": {
     "new_game": "Nouvelle Partie"

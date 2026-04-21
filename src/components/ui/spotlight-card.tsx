@@ -152,8 +152,6 @@ export function GlowCard({
           </filter>
         </defs>
       </svg>
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: css string is
-          built from a useId-generated id; no user input. */}
       <style>{css}</style>
       <div
         ref={cardRef}

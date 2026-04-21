@@ -226,7 +226,7 @@ export function ShareCard({
     setShareStatus("sharing");
 
     try {
-      if (navigator.share && navigator.canShare) {
+      if (navigator.share) {
         // Web Share API — available on iOS Safari, Android Chrome, etc.
         const blob = await new Promise<Blob>((resolve, reject) => {
           canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png");
@@ -234,10 +234,14 @@ export function ShareCard({
         const file = new File([blob], `petitio-${seed}.png`, { type: "image/png" });
         const shareData: ShareData = {
           title: "Petitio Principii",
-          text: `I closed the argument "${phrase}" in ${turnCount} turns.`,
+          text: t("share_card.share_message", {
+            defaultValue: `I closed the argument "${phrase}" in ${turnCount} turn${turnCount === 1 ? "" : "s"}.`,
+            phrase,
+            turnCount,
+          }),
           url: `${window.location.origin}${window.location.pathname}?seed=${seed}`,
         };
-        if (navigator.canShare({ files: [file] })) {
+        if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ ...shareData, files: [file] });
         } else {
           await navigator.share(shareData);
@@ -260,7 +264,7 @@ export function ShareCard({
         setTimeout(() => setShareStatus("idle"), 3000);
       }
     }
-  }, [dataURL, seed, phrase, turnCount]);
+  }, [dataURL, seed, phrase, turnCount, t]);
 
   return (
     <div className="mt-4 flex flex-col items-center gap-3">

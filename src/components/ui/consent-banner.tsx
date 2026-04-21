@@ -5,9 +5,9 @@
  * Defaults to OFF. Once a choice is made it is persisted to localStorage
  * and the banner never appears again.
  *
- * The banner is minimal: one sentence of plain language, two buttons.
- * Full privacy policy is linked from the banner text → docs/PRIVACY.md
- * (hosted at /privacy or the README, whichever is available).
+ * The banner is minimal: one sentence of plain language and two buttons.
+ * Full privacy policy lives in docs/PRIVACY.md; the banner does not
+ * render an inline link — see docs/PRIVACY.md for the hosted policy.
  */
 import { setConsent } from "@/lib/telemetry";
 import { useEffect, useState } from "react";

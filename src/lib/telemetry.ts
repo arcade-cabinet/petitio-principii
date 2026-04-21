@@ -5,7 +5,7 @@
  *   • Opt-IN only. The beacon script is never loaded until the player
  *     explicitly consents. Default is OFF.
  *   • No cookies, no cross-site tracking (Plausible design).
- *   • Events are minimal: page_view, verb_used, circle_closed.
+ *   • Events are minimal: pageview, verb_used, circle_closed.
  *   • No IP logging on a self-hosted Plausible instance.
  *   • Self-hosted ONLY: if VITE_PLAUSIBLE_HOST is unset the script is never
  *     injected — we refuse to silently fall back to the public plausible.io

@@ -41,14 +41,14 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
   return (
     <div
       className="mt-6 flex items-center justify-between gap-4 border-t border-[var(--color-panel-edge)] pt-4"
-      aria-label="Display settings"
+      aria-label={t("settings.display_settings_label")}
     >
       {/* T85 — Dyslexia font toggle */}
       <button
         type="button"
         role="switch"
         aria-checked={dyslexia}
-        aria-label="Toggle dyslexia-friendly font"
+        aria-label={t("settings.dyslexic_font_aria")}
         onClick={toggleDyslexia}
         className={`
           flex items-center gap-2
