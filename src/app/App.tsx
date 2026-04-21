@@ -26,6 +26,26 @@ const ShareCard = lazy(() =>
 initTelemetry();
 
 /**
+ * Suspense fallback for the landing→game transition. On a fast connection
+ * the TerminalDisplay chunk (~49 kB gzipped) resolves within ~100 ms and
+ * this is never seen; on Slow 3G it can be ~1 s, so a quiet pill keeps the
+ * user anchored rather than flashing blank. Styling stays within existing
+ * design tokens — no new dependencies.
+ */
+function TerminalLoadingPill() {
+  return (
+    <output
+      className="absolute inset-0 flex items-center justify-center pointer-events-none"
+      aria-live="polite"
+    >
+      <span className="rounded-[4px] border border-[var(--color-panel-edge)] bg-[var(--color-panel)]/70 px-4 py-2 font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.16em] uppercase text-[var(--color-dim)]">
+        Loading…
+      </span>
+    </output>
+  );
+}
+
+/**
  * App shell. Three layers, back to front:
  *
  *   0. CrystalField      — the memory-palace backdrop (canvas, always on)
@@ -75,7 +95,7 @@ export function App() {
       {/* T71: <main> landmark so screen readers can navigate the primary content area */}
       <main className="absolute inset-0" aria-label={game.state.started ? "Game" : "Landing"}>
         {game.state.started ? (
-          <Suspense fallback={null}>
+          <Suspense fallback={<TerminalLoadingPill />}>
             <TerminalDisplay
               state={game.state}
               world={game.world}
