@@ -1,4 +1,4 @@
-import type { CompassHeading } from "@/components/ui/compass-rose";
+import type { CompassDirection, CompassHeading } from "@/components/ui/compass-rose";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
@@ -122,26 +122,69 @@ export function TerminalDisplay({
     return set;
   }, [state.transcript]);
 
-  // Last cardinal heading the player committed to — drives the compass
-  // rose's rotation in the PRESENT underlay. Purely derived from the
-  // transcript; null until the player moves.
+  // Last horizontal direction the player committed to — drives the compass
+  // rose's rotation. 8 cardinals (N/NE/E/SE/S/SW/W/NW). Purely derived
+  // from the transcript; null until the player moves horizontally.
   const lastCardinalHeading = useMemo<CompassHeading>(() => {
-    const CARDINALS = new Set(["north", "south", "east", "west"]);
+    const HORIZ = new Set([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+    ]);
     for (let i = state.transcript.length - 1; i >= 0; i--) {
       const entry = state.transcript[i];
       if (entry.kind !== "echo") continue;
       const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
-      if (CARDINALS.has(raw)) return raw as CompassHeading;
+      if (HORIZ.has(raw)) return raw as CompassHeading;
     }
     return null;
   }, [state.transcript]);
 
+  // Set of horizontal cardinals available as exits from the current room.
+  // Drives the compass-rose's enabled/disabled wedges.
+  const availableCompassDirections = useMemo<Set<CompassDirection>>(() => {
+    const set = new Set<CompassDirection>();
+    if (!currentRoom) return set;
+    const HORIZ = new Set<CompassDirection>([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+    ]);
+    for (const exit of currentRoom.exits) {
+      if (HORIZ.has(exit.direction as CompassDirection)) {
+        set.add(exit.direction as CompassDirection);
+      }
+    }
+    return set;
+  }, [currentRoom]);
+
   // Exits already traversed from this room (via movement-verb echoes in
   // the current room). Used to draw the faint trail-glow on direction
-  // keycaps — the UX half of the argument map's geometry.
+  // keycaps.
   const traversedDirections = useMemo(() => {
     const set = new Set<string>();
-    const DIRS = new Set(["north", "south", "east", "west", "up", "down", "back", "forward"]);
+    const DIRS = new Set([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "up",
+      "down",
+    ]);
     for (const entry of state.transcript) {
       if (entry.kind !== "echo") continue;
       const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
@@ -211,7 +254,14 @@ export function TerminalDisplay({
       id: "heading",
       label: "Heading",
       weight: 1,
-      content: <HeadingPanel heading={lastCardinalHeading} visitedCount={visitedCount} />,
+      content: (
+        <HeadingPanel
+          heading={lastCardinalHeading}
+          available={availableCompassDirections}
+          onDirection={(dir) => onCommand(dir)}
+          visitedCount={visitedCount}
+        />
+      ),
     },
     {
       id: "present",

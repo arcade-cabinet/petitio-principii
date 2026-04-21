@@ -1,29 +1,40 @@
-import { type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
+import { type CompassDirection, type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
 import { GlowCard } from "@/components/ui/spotlight-card";
 
 /**
  * HeadingPanel — the "where am I facing" panel.
  *
+ * Hosts the interactive 8-cardinal CompassRose. Receives the available
+ * exits from the parent and an `onDirection` callback that submits the
+ * spatial command. The compass spins to the last heading the player
+ * pressed.
+ *
  * Wrapped in a GlowCard (pointer-tracked spotlight + organic
- * SVG-distorted border) instead of a machined BezelPanel. The
- * dreamspace aesthetic the chassis was reaching for, achieved through
- * fluid color washes that follow the cursor rather than steel rivets.
+ * SVG-distorted border) instead of a machined BezelPanel.
  */
 
-const READOUT_LABEL: Record<Exclude<CompassHeading, null>, string> = {
+const READOUT_LABEL: Record<CompassDirection, string> = {
   north: "North",
+  northeast: "Northeast",
   east: "East",
+  southeast: "Southeast",
   south: "South",
+  southwest: "Southwest",
   west: "West",
+  northwest: "Northwest",
 };
 
 export interface HeadingPanelProps {
   readonly heading: CompassHeading;
+  /** Set of directions currently available as exits from the present room. */
+  readonly available: ReadonlySet<CompassDirection>;
+  /** Called when the player clicks an enabled compass direction. */
+  readonly onDirection: (dir: CompassDirection) => void;
   /** Total rooms visited so far. Shown beneath the compass. */
   readonly visitedCount: number;
 }
 
-export function HeadingPanel({ heading, visitedCount }: HeadingPanelProps) {
+export function HeadingPanel({ heading, available, onDirection, visitedCount }: HeadingPanelProps) {
   const label = heading ? READOUT_LABEL[heading] : "—";
   return (
     <GlowCard
@@ -36,7 +47,12 @@ export function HeadingPanel({ heading, visitedCount }: HeadingPanelProps) {
         Heading
       </div>
       <div className="w-full max-w-[260px]" style={{ opacity: 0.9 }}>
-        <CompassRose heading={heading} size="100%" />
+        <CompassRose
+          available={available}
+          lastHeading={heading}
+          onDirection={onDirection}
+          size="100%"
+        />
       </div>
       <div className="text-center">
         <div
