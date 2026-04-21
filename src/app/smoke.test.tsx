@@ -29,9 +29,11 @@ vi.mock("@/hooks/use-audio", async () => {
   return {
     useAudio: () => ({
       stopBgm: vi.fn(),
-      startBgm: vi.fn(),
       playBgm: vi.fn(),
       playSfx: vi.fn(),
+      toggleMute: vi.fn(() => false),
+      isMuted: vi.fn(() => false),
+      unlock: vi.fn(),
     }),
   };
 });
