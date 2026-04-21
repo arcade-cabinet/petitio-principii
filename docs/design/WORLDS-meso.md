@@ -509,10 +509,13 @@ The 10 nodes were selected to satisfy three constraints:
    meta) is represented by at least one node. Two types — premise
    and meta — are represented by two nodes each, because both are
    load-bearing to the circle-closing mechanic.
-2. **Region distribution.** Two nodes per region per world, one at
-   the region's entry and one at its exit, so a seed crossing
-   between worlds does so at a meaningful region boundary rather
-   than mid-region.
+2. **Region distribution.** Nodes spread across all 5 spine regions
+   per world, with ~2 per region — except the terminal regions (A.5,
+   B.5) which carry only 1 node (#10, shared), and one mid-region
+   per world carries 3 due to the catchment-bias around node #10's
+   approach (A.2 = 3 nodes; B.3 = 3 nodes). Every region has at
+   least one node, so a seed crossing between worlds does so at a
+   meaningful region boundary rather than mid-region.
 3. **Spatial fingerprint shareability.** Each node has a geometry
    that reads naturally in both registers (a hall of columns, a
    balcony over an expanse, a drum-shaped atrium). Nothing here
@@ -823,6 +826,16 @@ turns 1–4, Act II turns 5–12, Act III turn 13+). Meso's density
 curve specifies which regions contribute to which act, how
 connection-nodes cluster, and where puzzle groups land.
 
+> **Note — turns vs rooms:** Macro's act boundaries are defined in
+> *turns* (player inputs), while meso's density table below uses
+> *rooms visited*. The two counts diverge because a single room can
+> consume multiple turns (LOOK, EXAMINE, puzzle dwell, backtracking),
+> and some turns produce no room transition at all. Empirically, ~5
+> rooms fall in Act I (turns 1–4) because early rooms generate more
+> LOOK turns per room; Act II and III compress to closer to 1 turn
+> per room as the player becomes fluent. The room ranges below are
+> calibrated to this expected compression curve.
+
 ### 8.1 Density curve, per-walk expected
 
 | Phase | Expected room count | Regions active | Connection-nodes available | Puzzle-groups possible |
@@ -999,11 +1012,14 @@ Four structural properties of the meso map deliver the 99% bar:
    so that every region's *cheapest* exit is one step closer to
    its closing cluster. A random-walk bias on cheap edges produces
    a monotonic drift toward A.5 or B.5 over ≥ 20 rooms.
-2. **No region cluster exceeds depth 4.** The deepest dead-end
-   chain (A-PG-2 The Catacomb and B-PG-2 The Chamber of Self-
-   Reference) has 5 and 4 rooms respectively, with a guaranteed
-   exit (A-PG-2 exit via marker; B-PG-2 exit via correct sequence).
-   No region permits an infinite loop outside a puzzle group.
+2. **No region cluster exceeds depth 4** (where *depth* is
+   edges-from-entry, counting the entry room as depth 0). The
+   deepest dead-end chain (A-PG-2 The Catacomb and B-PG-2 The
+   Chamber of Self-Reference) has 5 and 4 rooms respectively;
+   A-PG-2's 5 rooms span depths 0–4, and B-PG-2's 4 rooms span
+   depths 0–3. Both have a guaranteed exit (A-PG-2 exit via
+   marker; B-PG-2 exit via correct sequence). No region permits
+   an infinite loop outside a puzzle group.
 3. **Connection-node #10 is a universal basin.** The Reading Rooms
    Atrium / Inner Observatories Atrium connection-node is accessible
    from every Act III region (A.4, A.5, B.4, B.5). Any walk that
@@ -1065,7 +1081,7 @@ Micro (`WORLDS-micro.md`) will consume this document and produce:
   distinct authoring pass, the hinge sentence is shared).
 - **8 closing-chamber bodies** (4 × 2 worlds), each honoring the
   four §5.1 obligations.
-- **4 puzzle-group spec blocks** (A-PG-1, A-PG-2, B-PG-1, B-PG-2,
+- **5 puzzle-group spec blocks** (A-PG-1, A-PG-2, B-PG-1, B-PG-2,
   AB-PG-1), including entry/exit conditions, state schema, and
   per-room prose variations.
 - **5 gnome repertoires** (§7), including per-region line counts,
