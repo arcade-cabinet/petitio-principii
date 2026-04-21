@@ -17,6 +17,9 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
+    "cap-sync": "pnpm exec cap sync",
+    "cap-sync:android": "pnpm exec cap sync android",
+    "cap-sync:ios": "pnpm exec cap sync ios",
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {
@@ -46,8 +49,10 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.3.1",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.3.1",
     "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
     "@fontsource/dm-mono": "^5.2.7",
