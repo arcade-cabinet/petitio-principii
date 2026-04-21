@@ -1,6 +1,6 @@
 export { generateArgumentGraph, type ArgumentGraph } from "./core/ArgumentGraph";
 export type { SfxKey } from "./core/audio-effects";
-export type { ClockSlotId, CommandVerb, Move, ParsedCommand } from "./core/Command";
+export type { CommandVerb, Move, ParsedCommand, SlotId } from "./core/Command";
 export {
   type ActiveHint,
   createInitialGameState,
