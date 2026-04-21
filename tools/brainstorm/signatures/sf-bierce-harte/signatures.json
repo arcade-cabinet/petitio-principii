@@ -1,0 +1,1337 @@
+[
+  {
+    "cluster_id": "sf-bierce-harte",
+    "source_ref": "bierce-devils-dictionary-1911",
+    "sentence_count": 4408,
+    "word_count": 60768,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 11,
+    "sentence_length_p90": 30,
+    "sentence_length_max": 237,
+    "latinate_ratio": 0.035841232227488154,
+    "type_token_ratio": 0.1833695365982096,
+    "modal_verb_rate": 0.00743812532912059,
+    "sensory_mix": {
+      "visual": 0.4880546075085324,
+      "auditory": 0.22866894197952217,
+      "tactile": 0.14334470989761092,
+      "olfactory": 0.020477815699658702,
+      "kinesthetic": 0.11945392491467577
+    },
+    "pov_1st": 0.33166515013648773,
+    "pov_2nd": 0.1492265696087352,
+    "pov_3rd": 0.5191082802547771,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 627
+      },
+      {
+        "bigram": "in the",
+        "count": 276
+      },
+      {
+        "bigram": "to the",
+        "count": 263
+      },
+      {
+        "bigram": "of a",
+        "count": 192
+      },
+      {
+        "bigram": "by the",
+        "count": 142
+      },
+      {
+        "bigram": "it is",
+        "count": 141
+      },
+      {
+        "bigram": "and the",
+        "count": 120
+      },
+      {
+        "bigram": "for the",
+        "count": 110
+      },
+      {
+        "bigram": "to be",
+        "count": 105
+      },
+      {
+        "bigram": "from the",
+        "count": 93
+      },
+      {
+        "bigram": "with a",
+        "count": 91
+      },
+      {
+        "bigram": "in a",
+        "count": 85
+      },
+      {
+        "bigram": "of his",
+        "count": 83
+      },
+      {
+        "bigram": "is a",
+        "count": 73
+      },
+      {
+        "bigram": "as a",
+        "count": 69
+      },
+      {
+        "bigram": "is the",
+        "count": 64
+      },
+      {
+        "bigram": "with the",
+        "count": 61
+      },
+      {
+        "bigram": "on the",
+        "count": 61
+      },
+      {
+        "bigram": "that the",
+        "count": 60
+      },
+      {
+        "bigram": "one of",
+        "count": 59
+      },
+      {
+        "bigram": "that he",
+        "count": 53
+      },
+      {
+        "bigram": "to a",
+        "count": 49
+      },
+      {
+        "bigram": "of an",
+        "count": 48
+      },
+      {
+        "bigram": "by a",
+        "count": 48
+      },
+      {
+        "bigram": "as the",
+        "count": 48
+      },
+      {
+        "bigram": "it was",
+        "count": 45
+      },
+      {
+        "bigram": "one who",
+        "count": 44
+      },
+      {
+        "bigram": "and a",
+        "count": 44
+      },
+      {
+        "bigram": "the most",
+        "count": 43
+      },
+      {
+        "bigram": "at the",
+        "count": 42
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 29
+      },
+      {
+        "trigram": "part of the",
+        "count": 17
+      },
+      {
+        "trigram": "in which the",
+        "count": 16
+      },
+      {
+        "trigram": "of the most",
+        "count": 15
+      },
+      {
+        "trigram": "to have been",
+        "count": 15
+      },
+      {
+        "trigram": "the word is",
+        "count": 14
+      },
+      {
+        "trigram": "a kind of",
+        "count": 13
+      },
+      {
+        "trigram": "that of the",
+        "count": 11
+      },
+      {
+        "trigram": "the right to",
+        "count": 11
+      },
+      {
+        "trigram": "some of the",
+        "count": 10
+      },
+      {
+        "trigram": "as distinguished from",
+        "count": 10
+      },
+      {
+        "trigram": "it is not",
+        "count": 10
+      },
+      {
+        "trigram": "of the human",
+        "count": 10
+      },
+      {
+        "trigram": "to be a",
+        "count": 9
+      },
+      {
+        "trigram": "of his own",
+        "count": 9
+      },
+      {
+        "trigram": "a person who",
+        "count": 9
+      },
+      {
+        "trigram": "and so forth",
+        "count": 8
+      },
+      {
+        "trigram": "distinguished from the",
+        "count": 8
+      },
+      {
+        "trigram": "the man who",
+        "count": 8
+      },
+      {
+        "trigram": "person of the",
+        "count": 8
+      },
+      {
+        "trigram": "the name of",
+        "count": 8
+      },
+      {
+        "trigram": "is one of",
+        "count": 8
+      },
+      {
+        "trigram": "in the same",
+        "count": 8
+      },
+      {
+        "trigram": "that part of",
+        "count": 7
+      },
+      {
+        "trigram": "it is a",
+        "count": 7
+      },
+      {
+        "trigram": "the fact that",
+        "count": 7
+      },
+      {
+        "trigram": "of the world",
+        "count": 7
+      },
+      {
+        "trigram": "the art of",
+        "count": 7
+      },
+      {
+        "trigram": "and in the",
+        "count": 7
+      },
+      {
+        "trigram": "said to be",
+        "count": 7
+      }
+    ]
+  },
+  {
+    "cluster_id": "sf-bierce-harte",
+    "source_ref": "bierce-in-the-midst-of-life-1898",
+    "sentence_count": 3023,
+    "word_count": 61171,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 17,
+    "sentence_length_p90": 40,
+    "sentence_length_max": 153,
+    "latinate_ratio": 0.025469585260989684,
+    "type_token_ratio": 0.12002419447123637,
+    "modal_verb_rate": 0.010037436039953572,
+    "sensory_mix": {
+      "visual": 0.47157190635451507,
+      "auditory": 0.21181716833890746,
+      "tactile": 0.13489409141583056,
+      "olfactory": 0.002229654403567447,
+      "kinesthetic": 0.1794871794871795
+    },
+    "pov_1st": 0.5251295920667117,
+    "pov_2nd": 0.1032228983547442,
+    "pov_3rd": 0.3716475095785441,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 565
+      },
+      {
+        "bigram": "in the",
+        "count": 363
+      },
+      {
+        "bigram": "to the",
+        "count": 189
+      },
+      {
+        "bigram": "it was",
+        "count": 177
+      },
+      {
+        "bigram": "of a",
+        "count": 168
+      },
+      {
+        "bigram": "with a",
+        "count": 130
+      },
+      {
+        "bigram": "of his",
+        "count": 116
+      },
+      {
+        "bigram": "he had",
+        "count": 113
+      },
+      {
+        "bigram": "from the",
+        "count": 112
+      },
+      {
+        "bigram": "he was",
+        "count": 112
+      },
+      {
+        "bigram": "and the",
+        "count": 103
+      },
+      {
+        "bigram": "at the",
+        "count": 100
+      },
+      {
+        "bigram": "i had",
+        "count": 98
+      },
+      {
+        "bigram": "in a",
+        "count": 96
+      },
+      {
+        "bigram": "had been",
+        "count": 95
+      },
+      {
+        "bigram": "it is",
+        "count": 93
+      },
+      {
+        "bigram": "by the",
+        "count": 92
+      },
+      {
+        "bigram": "was a",
+        "count": 91
+      },
+      {
+        "bigram": "on the",
+        "count": 89
+      },
+      {
+        "bigram": "i was",
+        "count": 86
+      },
+      {
+        "bigram": "that i",
+        "count": 74
+      },
+      {
+        "bigram": "that he",
+        "count": 71
+      },
+      {
+        "bigram": "into the",
+        "count": 68
+      },
+      {
+        "bigram": "of my",
+        "count": 67
+      },
+      {
+        "bigram": "did not",
+        "count": 66
+      },
+      {
+        "bigram": "the man",
+        "count": 65
+      },
+      {
+        "bigram": "that the",
+        "count": 64
+      },
+      {
+        "bigram": "one of",
+        "count": 61
+      },
+      {
+        "bigram": "was not",
+        "count": 60
+      },
+      {
+        "bigram": "with the",
+        "count": 59
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 29
+      },
+      {
+        "trigram": "out of the",
+        "count": 27
+      },
+      {
+        "trigram": "it was a",
+        "count": 23
+      },
+      {
+        "trigram": "that he had",
+        "count": 19
+      },
+      {
+        "trigram": "he had been",
+        "count": 18
+      },
+      {
+        "trigram": "that he was",
+        "count": 18
+      },
+      {
+        "trigram": "a sense of",
+        "count": 16
+      },
+      {
+        "trigram": "i did not",
+        "count": 16
+      },
+      {
+        "trigram": "that it was",
+        "count": 15
+      },
+      {
+        "trigram": "side of the",
+        "count": 15
+      },
+      {
+        "trigram": "of the night",
+        "count": 14
+      },
+      {
+        "trigram": "there was no",
+        "count": 14
+      },
+      {
+        "trigram": "it was not",
+        "count": 13
+      },
+      {
+        "trigram": "the man was",
+        "count": 12
+      },
+      {
+        "trigram": "it was as",
+        "count": 12
+      },
+      {
+        "trigram": "part of the",
+        "count": 12
+      },
+      {
+        "trigram": "and with a",
+        "count": 11
+      },
+      {
+        "trigram": "he could not",
+        "count": 11
+      },
+      {
+        "trigram": "the middle of",
+        "count": 11
+      },
+      {
+        "trigram": "for a moment",
+        "count": 11
+      },
+      {
+        "trigram": "there was a",
+        "count": 11
+      },
+      {
+        "trigram": "of the house",
+        "count": 11
+      },
+      {
+        "trigram": "that i was",
+        "count": 11
+      },
+      {
+        "trigram": "of the room",
+        "count": 11
+      },
+      {
+        "trigram": "that i had",
+        "count": 11
+      },
+      {
+        "trigram": "i do not",
+        "count": 11
+      },
+      {
+        "trigram": "of the dead",
+        "count": 11
+      },
+      {
+        "trigram": "and it was",
+        "count": 10
+      },
+      {
+        "trigram": "at the same",
+        "count": 10
+      },
+      {
+        "trigram": "a moment later",
+        "count": 10
+      }
+    ]
+  },
+  {
+    "cluster_id": "sf-bierce-harte",
+    "source_ref": "harte-luck-roaring-camp-1870",
+    "sentence_count": 355,
+    "word_count": 11769,
+    "sentence_length_p10": 6,
+    "sentence_length_p50": 30,
+    "sentence_length_p90": 62,
+    "sentence_length_max": 158,
+    "latinate_ratio": 0.033647718582717305,
+    "type_token_ratio": 0.22457303084374203,
+    "modal_verb_rate": 0.011470813153199082,
+    "sensory_mix": {
+      "visual": 0.40540540540540543,
+      "auditory": 0.13513513513513514,
+      "tactile": 0.2972972972972973,
+      "olfactory": 0,
+      "kinesthetic": 0.16216216216216217
+    },
+    "pov_1st": 0.4187192118226601,
+    "pov_2nd": 0,
+    "pov_3rd": 0.5812807881773399,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 283
+      },
+      {
+        "bigram": "in the",
+        "count": 90
+      },
+      {
+        "bigram": "to the",
+        "count": 70
+      },
+      {
+        "bigram": "that the",
+        "count": 50
+      },
+      {
+        "bigram": "and the",
+        "count": 45
+      },
+      {
+        "bigram": "it is",
+        "count": 39
+      },
+      {
+        "bigram": "by the",
+        "count": 35
+      },
+      {
+        "bigram": "have been",
+        "count": 30
+      },
+      {
+        "bigram": "on the",
+        "count": 27
+      },
+      {
+        "bigram": "from the",
+        "count": 27
+      },
+      {
+        "bigram": "for the",
+        "count": 26
+      },
+      {
+        "bigram": "the euphrates",
+        "count": 26
+      },
+      {
+        "bigram": "of a",
+        "count": 25
+      },
+      {
+        "bigram": "to be",
+        "count": 25
+      },
+      {
+        "bigram": "with the",
+        "count": 19
+      },
+      {
+        "bigram": "the present",
+        "count": 19
+      },
+      {
+        "bigram": "the sea",
+        "count": 18
+      },
+      {
+        "bigram": "which the",
+        "count": 16
+      },
+      {
+        "bigram": "and that",
+        "count": 16
+      },
+      {
+        "bigram": "in a",
+        "count": 16
+      },
+      {
+        "bigram": "euphrates valley",
+        "count": 16
+      },
+      {
+        "bigram": "in which",
+        "count": 15
+      },
+      {
+        "bigram": "at the",
+        "count": 15
+      },
+      {
+        "bigram": "the valley",
+        "count": 15
+      },
+      {
+        "bigram": "of his",
+        "count": 13
+      },
+      {
+        "bigram": "as the",
+        "count": 13
+      },
+      {
+        "bigram": "of which",
+        "count": 13
+      },
+      {
+        "bigram": "the great",
+        "count": 13
+      },
+      {
+        "bigram": "there is",
+        "count": 13
+      },
+      {
+        "bigram": "must have",
+        "count": 13
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "the euphrates valley",
+        "count": 16
+      },
+      {
+        "trigram": "of the euphrates",
+        "count": 13
+      },
+      {
+        "trigram": "the glacial epoch",
+        "count": 13
+      },
+      {
+        "trigram": "the duke of",
+        "count": 10
+      },
+      {
+        "trigram": "duke of argyll",
+        "count": 9
+      },
+      {
+        "trigram": "waters of the",
+        "count": 8
+      },
+      {
+        "trigram": "feet above the",
+        "count": 8
+      },
+      {
+        "trigram": "level of the",
+        "count": 8
+      },
+      {
+        "trigram": "the waters of",
+        "count": 8
+      },
+      {
+        "trigram": "the dead sea",
+        "count": 8
+      },
+      {
+        "trigram": "the persian gulf",
+        "count": 7
+      },
+      {
+        "trigram": "of the jordan",
+        "count": 7
+      },
+      {
+        "trigram": "the level of",
+        "count": 7
+      },
+      {
+        "trigram": "of the present",
+        "count": 6
+      },
+      {
+        "trigram": "that of the",
+        "count": 6
+      },
+      {
+        "trigram": "some of the",
+        "count": 6
+      },
+      {
+        "trigram": "must have been",
+        "count": 6
+      },
+      {
+        "trigram": "of the sea",
+        "count": 6
+      },
+      {
+        "trigram": "the black sea",
+        "count": 6
+      },
+      {
+        "trigram": "thousands of years",
+        "count": 5
+      },
+      {
+        "trigram": "and that the",
+        "count": 5
+      },
+      {
+        "trigram": "of the persian",
+        "count": 5
+      },
+      {
+        "trigram": "of the valley",
+        "count": 5
+      },
+      {
+        "trigram": "the sea level",
+        "count": 5
+      },
+      {
+        "trigram": "end of the",
+        "count": 5
+      },
+      {
+        "trigram": "the alluvial plain",
+        "count": 5
+      },
+      {
+        "trigram": "the valley of",
+        "count": 5
+      },
+      {
+        "trigram": "valley of the",
+        "count": 5
+      },
+      {
+        "trigram": "the euphrates and",
+        "count": 5
+      },
+      {
+        "trigram": "of the nile",
+        "count": 5
+      }
+    ]
+  },
+  {
+    "cluster_id": "sf-bierce-harte",
+    "source_ref": "twain-roughing-it-1872",
+    "sentence_count": 8344,
+    "word_count": 172250,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 15,
+    "sentence_length_p90": 46,
+    "sentence_length_max": 307,
+    "latinate_ratio": 0.01990130624092888,
+    "type_token_ratio": 0.07800290275761974,
+    "modal_verb_rate": 0.010949201741654572,
+    "sensory_mix": {
+      "visual": 0.5064432989690721,
+      "auditory": 0.17332474226804123,
+      "tactile": 0.148840206185567,
+      "olfactory": 0.010309278350515464,
+      "kinesthetic": 0.16108247422680413
+    },
+    "pov_1st": 0.4714101856959,
+    "pov_2nd": 0.10056995771281485,
+    "pov_3rd": 0.42801985659128516,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 1305
+      },
+      {
+        "bigram": "in the",
+        "count": 928
+      },
+      {
+        "bigram": "it was",
+        "count": 511
+      },
+      {
+        "bigram": "to the",
+        "count": 504
+      },
+      {
+        "bigram": "and the",
+        "count": 447
+      },
+      {
+        "bigram": "on the",
+        "count": 367
+      },
+      {
+        "bigram": "of a",
+        "count": 326
+      },
+      {
+        "bigram": "jpg k",
+        "count": 307
+      },
+      {
+        "bigram": "was a",
+        "count": 292
+      },
+      {
+        "bigram": "in a",
+        "count": 288
+      },
+      {
+        "bigram": "he was",
+        "count": 279
+      },
+      {
+        "bigram": "and then",
+        "count": 233
+      },
+      {
+        "bigram": "it is",
+        "count": 221
+      },
+      {
+        "bigram": "and a",
+        "count": 215
+      },
+      {
+        "bigram": "for the",
+        "count": 213
+      },
+      {
+        "bigram": "at the",
+        "count": 205
+      },
+      {
+        "bigram": "to be",
+        "count": 205
+      },
+      {
+        "bigram": "that the",
+        "count": 204
+      },
+      {
+        "bigram": "with a",
+        "count": 200
+      },
+      {
+        "bigram": "out of",
+        "count": 196
+      },
+      {
+        "bigram": "he had",
+        "count": 195
+      },
+      {
+        "bigram": "from the",
+        "count": 189
+      },
+      {
+        "bigram": "i was",
+        "count": 186
+      },
+      {
+        "bigram": "by the",
+        "count": 185
+      },
+      {
+        "bigram": "with the",
+        "count": 185
+      },
+      {
+        "bigram": "there was",
+        "count": 183
+      },
+      {
+        "bigram": "of it",
+        "count": 164
+      },
+      {
+        "bigram": "of his",
+        "count": 157
+      },
+      {
+        "bigram": "was the",
+        "count": 155
+      },
+      {
+        "bigram": "i had",
+        "count": 150
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "it was a",
+        "count": 80
+      },
+      {
+        "trigram": "out of the",
+        "count": 76
+      },
+      {
+        "trigram": "one of the",
+        "count": 58
+      },
+      {
+        "trigram": "there was a",
+        "count": 48
+      },
+      {
+        "trigram": "the end of",
+        "count": 43
+      },
+      {
+        "trigram": "there was no",
+        "count": 41
+      },
+      {
+        "trigram": "he was a",
+        "count": 38
+      },
+      {
+        "trigram": "it is a",
+        "count": 35
+      },
+      {
+        "trigram": "by and by",
+        "count": 35
+      },
+      {
+        "trigram": "and it was",
+        "count": 35
+      },
+      {
+        "trigram": "it was the",
+        "count": 35
+      },
+      {
+        "trigram": "hundred and fifty",
+        "count": 32
+      },
+      {
+        "trigram": "now and then",
+        "count": 31
+      },
+      {
+        "trigram": "i do not",
+        "count": 31
+      },
+      {
+        "trigram": "two or three",
+        "count": 29
+      },
+      {
+        "trigram": "i could not",
+        "count": 29
+      },
+      {
+        "trigram": "in the morning",
+        "count": 29
+      },
+      {
+        "trigram": "a couple of",
+        "count": 27
+      },
+      {
+        "trigram": "that he had",
+        "count": 27
+      },
+      {
+        "trigram": "at the end",
+        "count": 26
+      },
+      {
+        "trigram": "it came to",
+        "count": 26
+      },
+      {
+        "trigram": "all the time",
+        "count": 25
+      },
+      {
+        "trigram": "the midst of",
+        "count": 25
+      },
+      {
+        "trigram": "one of them",
+        "count": 25
+      },
+      {
+        "trigram": "came to pass",
+        "count": 25
+      },
+      {
+        "trigram": "in the world",
+        "count": 24
+      },
+      {
+        "trigram": "that he was",
+        "count": 24
+      },
+      {
+        "trigram": "part of the",
+        "count": 24
+      },
+      {
+        "trigram": "and it came",
+        "count": 24
+      },
+      {
+        "trigram": "and a half",
+        "count": 23
+      }
+    ]
+  },
+  {
+    "cluster_id": "sf-bierce-harte",
+    "source_ref": null,
+    "sentence_count": 16130,
+    "word_count": 305958,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 15,
+    "sentence_length_p90": 41,
+    "sentence_length_max": 307,
+    "latinate_ratio": 0.024709273821897124,
+    "type_token_ratio": 0.06925787199550265,
+    "modal_verb_rate": 0.010089620143941325,
+    "sensory_mix": {
+      "visual": 0.4919035624325297,
+      "auditory": 0.19107592659229938,
+      "tactile": 0.14573587621446563,
+      "olfactory": 0.008636200071968334,
+      "kinesthetic": 0.16264843468873696
+    },
+    "pov_1st": 0.46692255588168885,
+    "pov_2nd": 0.10611876270038384,
+    "pov_3rd": 0.4269586814179273,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 2780
+      },
+      {
+        "bigram": "in the",
+        "count": 1657
+      },
+      {
+        "bigram": "to the",
+        "count": 1026
+      },
+      {
+        "bigram": "it was",
+        "count": 738
+      },
+      {
+        "bigram": "and the",
+        "count": 715
+      },
+      {
+        "bigram": "of a",
+        "count": 711
+      },
+      {
+        "bigram": "on the",
+        "count": 544
+      },
+      {
+        "bigram": "it is",
+        "count": 494
+      },
+      {
+        "bigram": "in a",
+        "count": 485
+      },
+      {
+        "bigram": "by the",
+        "count": 454
+      },
+      {
+        "bigram": "with a",
+        "count": 426
+      },
+      {
+        "bigram": "from the",
+        "count": 421
+      },
+      {
+        "bigram": "he was",
+        "count": 415
+      },
+      {
+        "bigram": "was a",
+        "count": 408
+      },
+      {
+        "bigram": "to be",
+        "count": 392
+      },
+      {
+        "bigram": "for the",
+        "count": 392
+      },
+      {
+        "bigram": "that the",
+        "count": 378
+      },
+      {
+        "bigram": "of his",
+        "count": 369
+      },
+      {
+        "bigram": "at the",
+        "count": 362
+      },
+      {
+        "bigram": "he had",
+        "count": 338
+      },
+      {
+        "bigram": "with the",
+        "count": 324
+      },
+      {
+        "bigram": "jpg k",
+        "count": 307
+      },
+      {
+        "bigram": "and a",
+        "count": 300
+      },
+      {
+        "bigram": "out of",
+        "count": 290
+      },
+      {
+        "bigram": "i was",
+        "count": 280
+      },
+      {
+        "bigram": "that he",
+        "count": 272
+      },
+      {
+        "bigram": "one of",
+        "count": 271
+      },
+      {
+        "bigram": "had been",
+        "count": 266
+      },
+      {
+        "bigram": "and then",
+        "count": 261
+      },
+      {
+        "bigram": "i had",
+        "count": 254
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 120
+      },
+      {
+        "trigram": "out of the",
+        "count": 110
+      },
+      {
+        "trigram": "it was a",
+        "count": 107
+      },
+      {
+        "trigram": "there was a",
+        "count": 63
+      },
+      {
+        "trigram": "part of the",
+        "count": 56
+      },
+      {
+        "trigram": "there was no",
+        "count": 55
+      },
+      {
+        "trigram": "that he had",
+        "count": 52
+      },
+      {
+        "trigram": "he was a",
+        "count": 51
+      },
+      {
+        "trigram": "the end of",
+        "count": 50
+      },
+      {
+        "trigram": "and it was",
+        "count": 48
+      },
+      {
+        "trigram": "i do not",
+        "count": 46
+      },
+      {
+        "trigram": "it is a",
+        "count": 44
+      },
+      {
+        "trigram": "that he was",
+        "count": 44
+      },
+      {
+        "trigram": "that it was",
+        "count": 43
+      },
+      {
+        "trigram": "it was the",
+        "count": 42
+      },
+      {
+        "trigram": "some of the",
+        "count": 39
+      },
+      {
+        "trigram": "he had been",
+        "count": 39
+      },
+      {
+        "trigram": "i could not",
+        "count": 39
+      },
+      {
+        "trigram": "it was not",
+        "count": 39
+      },
+      {
+        "trigram": "side of the",
+        "count": 37
+      },
+      {
+        "trigram": "i did not",
+        "count": 36
+      },
+      {
+        "trigram": "by and by",
+        "count": 36
+      },
+      {
+        "trigram": "hundred and fifty",
+        "count": 36
+      },
+      {
+        "trigram": "end of the",
+        "count": 35
+      },
+      {
+        "trigram": "the middle of",
+        "count": 35
+      },
+      {
+        "trigram": "the name of",
+        "count": 34
+      },
+      {
+        "trigram": "one of them",
+        "count": 34
+      },
+      {
+        "trigram": "two or three",
+        "count": 34
+      },
+      {
+        "trigram": "he could not",
+        "count": 33
+      },
+      {
+        "trigram": "of his own",
+        "count": 32
+      }
+    ]
+  }
+]

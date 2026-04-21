@@ -1,0 +1,1337 @@
+[
+  {
+    "cluster_id": "yukon-gold-rush",
+    "source_ref": "london-call-of-the-wild-1903",
+    "sentence_count": 1692,
+    "word_count": 32432,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 17,
+    "sentence_length_p90": 36,
+    "sentence_length_max": 124,
+    "latinate_ratio": 0.013659348791317218,
+    "type_token_ratio": 0.14578194375925013,
+    "modal_verb_rate": 0.00632091761223483,
+    "sensory_mix": {
+      "visual": 0.364741641337386,
+      "auditory": 0.20972644376899696,
+      "tactile": 0.2066869300911854,
+      "olfactory": 0.0182370820668693,
+      "kinesthetic": 0.2006079027355623
+    },
+    "pov_1st": 0.03907074973600845,
+    "pov_2nd": 0.0337909186906019,
+    "pov_3rd": 0.9271383315733897,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 246
+      },
+      {
+        "bigram": "in the",
+        "count": 176
+      },
+      {
+        "bigram": "he was",
+        "count": 131
+      },
+      {
+        "bigram": "to the",
+        "count": 122
+      },
+      {
+        "bigram": "it was",
+        "count": 111
+      },
+      {
+        "bigram": "and the",
+        "count": 103
+      },
+      {
+        "bigram": "on the",
+        "count": 86
+      },
+      {
+        "bigram": "he had",
+        "count": 83
+      },
+      {
+        "bigram": "at the",
+        "count": 71
+      },
+      {
+        "bigram": "into the",
+        "count": 69
+      },
+      {
+        "bigram": "and he",
+        "count": 65
+      },
+      {
+        "bigram": "they were",
+        "count": 63
+      },
+      {
+        "bigram": "did not",
+        "count": 62
+      },
+      {
+        "bigram": "from the",
+        "count": 61
+      },
+      {
+        "bigram": "of his",
+        "count": 60
+      },
+      {
+        "bigram": "fran ois",
+        "count": 60
+      },
+      {
+        "bigram": "by the",
+        "count": 58
+      },
+      {
+        "bigram": "for the",
+        "count": 57
+      },
+      {
+        "bigram": "in a",
+        "count": 52
+      },
+      {
+        "bigram": "with the",
+        "count": 51
+      },
+      {
+        "bigram": "was a",
+        "count": 51
+      },
+      {
+        "bigram": "was the",
+        "count": 50
+      },
+      {
+        "bigram": "buck s",
+        "count": 47
+      },
+      {
+        "bigram": "out of",
+        "count": 46
+      },
+      {
+        "bigram": "the sled",
+        "count": 46
+      },
+      {
+        "bigram": "the man",
+        "count": 45
+      },
+      {
+        "bigram": "with a",
+        "count": 45
+      },
+      {
+        "bigram": "as he",
+        "count": 44
+      },
+      {
+        "bigram": "of a",
+        "count": 42
+      },
+      {
+        "bigram": "through the",
+        "count": 39
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "he did not",
+        "count": 22
+      },
+      {
+        "trigram": "and he was",
+        "count": 18
+      },
+      {
+        "trigram": "out of the",
+        "count": 14
+      },
+      {
+        "trigram": "there was no",
+        "count": 14
+      },
+      {
+        "trigram": "in the traces",
+        "count": 14
+      },
+      {
+        "trigram": "out of his",
+        "count": 13
+      },
+      {
+        "trigram": "it was a",
+        "count": 13
+      },
+      {
+        "trigram": "of the team",
+        "count": 13
+      },
+      {
+        "trigram": "that he was",
+        "count": 12
+      },
+      {
+        "trigram": "back and forth",
+        "count": 12
+      },
+      {
+        "trigram": "did not know",
+        "count": 11
+      },
+      {
+        "trigram": "to his feet",
+        "count": 11
+      },
+      {
+        "trigram": "it was the",
+        "count": 11
+      },
+      {
+        "trigram": "and in the",
+        "count": 11
+      },
+      {
+        "trigram": "the man in",
+        "count": 11
+      },
+      {
+        "trigram": "man in the",
+        "count": 11
+      },
+      {
+        "trigram": "in the red",
+        "count": 11
+      },
+      {
+        "trigram": "the red sweater",
+        "count": 11
+      },
+      {
+        "trigram": "the rest of",
+        "count": 11
+      },
+      {
+        "trigram": "buck did not",
+        "count": 10
+      },
+      {
+        "trigram": "the end of",
+        "count": 10
+      },
+      {
+        "trigram": "but it was",
+        "count": 10
+      },
+      {
+        "trigram": "one of the",
+        "count": 9
+      },
+      {
+        "trigram": "he could not",
+        "count": 9
+      },
+      {
+        "trigram": "fran ois s",
+        "count": 9
+      },
+      {
+        "trigram": "and sol leks",
+        "count": 9
+      },
+      {
+        "trigram": "rest of the",
+        "count": 9
+      },
+      {
+        "trigram": "at the head",
+        "count": 9
+      },
+      {
+        "trigram": "the head of",
+        "count": 9
+      },
+      {
+        "trigram": "of the wild",
+        "count": 8
+      }
+    ]
+  },
+  {
+    "cluster_id": "yukon-gold-rush",
+    "source_ref": "london-white-fang-1906",
+    "sentence_count": 4776,
+    "word_count": 73794,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 13,
+    "sentence_length_p90": 29,
+    "sentence_length_max": 96,
+    "latinate_ratio": 0.017508198498522917,
+    "type_token_ratio": 0.088719950131447,
+    "modal_verb_rate": 0.006491042632192319,
+    "sensory_mix": {
+      "visual": 0.3793517406962785,
+      "auditory": 0.16566626650660263,
+      "tactile": 0.18247298919567828,
+      "olfactory": 0.024009603841536616,
+      "kinesthetic": 0.24849939975990396
+    },
+    "pov_1st": 0.056338028169014086,
+    "pov_2nd": 0.03951486697965571,
+    "pov_3rd": 0.9041471048513302,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 640
+      },
+      {
+        "bigram": "white fang",
+        "count": 601
+      },
+      {
+        "bigram": "in the",
+        "count": 440
+      },
+      {
+        "bigram": "it was",
+        "count": 320
+      },
+      {
+        "bigram": "he was",
+        "count": 300
+      },
+      {
+        "bigram": "he had",
+        "count": 298
+      },
+      {
+        "bigram": "to the",
+        "count": 236
+      },
+      {
+        "bigram": "of his",
+        "count": 225
+      },
+      {
+        "bigram": "and the",
+        "count": 209
+      },
+      {
+        "bigram": "at the",
+        "count": 183
+      },
+      {
+        "bigram": "was a",
+        "count": 157
+      },
+      {
+        "bigram": "on the",
+        "count": 157
+      },
+      {
+        "bigram": "and he",
+        "count": 141
+      },
+      {
+        "bigram": "did not",
+        "count": 141
+      },
+      {
+        "bigram": "there was",
+        "count": 136
+      },
+      {
+        "bigram": "was the",
+        "count": 127
+      },
+      {
+        "bigram": "from the",
+        "count": 124
+      },
+      {
+        "bigram": "with the",
+        "count": 119
+      },
+      {
+        "bigram": "grey beaver",
+        "count": 119
+      },
+      {
+        "bigram": "in his",
+        "count": 112
+      },
+      {
+        "bigram": "had been",
+        "count": 106
+      },
+      {
+        "bigram": "him and",
+        "count": 105
+      },
+      {
+        "bigram": "that he",
+        "count": 103
+      },
+      {
+        "bigram": "into the",
+        "count": 99
+      },
+      {
+        "bigram": "to him",
+        "count": 99
+      },
+      {
+        "bigram": "the master",
+        "count": 97
+      },
+      {
+        "bigram": "of a",
+        "count": 96
+      },
+      {
+        "bigram": "by the",
+        "count": 96
+      },
+      {
+        "bigram": "with a",
+        "count": 91
+      },
+      {
+        "bigram": "the dogs",
+        "count": 90
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "white fang s",
+        "count": 75
+      },
+      {
+        "trigram": "the she wolf",
+        "count": 62
+      },
+      {
+        "trigram": "white fang was",
+        "count": 60
+      },
+      {
+        "trigram": "he did not",
+        "count": 59
+      },
+      {
+        "trigram": "it was the",
+        "count": 46
+      },
+      {
+        "trigram": "it was a",
+        "count": 41
+      },
+      {
+        "trigram": "there was no",
+        "count": 40
+      },
+      {
+        "trigram": "and white fang",
+        "count": 39
+      },
+      {
+        "trigram": "there was a",
+        "count": 35
+      },
+      {
+        "trigram": "did not know",
+        "count": 29
+      },
+      {
+        "trigram": "the master s",
+        "count": 29
+      },
+      {
+        "trigram": "the dog musher",
+        "count": 29
+      },
+      {
+        "trigram": "at the same",
+        "count": 28
+      },
+      {
+        "trigram": "the end of",
+        "count": 27
+      },
+      {
+        "trigram": "white fang had",
+        "count": 27
+      },
+      {
+        "trigram": "of the gods",
+        "count": 26
+      },
+      {
+        "trigram": "out of the",
+        "count": 26
+      },
+      {
+        "trigram": "he could not",
+        "count": 26
+      },
+      {
+        "trigram": "it was not",
+        "count": 24
+      },
+      {
+        "trigram": "grey beaver s",
+        "count": 24
+      },
+      {
+        "trigram": "of the pack",
+        "count": 23
+      },
+      {
+        "trigram": "but it was",
+        "count": 23
+      },
+      {
+        "trigram": "but white fang",
+        "count": 23
+      },
+      {
+        "trigram": "in the air",
+        "count": 22
+      },
+      {
+        "trigram": "that he was",
+        "count": 22
+      },
+      {
+        "trigram": "in the snow",
+        "count": 21
+      },
+      {
+        "trigram": "he had been",
+        "count": 21
+      },
+      {
+        "trigram": "the same time",
+        "count": 21
+      },
+      {
+        "trigram": "he was a",
+        "count": 21
+      },
+      {
+        "trigram": "the man animals",
+        "count": 21
+      }
+    ]
+  },
+  {
+    "cluster_id": "yukon-gold-rush",
+    "source_ref": "london-son-of-the-wolf-1900",
+    "sentence_count": 3079,
+    "word_count": 49819,
+    "sentence_length_p10": 4,
+    "sentence_length_p50": 14,
+    "sentence_length_p90": 32,
+    "sentence_length_max": 89,
+    "latinate_ratio": 0.01296694032397278,
+    "type_token_ratio": 0.13522953090186476,
+    "modal_verb_rate": 0.009373933639775988,
+    "sensory_mix": {
+      "visual": 0.39403973509933776,
+      "auditory": 0.26986754966887416,
+      "tactile": 0.19205298013245034,
+      "olfactory": 0.011589403973509934,
+      "kinesthetic": 0.13245033112582782
+    },
+    "pov_1st": 0.26670557338780276,
+    "pov_2nd": 0.07207470090458126,
+    "pov_3rd": 0.661219725707616,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 496
+      },
+      {
+        "bigram": "in the",
+        "count": 274
+      },
+      {
+        "bigram": "to the",
+        "count": 262
+      },
+      {
+        "bigram": "and the",
+        "count": 222
+      },
+      {
+        "bigram": "on the",
+        "count": 127
+      },
+      {
+        "bigram": "it was",
+        "count": 111
+      },
+      {
+        "bigram": "with the",
+        "count": 105
+      },
+      {
+        "bigram": "malemute kid",
+        "count": 102
+      },
+      {
+        "bigram": "was a",
+        "count": 90
+      },
+      {
+        "bigram": "of a",
+        "count": 85
+      },
+      {
+        "bigram": "at the",
+        "count": 85
+      },
+      {
+        "bigram": "for the",
+        "count": 79
+      },
+      {
+        "bigram": "from the",
+        "count": 79
+      },
+      {
+        "bigram": "by the",
+        "count": 77
+      },
+      {
+        "bigram": "there was",
+        "count": 76
+      },
+      {
+        "bigram": "of his",
+        "count": 70
+      },
+      {
+        "bigram": "and he",
+        "count": 62
+      },
+      {
+        "bigram": "he had",
+        "count": 62
+      },
+      {
+        "bigram": "but the",
+        "count": 61
+      },
+      {
+        "bigram": "had been",
+        "count": 59
+      },
+      {
+        "bigram": "in his",
+        "count": 58
+      },
+      {
+        "bigram": "he was",
+        "count": 55
+      },
+      {
+        "bigram": "the snow",
+        "count": 51
+      },
+      {
+        "bigram": "and i",
+        "count": 51
+      },
+      {
+        "bigram": "and they",
+        "count": 51
+      },
+      {
+        "bigram": "with a",
+        "count": 49
+      },
+      {
+        "bigram": "the dogs",
+        "count": 47
+      },
+      {
+        "bigram": "the men",
+        "count": 46
+      },
+      {
+        "bigram": "into the",
+        "count": 46
+      },
+      {
+        "bigram": "they had",
+        "count": 46
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "in the snow",
+        "count": 29
+      },
+      {
+        "trigram": "there was a",
+        "count": 23
+      },
+      {
+        "trigram": "it was a",
+        "count": 22
+      },
+      {
+        "trigram": "there was no",
+        "count": 22
+      },
+      {
+        "trigram": "of the north",
+        "count": 20
+      },
+      {
+        "trigram": "out of the",
+        "count": 20
+      },
+      {
+        "trigram": "of the wolf",
+        "count": 16
+      },
+      {
+        "trigram": "and there was",
+        "count": 13
+      },
+      {
+        "trigram": "of the sea",
+        "count": 13
+      },
+      {
+        "trigram": "of the trail",
+        "count": 12
+      },
+      {
+        "trigram": "back to the",
+        "count": 12
+      },
+      {
+        "trigram": "the edge of",
+        "count": 12
+      },
+      {
+        "trigram": "he was a",
+        "count": 12
+      },
+      {
+        "trigram": "the men of",
+        "count": 11
+      },
+      {
+        "trigram": "the son of",
+        "count": 10
+      },
+      {
+        "trigram": "the white silence",
+        "count": 10
+      },
+      {
+        "trigram": "of the northland",
+        "count": 10
+      },
+      {
+        "trigram": "the first time",
+        "count": 10
+      },
+      {
+        "trigram": "and malemute kid",
+        "count": 10
+      },
+      {
+        "trigram": "one of the",
+        "count": 10
+      },
+      {
+        "trigram": "edge of the",
+        "count": 10
+      },
+      {
+        "trigram": "it was the",
+        "count": 10
+      },
+      {
+        "trigram": "for the first",
+        "count": 9
+      },
+      {
+        "trigram": "of his own",
+        "count": 9
+      },
+      {
+        "trigram": "to the north",
+        "count": 9
+      },
+      {
+        "trigram": "of the men",
+        "count": 9
+      },
+      {
+        "trigram": "it was not",
+        "count": 9
+      },
+      {
+        "trigram": "to his feet",
+        "count": 9
+      },
+      {
+        "trigram": "to the man",
+        "count": 8
+      },
+      {
+        "trigram": "and he had",
+        "count": 8
+      }
+    ]
+  },
+  {
+    "cluster_id": "yukon-gold-rush",
+    "source_ref": "service-songs-sourdough-1907",
+    "sentence_count": 836,
+    "word_count": 19285,
+    "sentence_length_p10": 3,
+    "sentence_length_p50": 22,
+    "sentence_length_p90": 44,
+    "sentence_length_max": 114,
+    "latinate_ratio": 0.008348457350272231,
+    "type_token_ratio": 0.19621467461757844,
+    "modal_verb_rate": 0.00860772621208193,
+    "sensory_mix": {
+      "visual": 0.4329896907216495,
+      "auditory": 0.24742268041237114,
+      "tactile": 0.2027491408934708,
+      "olfactory": 0,
+      "kinesthetic": 0.11683848797250859
+    },
+    "pov_1st": 0.5412787088764742,
+    "pov_2nd": 0.12042209807572936,
+    "pov_3rd": 0.3382991930477964,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 188
+      },
+      {
+        "bigram": "in the",
+        "count": 113
+      },
+      {
+        "bigram": "and the",
+        "count": 94
+      },
+      {
+        "bigram": "to the",
+        "count": 61
+      },
+      {
+        "bigram": "like a",
+        "count": 55
+      },
+      {
+        "bigram": "with a",
+        "count": 51
+      },
+      {
+        "bigram": "on the",
+        "count": 45
+      },
+      {
+        "bigram": "and i",
+        "count": 43
+      },
+      {
+        "bigram": "in a",
+        "count": 42
+      },
+      {
+        "bigram": "of a",
+        "count": 35
+      },
+      {
+        "bigram": "from the",
+        "count": 30
+      },
+      {
+        "bigram": "the man",
+        "count": 27
+      },
+      {
+        "bigram": "with the",
+        "count": 27
+      },
+      {
+        "bigram": "at the",
+        "count": 26
+      },
+      {
+        "bigram": "by the",
+        "count": 25
+      },
+      {
+        "bigram": "was a",
+        "count": 24
+      },
+      {
+        "bigram": "and there",
+        "count": 23
+      },
+      {
+        "bigram": "the sky",
+        "count": 22
+      },
+      {
+        "bigram": "the trail",
+        "count": 22
+      },
+      {
+        "bigram": "for a",
+        "count": 22
+      },
+      {
+        "bigram": "for the",
+        "count": 22
+      },
+      {
+        "bigram": "a man",
+        "count": 21
+      },
+      {
+        "bigram": "was the",
+        "count": 21
+      },
+      {
+        "bigram": "and he",
+        "count": 21
+      },
+      {
+        "bigram": "through the",
+        "count": 19
+      },
+      {
+        "bigram": "as a",
+        "count": 19
+      },
+      {
+        "bigram": "and a",
+        "count": 18
+      },
+      {
+        "bigram": "it was",
+        "count": 18
+      },
+      {
+        "bigram": "of his",
+        "count": 18
+      },
+      {
+        "bigram": "to a",
+        "count": 18
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "the ballad of",
+        "count": 16
+      },
+      {
+        "trigram": "the man from",
+        "count": 12
+      },
+      {
+        "trigram": "man from eldorado",
+        "count": 11
+      },
+      {
+        "trigram": "the high north",
+        "count": 10
+      },
+      {
+        "trigram": "of the high",
+        "count": 8
+      },
+      {
+        "trigram": "black fox skin",
+        "count": 8
+      },
+      {
+        "trigram": "men of the",
+        "count": 7
+      },
+      {
+        "trigram": "he's the man",
+        "count": 7
+      },
+      {
+        "trigram": "from eldorado and",
+        "count": 7
+      },
+      {
+        "trigram": "day after day",
+        "count": 7
+      },
+      {
+        "trigram": "ballad of the",
+        "count": 6
+      },
+      {
+        "trigram": "the northern lights",
+        "count": 6
+      },
+      {
+        "trigram": "of the brand",
+        "count": 6
+      },
+      {
+        "trigram": "the trail of",
+        "count": 6
+      },
+      {
+        "trigram": "the camp fire",
+        "count": 6
+      },
+      {
+        "trigram": "and there was",
+        "count": 6
+      },
+      {
+        "trigram": "there was the",
+        "count": 6
+      },
+      {
+        "trigram": "out of the",
+        "count": 6
+      },
+      {
+        "trigram": "there in the",
+        "count": 6
+      },
+      {
+        "trigram": "and there i",
+        "count": 6
+      },
+      {
+        "trigram": "this is the",
+        "count": 5
+      },
+      {
+        "trigram": "eldorado and he's",
+        "count": 5
+      },
+      {
+        "trigram": "of the trail",
+        "count": 5
+      },
+      {
+        "trigram": "of the wild",
+        "count": 5
+      },
+      {
+        "trigram": "and so they",
+        "count": 5
+      },
+      {
+        "trigram": "you will find",
+        "count": 5
+      },
+      {
+        "trigram": "man of the",
+        "count": 4
+      },
+      {
+        "trigram": "claw fingered kitty",
+        "count": 4
+      },
+      {
+        "trigram": "fingered kitty and",
+        "count": 4
+      },
+      {
+        "trigram": "kitty and windy",
+        "count": 4
+      }
+    ]
+  },
+  {
+    "cluster_id": "yukon-gold-rush",
+    "source_ref": null,
+    "sentence_count": 10383,
+    "word_count": 175330,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 15,
+    "sentence_length_p90": 32,
+    "sentence_length_max": 124,
+    "latinate_ratio": 0.01449837449381167,
+    "type_token_ratio": 0.07175041350596019,
+    "modal_verb_rate": 0.007511549649232875,
+    "sensory_mix": {
+      "visual": 0.3889158969372873,
+      "auditory": 0.21487603305785125,
+      "tactile": 0.1920272241127856,
+      "olfactory": 0.016042780748663103,
+      "kinesthetic": 0.18813806514341275
+    },
+    "pov_1st": 0.17834606443042178,
+    "pov_2nd": 0.058701428096977745,
+    "pov_3rd": 0.7629525074726005,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 1570
+      },
+      {
+        "bigram": "in the",
+        "count": 1003
+      },
+      {
+        "bigram": "to the",
+        "count": 681
+      },
+      {
+        "bigram": "and the",
+        "count": 628
+      },
+      {
+        "bigram": "white fang",
+        "count": 601
+      },
+      {
+        "bigram": "it was",
+        "count": 560
+      },
+      {
+        "bigram": "he was",
+        "count": 498
+      },
+      {
+        "bigram": "he had",
+        "count": 448
+      },
+      {
+        "bigram": "on the",
+        "count": 415
+      },
+      {
+        "bigram": "of his",
+        "count": 373
+      },
+      {
+        "bigram": "at the",
+        "count": 365
+      },
+      {
+        "bigram": "was a",
+        "count": 322
+      },
+      {
+        "bigram": "with the",
+        "count": 302
+      },
+      {
+        "bigram": "from the",
+        "count": 294
+      },
+      {
+        "bigram": "and he",
+        "count": 289
+      },
+      {
+        "bigram": "there was",
+        "count": 264
+      },
+      {
+        "bigram": "of a",
+        "count": 258
+      },
+      {
+        "bigram": "by the",
+        "count": 256
+      },
+      {
+        "bigram": "did not",
+        "count": 246
+      },
+      {
+        "bigram": "was the",
+        "count": 243
+      },
+      {
+        "bigram": "with a",
+        "count": 236
+      },
+      {
+        "bigram": "for the",
+        "count": 234
+      },
+      {
+        "bigram": "in his",
+        "count": 223
+      },
+      {
+        "bigram": "into the",
+        "count": 222
+      },
+      {
+        "bigram": "in a",
+        "count": 212
+      },
+      {
+        "bigram": "had been",
+        "count": 203
+      },
+      {
+        "bigram": "they were",
+        "count": 184
+      },
+      {
+        "bigram": "the man",
+        "count": 179
+      },
+      {
+        "bigram": "the dogs",
+        "count": 177
+      },
+      {
+        "bigram": "him and",
+        "count": 172
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "he did not",
+        "count": 88
+      },
+      {
+        "trigram": "it was a",
+        "count": 76
+      },
+      {
+        "trigram": "there was no",
+        "count": 76
+      },
+      {
+        "trigram": "white fang s",
+        "count": 75
+      },
+      {
+        "trigram": "it was the",
+        "count": 67
+      },
+      {
+        "trigram": "out of the",
+        "count": 66
+      },
+      {
+        "trigram": "there was a",
+        "count": 65
+      },
+      {
+        "trigram": "the she wolf",
+        "count": 62
+      },
+      {
+        "trigram": "white fang was",
+        "count": 60
+      },
+      {
+        "trigram": "in the snow",
+        "count": 56
+      },
+      {
+        "trigram": "did not know",
+        "count": 45
+      },
+      {
+        "trigram": "the end of",
+        "count": 44
+      },
+      {
+        "trigram": "that he was",
+        "count": 42
+      },
+      {
+        "trigram": "and he was",
+        "count": 42
+      },
+      {
+        "trigram": "it was not",
+        "count": 41
+      },
+      {
+        "trigram": "he could not",
+        "count": 40
+      },
+      {
+        "trigram": "one of the",
+        "count": 39
+      },
+      {
+        "trigram": "he was a",
+        "count": 39
+      },
+      {
+        "trigram": "and white fang",
+        "count": 39
+      },
+      {
+        "trigram": "but it was",
+        "count": 37
+      },
+      {
+        "trigram": "and in the",
+        "count": 35
+      },
+      {
+        "trigram": "of the wild",
+        "count": 34
+      },
+      {
+        "trigram": "at the same",
+        "count": 34
+      },
+      {
+        "trigram": "he had been",
+        "count": 34
+      },
+      {
+        "trigram": "to his feet",
+        "count": 33
+      },
+      {
+        "trigram": "out of his",
+        "count": 32
+      },
+      {
+        "trigram": "in the air",
+        "count": 32
+      },
+      {
+        "trigram": "and there was",
+        "count": 32
+      },
+      {
+        "trigram": "of the pack",
+        "count": 30
+      },
+      {
+        "trigram": "they did not",
+        "count": 29
+      }
+    ]
+  }
+]

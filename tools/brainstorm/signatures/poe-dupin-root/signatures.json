@@ -1,0 +1,803 @@
+[
+  {
+    "cluster_id": "poe-dupin-root",
+    "source_ref": "poe-dupin-1841-44",
+    "sentence_count": 104,
+    "word_count": 2444,
+    "sentence_length_p10": 7,
+    "sentence_length_p50": 18,
+    "sentence_length_p90": 40,
+    "sentence_length_max": 139,
+    "latinate_ratio": 0.022504091653027823,
+    "type_token_ratio": 0.3486088379705401,
+    "modal_verb_rate": 0.004909983633387889,
+    "sensory_mix": {
+      "visual": 0.3939393939393939,
+      "auditory": 0.30303030303030304,
+      "tactile": 0.12121212121212122,
+      "olfactory": 0,
+      "kinesthetic": 0.18181818181818182
+    },
+    "pov_1st": 0.12244897959183673,
+    "pov_2nd": 0,
+    "pov_3rd": 0.8775510204081632,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 65
+      },
+      {
+        "bigram": "in the",
+        "count": 20
+      },
+      {
+        "bigram": "and the",
+        "count": 15
+      },
+      {
+        "bigram": "to the",
+        "count": 15
+      },
+      {
+        "bigram": "there were",
+        "count": 13
+      },
+      {
+        "bigram": "from the",
+        "count": 13
+      },
+      {
+        "bigram": "the prince",
+        "count": 12
+      },
+      {
+        "bigram": "it was",
+        "count": 12
+      },
+      {
+        "bigram": "there was",
+        "count": 8
+      },
+      {
+        "bigram": "upon the",
+        "count": 7
+      },
+      {
+        "bigram": "of his",
+        "count": 7
+      },
+      {
+        "bigram": "that the",
+        "count": 7
+      },
+      {
+        "bigram": "was a",
+        "count": 7
+      },
+      {
+        "bigram": "through the",
+        "count": 7
+      },
+      {
+        "bigram": "the clock",
+        "count": 7
+      },
+      {
+        "bigram": "the red",
+        "count": 6
+      },
+      {
+        "bigram": "red death",
+        "count": 6
+      },
+      {
+        "bigram": "the whole",
+        "count": 6
+      },
+      {
+        "bigram": "prince prospero",
+        "count": 6
+      },
+      {
+        "bigram": "and then",
+        "count": 5
+      },
+      {
+        "bigram": "with the",
+        "count": 5
+      },
+      {
+        "bigram": "but in",
+        "count": 5
+      },
+      {
+        "bigram": "the seven",
+        "count": 5
+      },
+      {
+        "bigram": "to and",
+        "count": 5
+      },
+      {
+        "bigram": "and fro",
+        "count": 5
+      },
+      {
+        "bigram": "at the",
+        "count": 4
+      },
+      {
+        "bigram": "were the",
+        "count": 4
+      },
+      {
+        "bigram": "but the",
+        "count": 4
+      },
+      {
+        "bigram": "while the",
+        "count": 4
+      },
+      {
+        "bigram": "and thus",
+        "count": 4
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "the red death",
+        "count": 6
+      },
+      {
+        "trigram": "the prince prospero",
+        "count": 6
+      },
+      {
+        "trigram": "of the clock",
+        "count": 6
+      },
+      {
+        "trigram": "to and fro",
+        "count": 5
+      },
+      {
+        "trigram": "there was a",
+        "count": 4
+      },
+      {
+        "trigram": "of the red",
+        "count": 3
+      },
+      {
+        "trigram": "of the prince",
+        "count": 3
+      },
+      {
+        "trigram": "the prince s",
+        "count": 3
+      },
+      {
+        "trigram": "and while the",
+        "count": 3
+      },
+      {
+        "trigram": "of the seven",
+        "count": 3
+      },
+      {
+        "trigram": "but in the",
+        "count": 3
+      },
+      {
+        "trigram": "it was in",
+        "count": 3
+      },
+      {
+        "trigram": "much of the",
+        "count": 3
+      },
+      {
+        "trigram": "the ebony clock",
+        "count": 3
+      },
+      {
+        "trigram": "that the prince",
+        "count": 2
+      },
+      {
+        "trigram": "of the most",
+        "count": 2
+      },
+      {
+        "trigram": "it was a",
+        "count": 2
+      },
+      {
+        "trigram": "of the rooms",
+        "count": 2
+      },
+      {
+        "trigram": "to the walls",
+        "count": 2
+      },
+      {
+        "trigram": "of the whole",
+        "count": 2
+      },
+      {
+        "trigram": "might have been",
+        "count": 2
+      },
+      {
+        "trigram": "of the bizarre",
+        "count": 2
+      },
+      {
+        "trigram": "was a sharp",
+        "count": 2
+      },
+      {
+        "trigram": "a multitude of",
+        "count": 2
+      },
+      {
+        "trigram": "through the blood",
+        "count": 2
+      },
+      {
+        "trigram": "clock of ebony",
+        "count": 2
+      },
+      {
+        "trigram": "of the face",
+        "count": 2
+      },
+      {
+        "trigram": "of the orchestra",
+        "count": 2
+      },
+      {
+        "trigram": "and there was",
+        "count": 2
+      },
+      {
+        "trigram": "chiming of the",
+        "count": 2
+      }
+    ]
+  },
+  {
+    "cluster_id": "poe-dupin-root",
+    "source_ref": "poe-gold-bug-1843",
+    "sentence_count": 3938,
+    "word_count": 91801,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 19,
+    "sentence_length_p90": 46,
+    "sentence_length_max": 258,
+    "latinate_ratio": 0.032679382577531835,
+    "type_token_ratio": 0.10143680352065881,
+    "modal_verb_rate": 0.013768913192666746,
+    "sensory_mix": {
+      "visual": 0.5345911949685535,
+      "auditory": 0.22327044025157233,
+      "tactile": 0.12264150943396226,
+      "olfactory": 0.0047169811320754715,
+      "kinesthetic": 0.11477987421383648
+    },
+    "pov_1st": 0.6080402010050251,
+    "pov_2nd": 0.08479899497487438,
+    "pov_3rd": 0.3071608040201005,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 1344
+      },
+      {
+        "bigram": "in the",
+        "count": 588
+      },
+      {
+        "bigram": "to the",
+        "count": 402
+      },
+      {
+        "bigram": "of a",
+        "count": 260
+      },
+      {
+        "bigram": "from the",
+        "count": 221
+      },
+      {
+        "bigram": "it is",
+        "count": 204
+      },
+      {
+        "bigram": "at the",
+        "count": 196
+      },
+      {
+        "bigram": "and the",
+        "count": 194
+      },
+      {
+        "bigram": "that the",
+        "count": 191
+      },
+      {
+        "bigram": "it was",
+        "count": 188
+      },
+      {
+        "bigram": "to be",
+        "count": 180
+      },
+      {
+        "bigram": "with the",
+        "count": 178
+      },
+      {
+        "bigram": "by the",
+        "count": 176
+      },
+      {
+        "bigram": "upon the",
+        "count": 161
+      },
+      {
+        "bigram": "have been",
+        "count": 153
+      },
+      {
+        "bigram": "in a",
+        "count": 149
+      },
+      {
+        "bigram": "for the",
+        "count": 139
+      },
+      {
+        "bigram": "of his",
+        "count": 127
+      },
+      {
+        "bigram": "i had",
+        "count": 121
+      },
+      {
+        "bigram": "with a",
+        "count": 118
+      },
+      {
+        "bigram": "on the",
+        "count": 107
+      },
+      {
+        "bigram": "had been",
+        "count": 103
+      },
+      {
+        "bigram": "of my",
+        "count": 101
+      },
+      {
+        "bigram": "i have",
+        "count": 93
+      },
+      {
+        "bigram": "of this",
+        "count": 91
+      },
+      {
+        "bigram": "one of",
+        "count": 87
+      },
+      {
+        "bigram": "as the",
+        "count": 87
+      },
+      {
+        "bigram": "and a",
+        "count": 80
+      },
+      {
+        "bigram": "which i",
+        "count": 78
+      },
+      {
+        "bigram": "that of",
+        "count": 75
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 44
+      },
+      {
+        "trigram": "would have been",
+        "count": 31
+      },
+      {
+        "trigram": "of the earth",
+        "count": 30
+      },
+      {
+        "trigram": "it was not",
+        "count": 28
+      },
+      {
+        "trigram": "that of the",
+        "count": 27
+      },
+      {
+        "trigram": "as well as",
+        "count": 26
+      },
+      {
+        "trigram": "portion of the",
+        "count": 25
+      },
+      {
+        "trigram": "in the rue",
+        "count": 23
+      },
+      {
+        "trigram": "part of the",
+        "count": 23
+      },
+      {
+        "trigram": "is to say",
+        "count": 22
+      },
+      {
+        "trigram": "might have been",
+        "count": 21
+      },
+      {
+        "trigram": "that is to",
+        "count": 21
+      },
+      {
+        "trigram": "i could not",
+        "count": 21
+      },
+      {
+        "trigram": "by means of",
+        "count": 21
+      },
+      {
+        "trigram": "marie rog t",
+        "count": 21
+      },
+      {
+        "trigram": "was that of",
+        "count": 20
+      },
+      {
+        "trigram": "it is not",
+        "count": 18
+      },
+      {
+        "trigram": "that of a",
+        "count": 18
+      },
+      {
+        "trigram": "by no means",
+        "count": 18
+      },
+      {
+        "trigram": "the end of",
+        "count": 18
+      },
+      {
+        "trigram": "in regard to",
+        "count": 18
+      },
+      {
+        "trigram": "the barri re",
+        "count": 18
+      },
+      {
+        "trigram": "the rue morgue",
+        "count": 17
+      },
+      {
+        "trigram": "that it was",
+        "count": 17
+      },
+      {
+        "trigram": "of the moon",
+        "count": 17
+      },
+      {
+        "trigram": "there is no",
+        "count": 16
+      },
+      {
+        "trigram": "and a half",
+        "count": 16
+      },
+      {
+        "trigram": "the body of",
+        "count": 16
+      },
+      {
+        "trigram": "of the car",
+        "count": 16
+      },
+      {
+        "trigram": "surface of the",
+        "count": 16
+      }
+    ]
+  },
+  {
+    "cluster_id": "poe-dupin-root",
+    "source_ref": null,
+    "sentence_count": 4042,
+    "word_count": 94245,
+    "sentence_length_p10": 5,
+    "sentence_length_p50": 19,
+    "sentence_length_p90": 45,
+    "sentence_length_max": 258,
+    "latinate_ratio": 0.03241551275929758,
+    "type_token_ratio": 0.10094965250145896,
+    "modal_verb_rate": 0.013539179797336728,
+    "sensory_mix": {
+      "visual": 0.5276532137518685,
+      "auditory": 0.22720478325859492,
+      "tactile": 0.12257100149476831,
+      "olfactory": 0.004484304932735426,
+      "kinesthetic": 0.11808669656203288
+    },
+    "pov_1st": 0.6031088082901555,
+    "pov_2nd": 0.08393782383419689,
+    "pov_3rd": 0.31295336787564765,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 1409
+      },
+      {
+        "bigram": "in the",
+        "count": 608
+      },
+      {
+        "bigram": "to the",
+        "count": 417
+      },
+      {
+        "bigram": "of a",
+        "count": 263
+      },
+      {
+        "bigram": "from the",
+        "count": 234
+      },
+      {
+        "bigram": "and the",
+        "count": 209
+      },
+      {
+        "bigram": "it is",
+        "count": 204
+      },
+      {
+        "bigram": "at the",
+        "count": 200
+      },
+      {
+        "bigram": "it was",
+        "count": 200
+      },
+      {
+        "bigram": "that the",
+        "count": 198
+      },
+      {
+        "bigram": "to be",
+        "count": 184
+      },
+      {
+        "bigram": "with the",
+        "count": 183
+      },
+      {
+        "bigram": "by the",
+        "count": 178
+      },
+      {
+        "bigram": "upon the",
+        "count": 168
+      },
+      {
+        "bigram": "have been",
+        "count": 155
+      },
+      {
+        "bigram": "in a",
+        "count": 149
+      },
+      {
+        "bigram": "for the",
+        "count": 141
+      },
+      {
+        "bigram": "of his",
+        "count": 134
+      },
+      {
+        "bigram": "with a",
+        "count": 122
+      },
+      {
+        "bigram": "i had",
+        "count": 121
+      },
+      {
+        "bigram": "on the",
+        "count": 107
+      },
+      {
+        "bigram": "had been",
+        "count": 104
+      },
+      {
+        "bigram": "of my",
+        "count": 101
+      },
+      {
+        "bigram": "i have",
+        "count": 95
+      },
+      {
+        "bigram": "of this",
+        "count": 94
+      },
+      {
+        "bigram": "one of",
+        "count": 89
+      },
+      {
+        "bigram": "as the",
+        "count": 89
+      },
+      {
+        "bigram": "and a",
+        "count": 81
+      },
+      {
+        "bigram": "which i",
+        "count": 78
+      },
+      {
+        "bigram": "that of",
+        "count": 76
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 45
+      },
+      {
+        "trigram": "would have been",
+        "count": 31
+      },
+      {
+        "trigram": "of the earth",
+        "count": 30
+      },
+      {
+        "trigram": "that of the",
+        "count": 28
+      },
+      {
+        "trigram": "it was not",
+        "count": 28
+      },
+      {
+        "trigram": "as well as",
+        "count": 26
+      },
+      {
+        "trigram": "portion of the",
+        "count": 25
+      },
+      {
+        "trigram": "might have been",
+        "count": 23
+      },
+      {
+        "trigram": "in the rue",
+        "count": 23
+      },
+      {
+        "trigram": "part of the",
+        "count": 23
+      },
+      {
+        "trigram": "is to say",
+        "count": 22
+      },
+      {
+        "trigram": "that is to",
+        "count": 21
+      },
+      {
+        "trigram": "i could not",
+        "count": 21
+      },
+      {
+        "trigram": "by means of",
+        "count": 21
+      },
+      {
+        "trigram": "marie rog t",
+        "count": 21
+      },
+      {
+        "trigram": "was that of",
+        "count": 20
+      },
+      {
+        "trigram": "it is not",
+        "count": 18
+      },
+      {
+        "trigram": "that of a",
+        "count": 18
+      },
+      {
+        "trigram": "by no means",
+        "count": 18
+      },
+      {
+        "trigram": "the end of",
+        "count": 18
+      },
+      {
+        "trigram": "in regard to",
+        "count": 18
+      },
+      {
+        "trigram": "the barri re",
+        "count": 18
+      },
+      {
+        "trigram": "the rue morgue",
+        "count": 17
+      },
+      {
+        "trigram": "that it was",
+        "count": 17
+      },
+      {
+        "trigram": "of the moon",
+        "count": 17
+      },
+      {
+        "trigram": "of the most",
+        "count": 16
+      },
+      {
+        "trigram": "there is no",
+        "count": 16
+      },
+      {
+        "trigram": "and a half",
+        "count": 16
+      },
+      {
+        "trigram": "the body of",
+        "count": 16
+      },
+      {
+        "trigram": "of the car",
+        "count": 16
+      }
+    ]
+  }
+]
