@@ -105,8 +105,13 @@ ceilings. Verbs of motion read *rise, cross, above, mount, emerge*.
 **Authority figure.** A **Court** — never seen, only inferred: the clap
 of a gavel you didn't see fall, the rustle of robes behind a screen, a
 voice in the first-person plural: *"we find it so."* Gradually you
-realise the Court is also a past version of you, rendered in the
-grammar of committee. This is never stated. It is a voice property.
+realise the Court is a **future** version of you — the you who *will
+have* ratified this argument, speaking from beyond its own conclusion
+in the grammar of committee. Not *you who once wrote* (that is World
+A's register); *we who will have found*. The plural is not a group of
+people; it is you, having agreed with yourself often enough that your
+own voice has become a quorum. This is never stated. It is a voice
+property.
 
 **Moral temperature.** Ceremonious. The Court does not collude with you;
 it **confirms** you. Its fallacies feel like verdicts.
@@ -122,24 +127,41 @@ leaving the shutter ajar for the next ascent.
 ### Why *this* pair
 
 The two worlds are not aesthetic opposites for the sake of contrast. They
-are the **two natural postures of self-justification**:
+are the **two natural postures of self-justification**, each anchored to
+a different *tense of the self*:
 
-1. **The private version** — *"I have convinced myself."* World A. An
+1. **The private version — *"I have convinced myself."*** World A. An
    argument with no audience but you, conducted in the archive of your
-   own past reasoning. This is where conviction is *remembered into
-   existence*.
-2. **The public version** — *"we find it so."* World B. An argument
-   performed for an imagined tribunal whose approval ratifies it. This
-   is where conviction is *decreed into existence*.
+   own *past* reasoning. The authority-figure here is a **past self**:
+   the one who already finished this argument, whose marginalia agree
+   with you now. Conviction is *remembered into existence*. Tense:
+   past-indicative leaning pluperfect.
+2. **The public version — *"we find it so."*** World B. An argument
+   performed for a tribunal whose assent ratifies it. The authority-
+   figure here is a **future-plural self**: the one who *will have*
+   ratified this argument, speaking from beyond its own conclusion in
+   the first-person-plural because you have agreed with yourself often
+   enough that your own voice has become a quorum. Conviction is
+   *decreed into existence*. Tense: future-perfect leaning
+   ceremonial-present.
 
-Every human self-justification is some mixture of the two. World A and
-World B are that mixture pulled apart. When the braid re-mixes them per
-seed, each play is a different blend of archived and decreed, private
-and public — which is what the argument *felt* like, on the night you
-first had it.
+The asymmetry is the point. The braid does not stage *one self in two
+costumes* — it stages **two rival selves** who happen to be you:
 
-The premise is the same premise. The fallacy is the same fallacy. Only
-the **diction of surrender** differs.
+- The **past-singular self** of A, leaving you warm marginalia.
+- The **future-plural self** of B, ratifying from a bench you have not
+  yet sat on.
+
+The argument is the same argument. The premise is the same premise. The
+fallacy is the same fallacy. What differs is *which you is in the room
+with you* when you commit it — the *you-who-wrote* or the *we-who-will-
+have-found*. The braid re-mixes these two selves per seed, so each play
+is a different distribution of visitations by the past-self and the
+future-plural-self — which is what the argument *felt* like, on the
+night you first had it.
+
+Only the **diction of surrender** differs. But the diction is how
+surrender is felt.
 
 ---
 
@@ -155,13 +177,20 @@ for authoring.
 - **Second person, always.** The mind narrates to itself.
 - **No NPCs with names.** Voices are always *your own voice in another
   register* (see `VOICE.md`). The Librarian and the Court are both
-  *forms of you*.
+  *forms of you*, but not the *same* form — see §2 and §3.2 / §3.3 for
+  the past-singular / future-plural asymmetry that must be audible in
+  the prose.
 - **No fourth-wall breaks.** Never say *the argument*, never say
   *the game*, never address the player directly.
 - **Rhetorical vocabulary is real.** Premise, syllogism, enthymeme,
   analogy, petitio principii — used correctly. The content those terms
   describe may be Dadaist; the terminology is not.
-- **Descriptions under 80 words.** A breath, not prose.
+- **Descriptions aim for ≤ 80 words — guideline, not contract.** A
+  body-room description is a breath, not prose; if it is running past
+  80 words, something is over-explaining. Closing chambers (§5) are
+  explicitly exempt: they do synthesis work that the body rooms do not,
+  and may run 150–220 words. Any other room that needs a longer body
+  must earn it by the author's hand, not by reflex.
 
 ### 3.2 World A — The Subterranean Library
 
@@ -225,6 +254,81 @@ authoring:
   **confession**. A is private admittance; B is public verdict. Every
   beat should honor that.
 
+### 3.5 Connection-node voice — the hinge register
+
+A connection-node is a room that exists in **both worlds** at equivalent
+rhetorical positions — the Premise Hall appears in A and in B, the
+Circular Atrium appears in both, and so on. These are the weave-anchors
+the PRNG hops across. The preceding voice tables have specified what
+each world denies itself from the other — but a connection-node is
+*not* of one world or the other; it is the **hinge** the two worlds
+share. It therefore needs its own register. Without a specified hinge
+voice, every author will improvise, and the braid will read as
+inconsistent at exactly the places the player most needs it to feel
+structural.
+
+**The principle.** A connection-node is a room authored *twice* — once
+in A's register, once in B's register — and the player experiences only
+one of the two on any given traversal (determined by which world they
+are currently in). The hinge is therefore not a third voice rendered
+in prose. The hinge is a **constraint on both authors** that makes the
+two renderings feel like one room seen in different weather.
+
+**Shared geometry, split diction.** Each connection-node has a
+**spatial fingerprint** both versions must honor literally: the same
+number of exits, the same cardinal arrangement, the same pieces of
+furniture or architecture in the same positions. The Premise Hall in A
+has *seven columns of unjustified assumption*; the Premise Hall in B
+has *seven columns of unjustified assumption*. What differs is the
+weather: A's columns are warm amber, stained at the bases; B's columns
+are pale crystal, drawn upward into a vault. **Same bones, different
+light.** A player crossing the node from A to B should feel that the
+furniture moved a millimetre, no more — but the *air* changed
+completely.
+
+**The hinge sentence — one per node.** Each connection-node has a
+**single sentence** — the *hinge sentence* — that appears, word-for-
+word identical, in both renderings. It must be grammatical in both
+registers. It carries no first-person pronouns (which are load-bearing
+per §3.4); it uses no voice-specific verbs. It is a plain declarative
+about the room itself or about the argument. When the player crosses
+the node from A to B, the one sentence they hear identically is the
+hinge sentence — and that is the moment the braid lands in the prose.
+The rest of the room is in the receiving world's register; the hinge
+sentence is shared.
+
+Diagnostic examples of hinge-sentence shapes (not commitments — these
+are authoring cues):
+
+> The premise is the same premise it was.
+
+> Seven columns. Seven entrances. Nothing more is needed here.
+
+> Something has been agreed to in this room.
+
+These are grammatical in both the Librarian's hush and the Court's
+vault. They contain no *I*, no *we*, no *turn*, no *rise*. They are
+**where the two voices meet**.
+
+**What the hinge is NOT.**
+
+- **Not a third voice.** There is no neutral grey register between A
+  and B. A connection-node is always rendered in one world's voice per
+  traversal; the hinge is not a muting of both voices but a *shared
+  phrase inside two full-voiced rooms*.
+- **Not the whole room.** Only the hinge sentence is shared. Every
+  other line — the body, the verb-responses, the dead-end texts —
+  honors whichever world's register is active at that traversal.
+- **Not optional.** Every connection-node has exactly one hinge
+  sentence. The meso layer will enumerate them in the connection-node
+  table.
+
+**How this ties to §4's "crossings are voice-events."** The reason a
+crossing is felt in the prose rather than inferred from node geometry
+is that the hinge sentence recurs in the *other* voice the moment the
+player hops. The sentence is the hinge; the voice around it has
+swung. That swing is the braid.
+
 ---
 
 ## 4. Thematic pairing — what the braid is doing
@@ -273,42 +377,111 @@ weather.
 ## 5. End-state — when the walk is over
 
 Every braided walk terminates in a **closing chamber** hand-authored in
-whichever world the PRNG leaves the player in. There are exactly two
-such chambers per seed's possible outcome:
+whichever world the PRNG leaves the player in. A closing chamber is
+not just the last room; it is the only room in the game that **does
+synthesis work** on the path behind it. Body rooms describe; closing
+chambers *read the walk back to the player* and name what that walk
+meant.
 
-- **A's closing — The Reading Room.** A low alcove, a single open
-  volume, the inscription is the premise now in firmer type. The
-  Librarian is not there, though a chair is pulled out and the candle
-  is freshly trimmed. `ACCEPT` closes the book softly. `REJECT` closes
-  the book slightly more slowly. Either way the book closes. The
-  closing narration acknowledges the seeded path behind it — *you came
-  by the Fallacy Cellar, by the Antechamber of Definitions that
-  defined themselves; you arrived here anyway.*
+### 5.1 What a closing chamber must do
 
-- **B's closing — The Inner Observatory.** A pale dome; a telescope
-  inverted, looking down. Through the eyepiece you see yourself in the
-  chambers below, carrying the premise upward. The Court is not
-  present, though a gavel lies on the bench, warm. `ACCEPT` closes the
-  shutter; the closing is declared from the gallery by a voice that
-  leaves no name. `REJECT` leaves the shutter ajar and the next ascent
-  begins at the foot of the stair the next time. Either way the finding
-  has been entered. The closing narration acknowledges the seeded
-  ascent — *you passed the Atrium of Findings, you crossed the Crystal
-  Gallery; you emerged here anyway.*
+After 30+ turns of effort, a closing that is only exquisite is an
+anticlimax. Every closing chamber, regardless of which world or which
+variant, must honor all four of the following:
 
-### The game's rule about endings
+1. **Acknowledge the path.** Name at least one specific room the player
+   passed through on this seed. Not every room — the closing is not a
+   transcript replay — but enough rooms that the player recognizes the
+   walk they just took. The closing-chamber prose is conditioned on
+   the seeded path-list (this requires an engine hook; see §6).
+2. **Name the pattern.** The closing identifies what *kind* of walk
+   this was. The four canonical path-patterns the closings must cover
+   are listed below with *glosses* of their meaning — these glosses
+   are NOT closing prose, only descriptions of what each pattern's
+   closing must convey. The actual prose is authored per world in the
+   world's register:
+   - **The Acceptor's walk.** The player mostly accepted along the
+     way. Gloss: *you came by agreement; the finding was built of
+     your yeses.*
+   - **The Rejector's walk.** The player mostly rejected. Gloss:
+     *you came by refusal; the argument absorbed each no and grew.*
+   - **The Questioner's walk.** The player mostly questioned. Gloss:
+     *you came by doubt; each question was entered as evidence of
+     openness to scrutiny.*
+   - **The Tracer's walk.** The player used TRACE BACK heavily.
+     Gloss: *you tried to find where this began; every backward step
+     was already on the map.*
+   The path-pattern is computed from the transcript (dominant verb
+   class across the walk) and selects which closing variant is
+   rendered. Meso authors each pattern's prose twice — once in A's
+   voice, once in B's voice.
+3. **Re-surface at least one hinge sentence.** The hinge sentence of
+   the last connection-node the player crossed should recur in the
+   closing, in the closing world's register. This is what makes the
+   closing *feel* like the end of this braid, not a generic end of
+   either world.
+4. **Close the circle in prose, not just in mechanic.** The final
+   paragraph of every closing chamber must re-read the premise the
+   player began with — literally, word-for-word if possible, or in a
+   phrase the player heard in the opening rooms. The acceptance is
+   mechanical (the player types `ACCEPT`); the *recognition* is the
+   closing chamber's job.
+
+A closing chamber may run long — 150 to 220 words is the expected
+range, which is why §3.1 exempts closings from the ≤ 80-word guideline.
+
+### 5.2 The two worlds' closing registers
+
+- **World A's closings — the Reading Room and its neighbours.** The
+  Librarian is not present, but the marginalia are in your hand and
+  the candle has been freshly trimmed. ACCEPT closes the book softly;
+  REJECT closes it slightly more slowly; TRACE BACK turns to the first
+  page and finds the same sentence. The synthesis is *quiet admission*:
+  the walk is read back by the past-self who has already finished the
+  argument and is leaving you one last note, which is the note you are
+  now reading.
+
+- **World B's closings — the Inner Observatory and its neighbours.**
+  The Court is not present, but a finding has been entered. ACCEPT
+  closes the shutter; REJECT leaves it ajar for the next ascent; TRACE
+  BACK turns the inverted telescope on itself. The synthesis is
+  *formal finding*: the walk is read back by the future-plural-self
+  who has already ratified it, in the grammar of *it will have been so*.
+
+Both registers carry the same four obligations from §5.1. They differ
+only in diction, per §3.
+
+### 5.3 How many closings per world
+
+This is a deliberate deferral. Macro commits only to the principle:
+**each world needs enough closing-chamber variants that a player who
+replays will not exhaust them in three runs.** The exact count and
+variation strategy — whether each world authors a *family* of 3–4
+closing chambers (one per path-pattern), or two geographic variants
+each keyed to the path-pattern by conditional prose, or some hybrid —
+is a **meso-layer decision**. The choice has structural consequences
+(ending-chamber count eats into the ~40-room budget per world) and
+belongs in the density-curve layer, not the identity layer.
+
+Meso owes: (a) a count of closing chambers per world, (b) a mapping
+from path-pattern to closing variant, (c) a reachability guarantee
+that every seed reaches *some* closing chamber.
+
+### 5.4 The game's rule about endings
 
 Neither ending is "better." Neither is a success. The circle closes in
 either world because **the circle is not a property of the world — it
 is a property of the argument**. The player's felt sense, either way,
 should be: *I arrived here. I was always going to arrive here. The way
-in was the way through.*
+in was the way through.* What the closing adds is the synthesis — the
+moment the walk is named.
 
 The only **false ending** is a seeded walk that reaches a cap on turns
-without ever entering a closing chamber — this is the
-*indefinite loop* failure mode (Act III without closure). The meso
-layer must ensure every seed has a ≥ 95% chance of reaching one of the
-two closing chambers within 40 rooms. Budgeting happens there.
+without ever entering a closing chamber — the *indefinite loop*
+failure mode (Act III without closure). The meso layer must ensure
+every seed has a ≥ 95% chance of reaching *some* closing chamber
+(across both worlds and across all variants per world) within the
+turn budget. Budgeting happens there.
 
 ---
 
@@ -319,19 +492,52 @@ These are deliberate deferrals, by layer:
 **Meso (`WORLDS-meso.md`).**
 - How many regions each world has and what their names are.
 - Where the connection-nodes sit structurally and how the braid traverses them.
-- Which puzzle groups (T110) live in which world, which span both, and roughly how many rooms each claims.
-- Where the gnomes (T108) range and which of them are A-resident, B-resident, or A/B-bridging.
+- The **hinge-sentence table** — one sentence per connection-node,
+  enumerated and authored (per §3.5).
+- Which puzzle groups (T110) live in which world, which span both, and
+  roughly how many rooms each claims.
+- Where the gnomes (T108) range and which of them are A-resident,
+  B-resident, or A/B-bridging.
 - The pacing density curve across the ~40 rooms of each world.
-- How we guarantee reachability of a closing chamber inside the turn budget.
+- **Closing-chamber count and variation strategy per world** (per §5.3)
+  — number of closing chambers per world, the mapping from path-
+  pattern to closing variant, and the authoring approach (distinct
+  chambers per pattern vs. conditional prose inside fewer chambers).
+- How we guarantee reachability of *some* closing chamber inside the
+  turn budget.
 
 **Micro (`WORLDS-micro.md`).**
 - Individual room titles, bodies, verb-responses, and exits.
-- The exact JSON / TS shape each authored room takes.
-- 3–4 sample rooms per world that define the authoring style.
-- The Zod schema sketch that will validate authored rooms at build time.
+- The exact JSON / TS shape each authored room takes, including the
+  connection-node shape (a single room with two world-keyed bodies +
+  one shared hinge sentence).
+- 3–4 sample rooms per world that define the authoring style, including
+  at least one connection-node example with both A- and B-renderings.
+- At least one closing-chamber sample per world showing the four
+  §5.1 obligations in practice (path acknowledgement, pattern naming,
+  hinge re-surfacing, circle-closing premise recall).
+- The Zod schema sketch that will validate authored rooms at build
+  time, including the connection-node and closing-chamber variants.
 
-**Schema/loader, authoring, weaver.** Engineering, not design; live
-outside these three docs.
+**Engine (weaver + reducer).** Surfaced here so downstream agents aren't
+surprised:
+- The weaver must produce and retain a **seeded path-list** — the
+  ordered list of rooms visited in this braid — and make it available
+  to the grammar when a closing chamber is rendered (per §5.1 obligation
+  1). Today the transcript carries this implicitly; the closing chamber
+  needs it explicitly as a structured input.
+- The weaver (or the reducer) must compute a **dominant-verb path-
+  pattern classifier** over the walk (Acceptor / Rejector / Questioner
+  / Tracer, per §5.1) and expose it as a grammar input to the closing
+  chamber, so the correct closing variant can be selected per §5.3.
+- The weaver must track the **last connection-node crossed** so the
+  closing can re-surface that node's hinge sentence (§5.1 obligation
+  3).
+- None of this is specified here beyond the interface shape. It lives
+  in `WorldWeaver.ts` per T109 step 6.
+
+**Schema/loader, authoring.** Engineering, not design; lives outside
+these three docs.
 
 ---
 
@@ -344,12 +550,21 @@ If we do nothing else right, we do these:
 2. Every authored room passes the **Zork test**: can you describe it
    to a friend in a way that makes them want to visit it?
 3. The **braid is a voice-event**, not a technical detail — a crossing
-   is felt in the prose the moment it happens.
-4. Every seed **closes** — somewhere in the Reading Room or somewhere
-   in the Inner Observatory, the argument admits itself.
-5. The two worlds, taken together, argue that **the argument is the
+   is felt in the prose the moment it happens, carried by the hinge
+   sentence per §3.5.
+4. Every seed **closes**, in a closing chamber somewhere in A or
+   somewhere in B, and the closing does **synthesis work** — it
+   acknowledges the path, names the pattern, re-surfaces the hinge,
+   and re-reads the premise. A closing that is only exquisite is an
+   anticlimax; a closing earns itself by reading the walk back.
+5. The two worlds stage **two rival selves**, not one self in two
+   costumes: the past-singular self of A and the future-plural self of
+   B. That asymmetry is the pairing's quiet argument about how we
+   talk ourselves into things — by remembering agreement, and by
+   anticipating it.
+6. The two worlds, taken together, argue that **the argument is the
    invariant** and the diction is the variable. That thesis is the
    pairing's reason for existing.
 
-Once these five commitments hold on the page, the meso and micro layers
+Once these six commitments hold on the page, the meso and micro layers
 can begin.
