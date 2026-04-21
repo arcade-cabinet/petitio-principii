@@ -75,6 +75,9 @@ T87 → T88 (corpus v2)
 T89 → T90 (opponent)
 T91, T92, T93 (social)
 T97 → T98 → T99 → T100 → T101 → T102 → T103 (railroad-clock + chord — P28)
+T104 (full pipeline coverage) — unblocks T105/T106 (pacing/3D)
+T104 → T105 (pacing histogram) → T107 (blackboard test) → T108 (gnomes)
+T104 → T106 (3D depth)
 T94 (repo audit) → T95 (security) → T96 (v0.1.0 release)
 ```
 
@@ -197,6 +200,61 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 - [ ] **T103** Release-gate the clock — re-run T67 bundle audit (clock geometry is JSX-heavy), T70 Lighthouse, T71 a11y (each clock slot has an `aria-label` and is keyboard-focusable as a fallback for assistive tech, even though the game is touch-first).
     - **Verify**: bundle ≤ 180 kB gzip; Lighthouse ≥ 95; axe clean.
 
+- [ ] **T104** **Full pipeline coverage — every runtime string flows through the grammar pipeline.** The earlier claim (T43/T45) that text generation is pipeline-driven is partially true. The surrealist chainer + triumphant-state agent responses DO flow through Tracery under seeded RNG. Everything else is still hardcoded string literals:
+    - **`src/engine/core/reducer.ts`** — movement blocks ("You cannot go that way. The argument has no passage in that direction."), TRACE BACK ("You trace back through the argument.", "You cannot trace back further."), QUIT refusal, INVENTORY response, NEW GAME banner. ~8 literal sentences emitted by the reducer on miss paths.
+    - **`src/engine/core/NarrativeGenerator.ts`** — the fallacy-naming fallback ("You sense a logical error here, but cannot quite name it."). The help-text block. The `describeExamineFor` template.
+    - **`src/hooks/use-game.ts`** — the opening narration banner ("You find yourself at the threshold of an argument." / "The premise smells faintly of tautology.").
+    - **`src/features/terminal/hints.ts`** — every hint's prose.
+    - **`src/content/templates/roomTemplates.ts`** — the hand-authored "static" room descriptions emitted when `describeRoom` is called without a seed. This path is hit on every `LOOK` in the reducer.
+    - **`src/content/templates/fallacyTemplates.ts`** — hand-written fallacy encounters.
+
+    **Scope of fix** — add grammar entries for every category above into `scripts/build-grammars.ts` → `grammars.json`. Every runtime emission site calls `grammar.flatten()` under a seeded rng. The seed inputs (turn count, verb, room context) are already available at every call site. New grammar keys: `reducer.movement.blocked`, `reducer.trace.blocked`, `reducer.trace.walk`, `agent.opening`, `hints.<id>`, `fallacy.fallback`, `examine.<rhetoricalType>`, `room.<rhetoricalType>.static`. Room `description` field becomes optional (or removed) since it's now generated. The hint catalogue stays as the priority-ordered predicate list, but `hint.text` becomes a grammar key — the reducer flattens to get the actual prose per-turn, so the same hint id may read differently across seeds (reinforces the "you are navigating an argument, not reading UI copy" principle).
+
+    Determinism gate (T52-style) extended: the 100-turn replay must now cover reducer-emitted text, hint text, and opening narration — all seed-locked. The `grep "\"[A-Z][a-z]+.*\\.\"\\s*[,)]" src/engine src/hooks src/features` audit must return **zero hits** outside of tests, dev logs, UI chrome strings, and the grammar source files themselves.
+
+    **Verify**: (1) the grep audit returns zero prose-sentence hits in runtime code. (2) 1000-turn determinism test passes byte-identically across runs, covering all new grammar-driven emission points. (3) A 5-seed playthrough (T68) shows the same hint id produces different prose across different seeds. (4) The opening narration varies across seeds — 10 seeds, 10 distinct openings that all convey the same beat.
+
+- [ ] **T105** **Pacing model — determine and tune playthrough length.** Right now `generateArgumentGraph(seed)` emits some number of rooms per seed with no stated target. No one has measured "how long is a game" or tuned the arc shape (setup → complication → recognition → close). The graph generator needs an explicit target of **20-40 turns** to circle-close for a default-seed game, with the distribution normalized across seeds. Add `docs/PACING.md` documenting: the room-count distribution, the mean/median turns-to-circle across 100 sampled seeds, the "three-act" structure target (turns 1-N opening, N-M deepening, M+ closing), the ACCEPT-count required to trigger the close.
+    - **Verify**: (1) `scripts/pacing-audit.ts` runs 1000 seeds through a headless scripted player (TRACE BACK + ACCEPT in circle) and reports turns-to-close histogram. (2) The 10th/90th percentile spread is ≤ 2x (so the game isn't wildly variable in length). (3) Median turns-to-close lands inside the 20-40 target. (4) docs/PACING.md committed with the histogram + rationale.
+
+- [ ] **T106** **Room depth projection into 3D-sensed space.** The memory-palace tradition is explicitly three-dimensional — you walk *into* a place, things are *above*, *below*, *behind* you. Our rooms currently read as a single flat paragraph, which breaks the conceit. Each room generation gets a **layered spatial description**:
+    - **Volume**: ceiling type + floor type + wall treatment — emitted via grammar slots `#ceiling#`, `#floor#`, `#wall#` per rhetorical-type family (e.g. premise = marble-columned → high coffered ceiling + mosaic floor + axiom-engraved walls; fallacy cellar = stone-vaulted → low damp ceiling + cold flag floor + cobwebbed shelving).
+    - **Foreground / midground / background** — three sentences per room, each grammatically distinct: something you *touch* (fg), something you *see across the space* (mg), something you *only glimpse at the edge* (bg). The PRESENT panel renders them as three short paragraphs so the player's eye moves through the volume.
+    - **Implicit vertical axis** — the compass tick positions at 12 and 6 map to "look up" / "look down" as well as N/S navigation. When the player commits UP or DOWN (chord or direct tap), the prose adds a fourth spatial line drawing attention to the ceiling or floor of the current room.
+
+    Scope: extend the grammar JSON schema with the new `volume` / `fg` / `mg` / `bg` keys per rhetorical type. Update `chainDescription` to emit the 3+1 layered sentences in order. Extend `roomTemplates` to carry volume seeds, not full paragraphs. Update `docs/UX.md` with the PRESENT panel's new three-paragraph layout.
+    - **Verify**: (1) every room rendered under `LOOK` returns 3 distinct spatial layers + volume line. (2) A blind-read test — given two room descriptions at the same rhetoricalType but different seeds, a reader can identify "high ceiling" vs "low ceiling" + "wide" vs "tight" vs "vaulted" variance. (3) The 5-seed playthrough in T68 logs capture the 3D reading and a tester can draw a rough floor-plan from the prose.
+
+- [ ] **T107** **The blackboard test — the world must hold together as a map.** Adventure and Zork work because if a player draws what they've walked on a blackboard, a world emerges: "the Troll Room is two rooms west of Living Room; downstairs is the Cellar." Today the graph is bidirectional (go N from A, go S to return) but rooms know nothing diegetic about their neighbours. They read as isolated paragraphs, not connected places.
+
+    The world-test: hand a player pencil and paper after 15 turns; can they draw a map that (a) matches the graph we generated, (b) labels rooms correctly, and (c) notes what connects each pair? If no, we don't pass.
+
+    Scope: **geographic awareness** woven into generation.
+    - Rooms carry a **neighbour profile** — for each exit, a grammar slot tokenizing the target room's landmark ("↕ an arch opening into the Premise Hall's columned gloom" / "↕ a cellar stairwell smelling of stored fallacy"). Generated at graph construction, stamped into the Room record; available to `chainDescription` as `#exit.<direction>#` slots.
+    - **Persistent landmarks** — a handful of fixed rhetorical rooms have *always-the-same* spatial signatures across all seeds: the Circular Atrium is always central and always has 4+ exits; the Chamber of Self-Reference is always the meta-closer; the Premise Hall is always tall + columned. Not the seed-varying ones, but the load-bearing waypoints. Document the fixed set in `docs/GEOGRAPHY.md`.
+    - **Distance awareness** — each room's description can reference the distance to a memorable waypoint: "three rooms behind you lies the Fallacy Cellar" (derived from shortest-path at runtime).
+    - **Directional leakage** — rooms diegetically mention their neighbours: "the wall to your west bears similar inscriptions; you suspect the Premise Hall lies just through it." This leaks the graph into the text so the blackboard starts filling in.
+    - The compass hand spinning to indicate LAST heading reinforces this geography; the player's internal map is kept in sync by the visual.
+
+    Update `scripts/build-grammars.ts` to include the `#exit.<dir>#` and `#distance-to-<landmark>#` slot patterns. Extend `ArgumentGraph` construction to stamp neighbour profiles on each Room at generation time. Extend `chainDescription` to weave one neighbour reference into every room body unless the room has only one exit.
+    - **Verify**: (1) a fresh player plays 15 turns on an unseen seed, draws a pencil map; compare to the actual graph — matches in both topology (right number of rooms, right edges) and labels (player names rooms consistently). (2) A scripted test drives 20 rooms and asserts every room body contains at least one directional-phrase from a tokenized set of neighbour-reference templates. (3) `docs/GEOGRAPHY.md` documents the persistent landmarks + their fixed spatial signatures; a test asserts the 3 waypoints render consistently across 100 seeds.
+
+- [ ] **T108** **Strange little gnomes — ambient figures that inhabit the argument.** Adventure has the axe-throwing dwarf; Zork has grues; the Hitchhiker's Guide has Marvin. Ambient characters don't drive the plot, they make the world *peopled* — small repeating encounters with menace, whimsy, and memory. Petitio Principii has none yet. The argument feels uninhabited.
+
+    The cast (seeded, probabilistic per-room encounters; each has a small stable repertoire of response templates; each is remembered across revisits so their lines shift):
+    - **The Tautologist** — a small figure who lives in circular/meta rooms. Every visit she is finishing the same sentence ("…and therefore it is true because it is true, *as I was saying*"). Offers advice rephrased each time.
+    - **The Strawmen** — pipe-puppet figures who appear in objection spaces. They mirror arguments back malformed; their speeches cite things the player didn't say.
+    - **The Scholar-Mouse** — premise rooms. Cites an authority the player has never heard of to support the room's axiom. Usually misattributes the quote.
+    - **The Chorus of Mumbling Footnotes** — a low shared mutter in conclusion balconies. You catch fragments of famous dismissed rebuttals drifting up from below.
+    - **The Figure Behind the Mirror** — meta spaces only. Never turns around. Makes observations about the player's own history that are unsettlingly accurate (references their accepted/rejected/questioned count, their current path length).
+
+    Scope: new entity trait `InhabitedBy({ id: GnomeId, lastSeenTurn: number, linesShown: string })` stamped on rooms at generation time by `ArgumentGraph` (probabilistic per rhetoricalType). `src/engine/ai/gnomes.ts` — pure-function `respondFromGnome(id, context, rng)` returning a line flattened from the gnome's Tracery grammar. Rooms with a gnome append one gnome line to their description (after the 3D spatial layers from T106). Encounters are seeded so the same seed always places the same gnome in the same room, but the *line* rotates based on `lastSeenTurn` vs current turn (memory leak).
+
+    The Figure Behind the Mirror is a special case: her lines consume `state.memory` (accepted/rejected/questioned sets) and produce commentary specific to the player's path. E.g., "you rejected three premises between here and the atrium; you are building a no." Draws on `ChainingMemory` already in the engine. This is the most effortful gnome because her lines need to hold up under arbitrary play histories — seed ≥ 12 template variants that cover thin-memory / heavy-reject / heavy-accept / heavy-question / circle-closed.
+
+    The gnomes need `docs/BESTIARY.md` documenting each one: appearance, behaviour, room affinities, sample lines. The point is that an attentive player starts to *know* them — "oh, the Tautologist is here again, she's farther along in her sentence this time."
+    - **Verify**: (1) `grammars.json` contains a `gnomes.<id>` section per cast member, each with ≥ 8 line variants. (2) Determinism audit extended: gnome presence + line choice byte-identical across runs of the same seed. (3) A 5-seed playthrough captures every gnome at least once across the seeds; each encounter's line is distinct from the prior encounter in the same seed. (4) The Mirror Figure's lines verifiably reflect the player's memory state (scripted test with controlled memory profile, assert the commentary matches). (5) `docs/BESTIARY.md` committed with all five gnomes described.
+
 ### P29 — Final audit & release
 
 - [ ] **T94** Repo convergence audit — every doc in `docs/` has current frontmatter and reflects shipped state. `CLAUDE.md` + `AGENTS.md` + `README.md` + `CHANGELOG.md` + `STANDARDS.md` all reviewed. Broken links fixed. `docs/STATE.md` reflects all completed tasks.
@@ -212,7 +270,7 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 
 The project is complete when **all of the following are simultaneously true**:
 
-1. Every task T01 through T103 is marked VERIFIED_DONE in the batch state.
+1. Every task T01 through T108 is marked VERIFIED_DONE in the batch state.
 2. `pnpm verify` passes locally and in CI.
 3. A v0.1.0 release tag exists on `main` with signed artifacts for web, Android, and iOS.
 4. Five distinct seeds have been played to the circle-close end state and logged under `docs/playtest/`.
