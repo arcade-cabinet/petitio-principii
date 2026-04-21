@@ -1,352 +1,351 @@
 ---
-title: Personas — 12 Detectives, 12 Hours
+title: Personas — Source-Cluster Proposals
 updated: 2026-04-21
 status: current
 domain: creative
 ---
 
-# Personas — 12 Detectives, 12 Hours
+# Personas — Source-Cluster Proposals
 
-> Each case has one detective. The detective IS the case's narrator;
-> cases are not reusable across detectives. Twelve detectives, twelve
-> hours, twelve wholly-separate voices. The blind-read test (macro
-> §3): a reader shown a paragraph should identify which case it's
-> from ≥ 90% of the time.
-
-This document is a **proposal cast** — not a commitment. Each entry
-is the starting point for authoring; the authored persona in the
-SCENE file is what ultimately defines the character. These cast
-notes exist so we have a spread of voices that don't overlap, and a
-first hook for the case-card flavor lines.
-
----
-
-## 00 · Midnight — *A Voice Before Dawn*
-
-**Detective:** Harrison Drake
-**Era / Place:** Los Angeles, 1946
-**Register:** Hard-boiled noir, Chandler-adjacent.
-**Biography:** Discharged 1945, one lung half-useful since Anzio.
-Licensed as a private investigator in California June 1946 by lying
-on the health affidavit. Divorced. Drinks in the morning, works
-nights, owes his landlord. Office on Ivar above a Chinese restaurant
-that throws him a free plate when the rent is late. Does not own a
-car; walks everywhere. Has never recovered from the war and knows it.
-
-**Voice notes:**
-- Short sentences. Dry. Never uses three words where two will cut.
-- Similes from weather, liquor, or machinery.
-- Doesn't name women's clothing; notices how it hangs.
-- Smokes only between cases, never during. The pack in his pocket is
-  always creased.
-- Uses past perfect for weight: *"I had told her that already."*
-
-**Notices first:** physical-trace, posture, absence, weather
-**Theme chord:** A-flat minor 7th, bowed double-bass + muted piano
-**One-line:** *"A voice before dawn, counting rings."*
+> **This is not a finalized cast.** It is a list of proposed source
+> clusters for the twelve hours on the clock. Each cluster is 2-4
+> public-domain sources from which `tools/brainstorm/synthesize.ts`
+> will emit a synthesis brief. The author writes the persona
+> *against* the brief, not against my guess. A slot is finalized only
+> after its cluster passes the sign-off gate in
+> [05-BRAINSTORM-PIPELINE.md](./05-BRAINSTORM-PIPELINE.md) §7.
+>
+> The cluster-sourcing rule is strict: every slot must be grounded
+> in 2-4 sources that are **PD in the US** and provide **genuine
+> literary voice** for the era/milieu. Where that grounding does not
+> exist, the slot stays empty rather than being invented.
 
 ---
 
-## 01 · *Hollow Dawn*
+## The twelve hours — source-cluster proposals
 
-**Detective:** Marguerite Bierce
-**Era / Place:** San Francisco, 1891
-**Register:** 1890s newspaperman prose, dry, caustic. Written as a
-first-person newspaper column that has gone wrong.
-**Biography:** City-desk reporter for *The Examiner*, having arrived
-from New York after an incident she does not discuss. Thirty-four,
-widow (said to be; nobody's confirmed the husband). Writes a column
-under her own byline, which was unusual then and is unusual now.
-Cases reach her through tipsters who mistake "Miss Bierce" for a
-detective because her column names names. She does not correct them.
-
-**Voice notes:**
-- Periodic sentences, subordinate clauses. Latinate vocabulary.
-- Drops archaic Americanisms unironically. *Allowed as how*, *the
-  parties concerned*.
-- Never says "I think." Says *"it is not inconsiderable that..."*
-- The moment she is certain she is wrong, her prose gets shorter.
-
-**Notices first:** testimony, contradictions-in-prior-accounts,
-clothes, what a newspaper would print
-**Theme chord:** C minor 6th, solo cello pizzicato
-**One-line:** *"Nobody on Clay Street will say what they saw."*
+Slots below are ordered roughly around the clock (00 → 11), but a
+slot is only a *proposal*. Clusters may be retired or reassigned
+after the synthesis brief reads back. Every source listed below is
+US-PD as of 2026-04; translators' death-years are checked where
+relevant.
 
 ---
 
-## 02 · *A Cat on the Stairs*
+### 00 · Midnight — *Hard-boiled noir*
 
-**Detective:** Vera Halliday
-**Era / Place:** Connecticut, 1963
-**Register:** Cozy-mystery housewife-sleuth, with a strong streak of
-melancholy the genre doesn't usually carry.
-**Biography:** Age 47. Three children mostly grown. Husband a
-regional insurance executive, often absent. Volunteers at the
-library. Read her first Agatha Christie at 12 and has not stopped.
-Has never told her husband that the neighbors come to her when
-things go missing or children go strange.
+**Cluster proposal: LA / SF noir 1929-1934.**
 
-**Voice notes:**
-- Careful sentences. Educated without being showy.
-- Parentheticals (often containing the sharpest observation).
-- Habit of apologizing for noticing things.
-- Reads her own emotional life through other people's details.
+- **Dashiell Hammett — *Red Harvest*** (1929; PD in US 2025)
+- **Dashiell Hammett — *The Maltese Falcon*** (1930; PD in US 2026)
+- **Dashiell Hammett — *The Thin Man*** (1934; PD in US 2030 — hold
+  or sub Black Mask pulp anthology pieces 1920s)
+- **Black Mask magazine 1920-1928** (periodical PD clearly)
 
-**Notices first:** children's behavior, what's missing from a
-cabinet, whose coat is over whose chair, tone of voice
-**Theme chord:** E major 7th, upright piano + distant clarinet
-**One-line:** *"The MacAllister boy has been crying in the closet again."*
+The cluster combines Hammett's first-person/third-person range with
+the pulp Chrestomathy of *Black Mask*. Divergence along the
+realist-vs-pulp axis forces synthesis past either pole.
+
+**Cluster ID:** `la-noir-1929`
 
 ---
 
-## 03 · *Paydirt*
+### 01 · 1am — *Heian court women's voices*
 
-**Detective:** Able Conroy
-**Era / Place:** Yukon Territory, 1898
-**Register:** Jack London by way of muddy boots.
-**Biography:** 29. Came up to Dawson with a grubstake borrowed from
-his brother, who is dead. Claim #47 on a tributary that runs good
-three weeks a year. Reads when he can. Carries a battered edition of
-Aurelius in his breast pocket next to his paper money. Investigates
-because there is no law and his claim borders a man who has been
-seen twice where he should not have been.
+**Cluster proposal:**
 
-**Voice notes:**
-- Plain Saxon words. Concrete nouns.
-- The cold is in every scene as a physical presence.
-- Quotes Aurelius under breath without attribution.
-- Pauses mid-sentence because the cold took the next word.
+- **Sei Shōnagon — *The Pillow Book*** (Waley translation, 1928;
+  Waley d. 1966 — US-PD by publication date, 1928 is clearly PD)
+- **Murasaki Shikibu — *The Tale of Genji*** (Waley translation,
+  1925-1933; earliest volumes clearly US-PD)
+- **Sugawara no Takasue no Musume — *Sarashina Diary***
+  (Omori & Doi 1920 translation, PD)
 
-**Notices first:** boot-prints in mud, whose tent has a new rope,
-weather cues, animal sign, economic absence ("that claim's been
-quiet a week")
-**Theme chord:** D minor, lone fiddle over wind
-**One-line:** *"A claim that's been quiet too long."*
+Three voices from the same court century, distinct temperaments
+(list-observational / epistolary-courtly / inward-dreaming). No single
+source can dominate.
+
+**Cluster ID:** `heian-court-women`
 
 ---
 
-## 04 · *The Tundra Post*
+### 02 · 2am — *Antebellum ratiocination (the root of the form)*
 
-**Detective:** Nikolai Semyonov
-**Era / Place:** Arkhangelsk region, 1902
-**Register:** Chekhov-adjacent provincial melancholy. Russian sentence
-rhythm, slight formalness.
-**Biography:** Post-master of a village of 140 souls, 60 versts from
-the nearest railway. Educated in Moscow. Returned to his province
-because it was where his mother was dying. Mother died. He remained.
-Keeps the mail, keeps the books, is the only person with a key to
-the cabinet where official records are stored.
+**Cluster proposal:**
 
-**Voice notes:**
-- Compound-complex sentences with a little internal surprise.
-- Names of weather (`the dry wind from the east`, `the second frost`).
-- Cites distances in versts; time in terms of the saint's days.
-- Understated irony. Never raises his voice on the page.
+- **Edgar Allan Poe — *The Murders in the Rue Morgue*, *The
+  Mystery of Marie Rogêt*, *The Purloined Letter*** (Dupin trilogy,
+  1841-44, PD)
+- **Edgar Allan Poe — *The Gold-Bug*** (1843, PD)
+- **Edgar Allan Poe — selected essays / *Marginalia*** (1844-49, PD)
 
-**Notices first:** signatures on documents, who didn't come to
-services, which houses have candles at odd hours, dogs
-**Theme chord:** G minor, balalaika + viola
-**One-line:** *"A dog barks and does not stop."*
+The detective-genre's founder. A cluster of one author might seem
+to invite mimicry, but across Poe's ratiocinative and cryptographic
+and self-analytic modes there's enough divergence to demand
+synthesis. Synthesis brief will emphasize how *not* to cosplay
+Dupin.
+
+**Cluster ID:** `poe-dupin-root`
 
 ---
 
-## 05 · *The Carlton*
+### 03 · 3am — *Song-era forensic reasoning*
 
-**Detective:** Reginald Hobbs
-**Era / Place:** London, 1913
-**Register:** Edwardian gentleman's-gentleman, Wodehouse-adjacent but
-not comic — the valet as a genuine intelligence the household has
-failed to notice.
-**Biography:** 42. Valet to Sir James Carlton. Oxford-adjacent
-(butler's boy at Magdalen as a child; self-educated thereafter).
-Knows every member of Sir James's club and their histories to a
-degree that would disturb them if they understood. Has solved
-private matters for the household before. Has never been thanked in
-so many words.
+**Cluster proposal:**
 
-**Voice notes:**
-- Precise diction. Never slang.
-- Qualifies heavily before stating (*"If I may, without any wish to
-  seem forward..."*) and then states baldly.
-- Uses the third person for himself occasionally (*"one observes..."*).
-- Understated wit but never at the expense of the household.
+- **Song Ci — *Xiyuan Jilu* (The Washing Away of Wrongs)***
+  (Giles translation, 1924, PD — Giles d. 1935, translation PD in US)
+- **Giles — *Chinese Sketches*** (1876, PD) and *Strange Stories
+  from a Chinese Studio* (Pu Songling, Giles trans., 1880, PD)
+- (Optional third) **Herbert Giles — *A History of Chinese
+  Literature*** (1901, PD) for context only
 
-**Notices first:** who changed into which suit and when, cleared
-places at breakfast, correspondence on the hall table, the linen
-count
-**Theme chord:** F major, string quartet with muted first violin
-**One-line:** *"The telegrams were not in the usual place."*
+The persona is a fictional colleague of Song Ci (not Song Ci
+himself — real-person-speaking-in-first-person risks too much for
+a game). Investigation method: forensic, Song-dynasty court
+procedure.
+
+**Cluster ID:** `song-forensic`
 
 ---
 
-## 06 · *Press Row*
+### 04 · 4am — *Elizabethan rogue-catching*
 
-**Detective:** Daniel "Dannie" Corcoran
-**Era / Place:** Chicago, 1927
-**Register:** Prohibition-era cub reporter. Ben Hecht cadence.
-**Biography:** 23. Crime-desk at the *Tribune*. Came from the
-steelyards, has a nose for a lie like a dog has a nose for
-groundhogs. Does not sleep. Knows every desk-sergeant west of the
-lake. Falls for the wrong woman in every case and files copy in
-spite of it.
+**Cluster proposal:**
 
-**Voice notes:**
-- Short exclamatives. Sentence fragments.
-- Dialogue-heavy, tagged curtly. ("'Whaddya want.' The cop didn't
-  look up.")
-- Uses first-person plural for the paper (`we got a tip`).
-- Drinks coffee in every scene and mentions it in every scene.
+- **Robert Greene — *A Notable Discovery of Cozenage*** (1591, PD)
+  — literally early detective pamphlet literature
+- **Robert Greene — *The Second Part of Cony-Catching*** (1591, PD)
+- **Thomas Dekker — *The Gulls Hornbook*** (1609, PD) — urban London
+  satire
+- (Optional) **Anonymous — *The Merrie Conceited Jests of George
+  Peele*** (1627, PD)
 
-**Notices first:** lies in alibis, who ran from what, typography of
-threats, matchbook covers, politicians' middle names
-**Theme chord:** B-flat minor, trumpet + upright piano + brushes
-**One-line:** *"A body at the loading dock. We got a tip."*
+The milieu is Elizabethan/Jacobean London street-life; the register
+is pamphlet-reportorial. The detective is a "cony-catcher-catcher"
+— someone who turns Greene's own taxonomy against the rogues.
+
+**Cluster ID:** `elizabethan-rogue`
 
 ---
 
-## 07 · *The Seal*
+### 05 · 5am — *Colonial-era colonial Mexico (Sor Juana's circle)*
 
-**Detective:** Armand Gaboriau
-**Era / Place:** Paris, 1884
-**Register:** Third-republic examining magistrate. Formal French
-prose translated to English in a 19th-c. translator's cadence —
-slightly stilted, very precise.
-**Biography:** Juge d'instruction, Palais de Justice. 51. Widower.
-Methodical to the point his colleagues imitate his diction to mock
-him (he is aware). Believes the law is a craft. Does not believe in
-criminal types; believes in circumstance.
+**Cluster proposal:**
 
-**Voice notes:**
-- Third-person formal for himself in official context (*the magistrate
-  observes*).
-- Long descriptive sentences with multiple semi-colons.
-- Legal Latin occasionally; briefly (never a full tag).
-- Every paragraph has one precise verb that carries it.
+- **Sor Juana Inés de la Cruz — *Respuesta a Sor Filotea*** and
+  selected poems (PD in English; Sor Juana d. 1695; earliest US-PD
+  translations from around 1920s — verify Rodríguez de la Cruz or
+  other early translator)
+- **Bernal Díaz del Castillo — *The True History of the Conquest
+  of New Spain*** (Maudslay 1908-16 translation, PD)
+- **Juan Ruiz de Alarcón — selected comedias** (English translations
+  where PD)
 
-**Notices first:** wax seals, handwriting, who entered the ledger of
-what at whose instruction, official documents
-**Theme chord:** E minor, harpsichord + oboe
-**One-line:** *"The seal on the letter is not the Baron's."*
+The persona is a Hieronymite nun-investigator writing under
+Inquisition pressure. Sor Juana's *Respuesta* is the voice anchor.
+**Cluster requires careful translator-PD verification before
+finalizing.** If Sor Juana translations are not comfortably PD in
+US, retire this slot.
+
+**Cluster ID:** `sor-juana-circle`
+**Status:** PROBATION — translator PD to be verified.
 
 ---
 
-## 08 · *Placer County*
+### 06 · 6am — *French Third Republic investigative journalism*
 
-**Detective:** Amos Doone
-**Era / Place:** California foothills, 1853
-**Register:** Gold-rush plain prose. King James cadence in serious
-moments, Bret Harte in lighter ones.
-**Biography:** Saloon-keeper in a camp 200 souls strong. Lost his
-left eye at Monterey (Mexican War) and wears a silk patch. Keeps
-a ledger of who pays and who owes. Investigates because he is the
-closest thing the camp has to a clerk, and because two men are dead
-in the creek and the sheriff won't be through until the first snow.
+**Cluster proposal:**
 
-**Voice notes:**
-- King James rhythm when pronouncing. ("And he was not there.")
-- Uses camp names instead of surnames.
-- Colloquial contractions. *Ain't*. *Wa'n't*.
-- Homely metaphors. *Quiet as a horse that knows you're lying.*
+- **Émile Gaboriau — *L'Affaire Lerouge*, *Monsieur Lecoq***
+  (Bourne translations, 1880s, PD)
+- **Guy de Maupassant — *The Horla* and stories** (Laurie / Colbron
+  translations early 20th century, PD)
+- **Émile Zola — *J'Accuse* and selected journalism** (1898, PD)
 
-**Notices first:** debts in his ledger, whose sluice was running
-when, firearms, who's drunk by noon, who's not
-**Theme chord:** A minor, banjo + jaw harp
-**One-line:** *"Two men in the creek at Placer Bend."*
+Three voices around Parisian investigation in the decade
+surrounding the Dreyfus Affair. Detective-fiction origin (Gaboriau) +
+uncanny psychology (Maupassant) + public-facing press campaign
+(Zola). Heavy synthesis demand.
+
+**Cluster ID:** `paris-third-republic`
 
 ---
 
-## 09 · *The Matron's Ward*
+### 07 · 7am — *Weimar Berlin press (to earliest PD)*
 
-**Detective:** Sister Imogen Wrenfield
-**Era / Place:** Flanders, 1917
-**Register:** WWI field-hospital matron. Mary Roberts Rinehart's
-nurse-detective register.
-**Biography:** 38. RN from Edinburgh, volunteered via the VAD. Served
-1914-present without rotation. Runs night ward at a Canadian casualty
-clearing station. Investigates because men are dying from wounds
-they came in from with different wounds than the ones they bear, and
-the orderlies are the only ones with the key to the medicine locker.
+**Cluster proposal:**
 
-**Voice notes:**
-- Clipped, professional. Surgeon's precision in description.
-- Never melodramatic. Death is a datum.
-- First-person plural for the ward (*we lost two on the second shift*).
-- Flanders names fall casually. *The Somme*. *Vimy*.
+- **Kurt Tucholsky — *Deutschland, Deutschland über alles***
+  (1929, PD in some jurisdictions; verify US status)
+- **Joseph Roth — early newspaper feuilletons** (1920s journalism,
+  selected pieces likely PD)
+- **Arthur Schnitzler — *Dream Story*** (1925 translation; Trautner
+  trans., verify PD) or *Lieutenant Gustl* (Wolff translation, PD
+  status check)
 
-**Notices first:** dressings changed at wrong intervals, morphine
-counts, whose charts are in whose handwriting, whose name is signed
-twice
-**Theme chord:** D-flat major, reedy harmonium
-**One-line:** *"Bed Seven came in with a gut wound. He died of pneumonia."*
+**Status:** PROBATION — Weimar-era translator and publication PD is
+fragile. If verification fails, retire or swap.
+
+**Cluster ID:** `weimar-press`
+**Status:** PROBATION.
 
 ---
 
-## 10 · *Congo Square*
+### 08 · 8am — *Gold rush Yukon*
 
-**Detective:** Mama Octavie Thibodeaux
-**Era / Place:** New Orleans, 1911
-**Register:** Louisiana French-English creole, lightly rendered. A
-healer investigating in the faubourgs.
-**Biography:** 60. Known at Congo Square and at the cathedral
-equally. Keeps a small house on Burgundy. Sells teas, advice,
-poultices. Consulted by neighbors (of every color and station) when
-the police cannot be trusted, which is most weeks. Investigates
-because there is a child missing and the child's mother came to her
-door.
+**Cluster proposal:**
 
-**Voice notes:**
-- Lightly French-inflected word order. (*The gate, it was open.*)
-- Religious syncretism — says *the Virgin* and *Legba* in the same
-  breath without fanfare.
-- Culinary metaphors — roux, simmer, fold.
-- Slow cadence; trusts silence.
+- **Jack London — *The Son of the Wolf*** (1900, PD)
+- **Jack London — *White Fang*** (1906, PD)
+- **Jack London — *The Call of the Wild*** (1903, PD)
+- **Robert W. Service — *Songs of a Sourdough* / *Ballads of a
+  Cheechako*** (1907-09, PD)
 
-**Notices first:** who is afraid and who is acting afraid, whose
-shoes, what's on the fire in someone else's kitchen, the weather
-above the river
-**Theme chord:** G minor, accordion + hand drum
-**One-line:** *"The Duplanier child hasn't come home."*
+Two voices — London's prose realism, Service's ballad verse —
+framing the same geography. Solid synthesis space.
+
+**Cluster ID:** `yukon-gold-rush`
 
 ---
 
-## 11 · *The Bund*
+### 09 · 9am — *Had-I-But-Known American domestic*
 
-**Detective:** Lieutenant Matilda Shaw
-**Era / Place:** Shanghai (International Settlement), 1934
-**Register:** Shanghai Municipal Police, concession-zone dry.
-**Biography:** 34. Auckland-born, served six years Hong Kong, two in
-Shanghai. Lieutenant in the SMP Special Branch. Has a Mandarin
-vocabulary that surprises her colleagues; a Russian vocabulary that
-would surprise them more. Lives alone in a flat in the French
-Concession where her neighbors are White Russian refugees. Has
-solved three murders the paper didn't report.
+**Cluster proposal:**
 
-**Voice notes:**
-- Reports in police-note cadence. Bullet facts, then narrative.
-- British spelling. *Colour, manoeuvre.*
-- Uses transliterated names without italics or markers.
-- Dry humor. Never overplays it.
+- **Mary Roberts Rinehart — *The Circular Staircase*** (1908, PD)
+- **Mary Roberts Rinehart — *The Man in Lower Ten*** (1909, PD)
+- **Anna Katharine Green — *The Leavenworth Case*** (1878, PD)
+- **Edith Wharton — *Afterward* and selected ghost stories*** (PD)
 
-**Notices first:** customs declarations, ship manifests, who's been
-to what hotel, currencies in the wrong pockets, languages spoken not
-by the speaker's face
-**Theme chord:** F-sharp minor, pipa + jazz clarinet
-**One-line:** *"A Russian in the godown with a customs form he should not have."*
+American domestic mystery from a female perspective across two
+generations (Green's 1878 to Rinehart's 1909, plus Wharton's
+darker register). Detective is a middle-class widow investigator.
+
+**Cluster ID:** `hibk-domestic`
 
 ---
 
-## Authoring targets per persona
+### 10 · 10am — *Raj-era Indian-English press (probation)*
 
-Per case, the author produces:
-- 1 biography block (~3 sentences)
-- 1 voice-notes block (~5 bullets)
-- 4 proximity-cues (one per position)
-- 1 theme-chord definition
-- ~80 retorts in-voice
-- ~10 rooms × ~3 clues each = ~30 clue-prose blocks
-- ~6 verdict prose blocks with card-comments
-- connection and claim texts
+**Cluster proposal:**
 
-That's a meaningful authoring effort per case (~150-200 pieces of
-prose) but it's self-contained; each case can be authored end-to-end
-without blocking any other. Beta = Harrison Drake only.
+- **Rudyard Kipling — *Kim*** (1901, PD) and selected journalism
+  (from the Civil & Military Gazette, PD)
+- **Rabindranath Tagore — selected short stories** (early
+  translations 1912-1916 onward, PD)
+- **Mohandas K. Gandhi — *Hind Swaraj*** (1909 in English, PD) or
+  selected early essays
+- (Optional) Contemporary 1920s Indian English press pieces (PD
+  status per piece)
+
+**Concern:** risk of producing a cluster that reads dominantly
+from the British colonial POV (Kipling) rather than the Indian
+perspective the persona requires. Cluster weighting must
+deliberately privilege Tagore and Gandhi voices to compensate.
+
+**Cluster ID:** `raj-indian-press`
+**Status:** PROBATION — requires careful weighting review.
+
+---
+
+### 11 · 11am — *Bierce / Bret Harte San Francisco*
+
+**Cluster proposal:**
+
+- **Ambrose Bierce — *The Devil's Dictionary*** (1911, PD)
+- **Ambrose Bierce — *Can Such Things Be?*** (1893, PD) and
+  *In the Midst of Life* (1898, PD)
+- **Bret Harte — *The Luck of Roaring Camp and Other Sketches***
+  (1870, PD)
+- **Mark Twain — selected SF / Sacramento journalism** (PD)
+
+The detective is a newspaper columnist investigating murders that
+pass as accidents in the boom-town. Bierce's dry-caustic register
+anchors; Harte and Twain provide the SF-1880s civic-flavor counter-
+weight.
+
+**Cluster ID:** `sf-bierce-harte`
+
+---
+
+## Cluster status legend
+
+| Status | Meaning |
+|---|---|
+| **READY** | Cluster manifest can be authored; sources confirmed PD; proceed to pipeline synthesis. |
+| **PROBATION** | One or more sources need PD verification or editorial review before cluster can be ratified. |
+| **RETIRED** | Cluster evaluated and dropped; slot open for re-proposal. |
+
+Current inventory: 8 READY, 3 PROBATION, 1 open (if Weimar or Raj
+or Sor Juana is retired we fill the slot with a re-proposal).
+
+---
+
+## The slot-retirement loop
+
+Slots do not ship until their cluster is READY. If a cluster turns
+out to be ungroundable (PD fails, or the synthesis brief reads
+thin), the slot is **retired with honesty**: the clock shows that
+case-card as permanently locked with a one-line note ("this hour's
+case could not be written with the voice it deserved; some hours do
+not belong to us"). That is better than shipping a case we cannot
+voice.
+
+Candidate replacement clusters (if slots open):
+
+- **Revolutionary-era Paris (1789-1794)** — Mercier's *Tableau de
+  Paris* (various PD translations), Mirabeau's speeches (PD), Mme.
+  Roland's memoirs (PD).
+- **Imperial Rome (Pliny + Tacitus cluster)** — Pliny's *Letters*
+  (Melmoth 1745, PD) + Tacitus's *Annals* (Church & Brodribb 1864,
+  PD) + Suetonius *Lives* (Rolfe 1914, PD).
+- **Venetian Renaissance (1500-1600)** — Aretino's *Letters* (some
+  PD translations), Cellini's *Autobiography* (Symonds 1888
+  translation, PD).
+- **Revolutionary-era New England (1780-1810)** — Mercy Otis
+  Warren's *History* (1805, PD), Charles Brockden Brown's
+  *Wieland* (1798, PD).
+
+These are held in reserve and not elevated to a slot until needed.
+
+---
+
+## One slot authored for beta
+
+The midnight slot (`la-noir-1929`) is authored for beta. The other
+eleven cards render locked on the landing with their cluster-title
+visible. A locked card's display label uses the cluster's `title`,
+not a detective's name (because no detective has been authored yet).
+
+Example landing card in beta state for hour 02:
+
+```
+~~~ 02 : 00 ~~~  ■
+ANTEBELLUM RATIOCINATION
+— cluster: Poe's Dupin trilogy
+— coming soon
+```
+
+When a persona is finalized for that cluster, the card's display
+switches to the detective's name + era + one-line.
+
+---
+
+## Pipeline handoff
+
+Once you sign off on which clusters proceed, I'll:
+
+1. Hand-author each cluster manifest under
+   `tools/brainstorm/clusters/`.
+2. Add the fetch list to `tools/brainstorm/corpus-manifest.json`.
+3. Land the pipeline implementation (fetch/normalize/cluster/
+   signature/embed/synthesize/check).
+4. Run the pipeline; review the resulting briefs; iterate on any
+   brief that reads thin.
+5. Select the midnight cluster's persona and author the first case
+   against its brief.
+
+Nothing else proceeds until the midnight brief reads well and the
+first case passes the sameness-check gate (§7 of
+`05-BRAINSTORM-PIPELINE.md`).

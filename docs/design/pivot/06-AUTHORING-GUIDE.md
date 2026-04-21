@@ -15,29 +15,40 @@ domain: creative
 
 ---
 
-## 1. Start with the voice, not the crime
+## 1. Start with the cluster, then the voice, then the crime
 
-A case is 90% a voice and 10% a puzzle. If you begin with the
-puzzle — a locked room, a poisoned glass, a stolen heirloom —
-you will end up with a Wikipedia summary of a mystery story. That
-is the wrong direction. Instead:
+A case is 90% a voice and 10% a puzzle. A voice is 90% **against** a
+source-cluster synthesis and 10% yours to contribute. Start where
+the work starts.
 
-1. Pick an hour. Any hour. The hour on the clock frames the
-   emotional temperature of the case.
-2. Pick a person who is awake at that hour. That person is the
-   detective. (For beta we have Midnight/Harrison Drake, but for
-   any other hour, the detective is yours to invent.)
-3. Write a single **paragraph of that person's interior monologue**
-   with nothing happening in it. No crime yet. Just them, in their
-   room, at that hour, noticing something.
-
-Here is the test: read the paragraph back without the clock around
-you. Can you tell what time of night it is? What year? What country?
-If yes, the voice is specific enough. If not, specify.
+1. **Read the cluster's synthesis brief** at
+   `authoring/briefs/<cluster-id>.md`. Read it slowly. Read the
+   seed passages. Answer the ten authorial questions. Keep it open
+   on your desk.
+2. **Read one source in the cluster end-to-end.** Not to mimic it —
+   to soak. Pick the source whose voice most surprises you.
+3. **Now pick a person who is awake at this hour** inside the
+   milieu the cluster names. That person is the detective.
+4. **Write a single paragraph of their interior monologue** with
+   nothing happening in it. No crime yet. Just them, in their
+   place, at that hour, noticing something.
+5. **Run `pnpm brainstorm check`** on that paragraph. It checks
+   your paragraph against the cluster's embedding space. Goal:
+   nearest cluster-sentence cosine distance ≥ 0.25. If your
+   paragraph fails (< 0.18), you wrote too close to one source;
+   revise. If it warns (0.18–0.25), consider revising. If it
+   passes, the synthesis is happening. You have a starting voice.
 
 This first paragraph is not part of the case file. It's the
 paragraph the author keeps on their desk. Every time a line of
-prose in the case is wrong, read this paragraph again.
+prose in the case is wrong, reread the brief, then reread this
+paragraph.
+
+**Read the test above strictly.** The sameness-check is not an
+ornament. A case whose prose lives within 0.18 of any one cluster
+source is a case that is paraphrasing, not synthesizing — and it
+will read to readers as a cheap imitation of its nearest source.
+The pipeline fails such prose on purpose. Revise until it passes.
 
 ---
 
@@ -312,20 +323,48 @@ Guidelines:
 
 ---
 
-## 10. The blind-read test
+## 10. The two gates before a case ships
 
-Before you consider a case finished, hand three paragraphs from it
-to a friend who has not played the game. Can they tell which
-detective wrote them? If yes, the voice is there. If no, you're
-writing in the default register of a Wikipedia mystery, and the
-case needs another pass.
+A case passes **both** gates or it does not ship.
 
-This test is mandatory. It is the gate before a case ships.
+### 10.1 Sameness-check gate (mechanical)
+
+```
+pnpm brainstorm check scene/cases/<your-case>.scene
+```
+
+Every authored prose block must score `CLEAN` (cosine distance
+≥ 0.25 to nearest cluster sentence). Warnings (0.18–0.25) require
+author judgment and must be acknowledged in the PR description.
+Failures (< 0.18) block the merge. No exceptions.
+
+### 10.2 Blind-read gate (human)
+
+Hand three paragraphs from the case to a reader who has not played
+the game. Ask which cluster they are from (or which era / milieu if
+they don't know your cluster). A reader who cannot tell they are
+from a *specific* voice — distinct, yours, not Wikipedia-generic —
+means the voice is not there and the case needs another pass.
+
+The blind-read is the harder of the two gates. A prose block can
+pass the sameness-check and still fail the blind-read (meaning:
+it is distinct from the cluster's sources but without a voice of
+its own). The sameness-check stops you paraphrasing; the blind-read
+demands that you invent.
+
+Both gates are mandatory.
 
 ---
 
 ## 11. Technical checklist before merging a case
 
+- [ ] Cluster manifest has passed the sign-off gate
+      ([05-BRAINSTORM-PIPELINE.md §7](./05-BRAINSTORM-PIPELINE.md)).
+- [ ] Synthesis brief for this cluster exists at
+      `authoring/briefs/<cluster-id>.md` and has been reread
+      during authoring.
+- [ ] `pnpm brainstorm check scene/cases/<case>.scene` passes with
+      zero failures. Warnings are acknowledged in the PR description.
 - [ ] `pnpm build-scene <path>` succeeds without linter warnings
       (or warnings are explicitly waived in the PR description).
 - [ ] The case has ≥ 6 verdicts, spread across at least 3 distinct
@@ -337,7 +376,8 @@ This test is mandatory. It is the gate before a case ships.
 - [ ] The `opens` room has an exit to somewhere, and every room is
       reachable from `opens` by some combination of choices.
 - [ ] Retort pool has at least 40 entries.
-- [ ] `blind-read` test has been performed with at least one human.
+- [ ] Blind-read test has been performed with at least one human
+      who has not read the cluster's source material.
 - [ ] Maestro smoke flow `walk-<case-id>.yaml` exists and passes
       against the built APK on a booted emulator.
 

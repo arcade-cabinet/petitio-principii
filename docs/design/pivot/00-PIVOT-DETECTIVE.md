@@ -235,12 +235,42 @@ The landing does change — see `02-LANDING.md`.
 
 ## 7. Scope
 
-- **Beta release:** 1 case fully authored (the Midnight case:
-  Harrison Drake, LA, 1946). 11 case cards visible on the landing as
-  locked / "coming soon." Full engine, full DSL parser, full build
-  pipeline, full authoring guide.
-- **1.0 release:** all 12 cases authored. Each independent. No
-  meta-arc; 12 is just how many hours are on a clock.
+- **Beta release:** 1 case fully authored for the Midnight slot
+  (cluster: hard-boiled noir 1929-1934, per
+  [04-PERSONAS.md](./04-PERSONAS.md)). 11 case cards visible on the
+  landing as locked / "coming soon." Full engine, full SCENE DSL
+  parser, full build pipeline, full authoring guide, full
+  per-cluster synthesis pipeline.
+- **1.0 release:** as many cases as pass the sameness-check gate
+  with voice we can honestly stand behind. 12 is the target; fewer
+  is acceptable if a cluster's synthesis brief reads thin. Each
+  case is independent. No meta-arc; 12 is just how many hours are
+  on a clock. Slots whose clusters don't ratify render locked with
+  a one-line "this hour could not be written with the voice it
+  deserved" note — honesty over completionism.
+
+## 7a. Ordering of the work
+
+The pivot's implementation order is:
+
+1. **Brainstorm pipeline first** — per-cluster synthesis is a
+   prerequisite for honest persona authoring
+   ([05-BRAINSTORM-PIPELINE.md](./05-BRAINSTORM-PIPELINE.md)).
+2. **Cluster manifests land** for all slots we intend to fill; each
+   passes the cluster-sign-off gate.
+3. **Midnight case authored** against its cluster's synthesis brief;
+   passes the sameness-check gate.
+4. **Engine / DSL parser / game.db builder** land in parallel with
+   step 3.
+5. **Landing overhaul** lands after the midnight case is playable.
+6. **Additional cases** authored one at a time, each gated on its
+   own cluster + sameness-check.
+
+Rationale: we cannot honestly finalize persona voices against
+sources we haven't synthesized. The pipeline produces the synthesis
+briefs that the personas are written against. Attempting to fix the
+persona cast before running the pipeline is guessing with the
+pipeline's clothes on.
 
 ## 8. Non-goals (stated so nothing creeps in)
 

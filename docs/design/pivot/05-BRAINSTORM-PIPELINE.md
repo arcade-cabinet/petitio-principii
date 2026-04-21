@@ -1,269 +1,411 @@
 ---
-title: Brainstorm Pipeline — Public-Domain Mystery Corpus → Inspiration Cards
+title: Brainstorm Pipeline — Per-Cluster Source Synthesis
 updated: 2026-04-21
 status: current
 domain: technical
 ---
 
-# Brainstorm Pipeline — Public-Domain Mystery Corpus → Inspiration Cards
+# Brainstorm Pipeline — Per-Cluster Source Synthesis
 
-> RiTa and Tracery move from runtime prose generators to **authoring-
-> time inspiration generators**. A one-shot build step scrapes a
-> curated list of public-domain mystery texts, runs them through
-> corpus-analysis to extract repeating shapes (detection moves, scene
-> transitions, dialogue tags, red-herring patterns, victim-archetypes),
-> and emits a pile of **seed cards** the author reads when stuck.
-
-No output of this pipeline is shipped to players. Nothing it produces
-appears at runtime. The pile lives under `authoring/brainstorm/` and
-is read by the author during case-writing.
-
----
-
-## 1. The corpus
-
-Starting list of public-domain sources (Project Gutenberg IDs where
-known). Goal: ~30 source texts across ~15 authors, spanning
-Victorian-through-Prohibition mystery fiction. All PD in the US.
-
-| Author | Works | Purpose |
-|---|---|---|
-| Arthur Conan Doyle | Holmes canon (PG 108, 244, 2097, 2852, 834, 1661) | Method-of-detection templates |
-| Edgar Allan Poe | Dupin trilogy, "The Gold-Bug" | Early ratiocination, mood |
-| Wilkie Collins | *The Moonstone*, *The Woman in White* | Multi-narrator, domestic |
-| Maurice Leblanc | Arsène Lupin (PG 6053 and others) | Antihero, con-games |
-| G. K. Chesterton | Father Brown | Moral-psychological deduction |
-| R. Austin Freeman | Thorndyke | Forensic procedure |
-| Jacques Futrelle | Thinking Machine | Problem-of-the-week shape |
-| Anna Katharine Green | *The Leavenworth Case*, *Behind Closed Doors* | American domestic mystery |
-| E. W. Hornung | Raffles | Antihero POV |
-| Baroness Orczy | *Old Man in the Corner* | Armchair detective frame |
-| Mary Roberts Rinehart | *The Circular Staircase*, *The Man in Lower Ten* | Female POV, HIBK |
-| Charles Dickens | *The Mystery of Edwin Drood* | Unfinished — suggestive gaps |
-| Sax Rohmer | Fu-Manchu (with caveats, see §1.1) | Atmospheric pulp |
-| Ambrose Bierce | *In the Midst of Life*, *Can Such Things Be?* | Dry caustic register |
-| Jack London | Yukon tales | Gold-rush register |
-| Anton Chekhov | *The Schoolmaster and Other Stories* | Provincial melancholy |
-
-### 1.1 Curation caveats
-
-- Rohmer, Doyle, and other era works contain period racist content.
-  The pipeline's **normalizer step** (§3) flags and excludes
-  passages that contain any of a blocklist of racial/ethnic slurs or
-  stereotyped dialect. The extracted seed cards must not carry that
-  language into the author's inspiration pile.
-- The author reading the pile can also mark any card `rejected`;
-  rejected cards are moved to `authoring/brainstorm/rejected/`
-  and never re-surfaced.
+> Each persona-to-be is grounded in a hand-curated **cluster** of 2-4
+> public-domain literary sources that share period, milieu, or
+> sensibility but differ enough that no single source dominates.
+> The pipeline does for each cluster what the author cannot do by
+> hand: extract style signatures, embed every sentence, emit a
+> **synthesis brief** the author writes against. The authored prose
+> is then checked back against the cluster's embedding space to
+> flag passages that paraphrase any single source. The pipeline
+> exists to ensure that the persona's voice is *ours*, produced by
+> synthesis, not mimicry.
 
 ---
 
-## 2. Fetch step
+## 1. Why cluster, not corpus
 
-```
-tools/brainstorm/fetch-corpus.ts
+The earlier version of this document framed the pipeline as a global
+inspiration pile: scrape many sources, emit many cards. That is the
+wrong tool for the pivot. Our problem is not lack of inspiration; it
+is voice-grounding for twelve distinct detective-personas across
+eras we can't all personally inhabit. A global pile retrieves nearest
+neighbors; a cluster retrieves *from inside the voice we're trying
+to write*.
 
-for each source in corpus-list.json:
-  gutenberg-fetch <pg-id> → raw/<author>/<work>.txt
-  strip PG header + license + front/back matter
-  normalize whitespace, curly quotes, em-dashes
-  → clean/<author>/<work>.txt
-```
-
-Sources are cached in `raw/`. Re-runs are idempotent. License files
-are preserved; the output never contains Gutenberg boilerplate but
-the attribution trail is kept in `corpus-manifest.json`.
-
----
-
-## 3. Normalize step
-
-```
-tools/brainstorm/normalize.ts
-
-for each clean/*:
-  split into sentences via RiTa.sentences()
-  for each sentence:
-    if contains any item in BLOCKLIST:
-      skip (log to blocked-count.json)
-    else:
-      append to sentences/<author>/<work>.jsonl
-      with {author, work, chapter, sentence-index, text}
-```
+Each persona gets its own cluster. Retrieval is cluster-scoped.
+Synthesis briefs are per-cluster. The global corpus stops being a
+retrieval target; it becomes a staging ground from which clusters
+are drawn.
 
 ---
 
-## 4. Extract step — five card flavors
+## 2. The ordering constraint (why this doc ships before persona finalization)
 
-```
-tools/brainstorm/extract.ts
+Pipeline-first, personas-after. The constraint is simple:
 
-for each sentence in sentences/**:
-  classify into one or more card flavors (§4.1-5)
-  for each match, emit a card stub into cards/<flavor>/
-```
+- The author cannot honestly finalize a persona against sources that
+  haven't been synthesized.
+- The pipeline's synthesis output *is* what the author writes against.
+- Therefore the pipeline must run before persona authoring — and
+  before we commit to the twelve.
 
-### 4.1 Detection-move cards
-
-Sentences that describe *an act of noticing*. Heuristic: contain
-verbs of observation (`noticed, observed, remarked, saw, perceived,
-marked, remarked upon`) and a concrete noun within 6 words.
-
-Card fields:
-```yaml
-flavor: detection-move
-source: doyle-study-in-scarlet/ch-3/s-142
-observation-verb: remarked
-object-of-observation: the chalk mark above the letter-rack
-persona-fit: [harrison-drake, matilda-shaw, sister-imogen]
-```
-
-### 4.2 Scene-transition cards
-
-Sentences that move the narrative from one location to another.
-Heuristic: verbs of motion + location noun, sentence-initial
-position.
-
-```yaml
-flavor: scene-transition
-source: leblanc-813/ch-7/s-9
-from: the anteroom
-to: the library
-device: "a door opened by a servant who did not know he was doing it"
-```
-
-### 4.3 Dialogue-tag cards
-
-Speaker-attribution fragments. Useful for persona voice calibration —
-each tag shows an era's idiom.
-
-```yaml
-flavor: dialogue-tag
-source: green-leavenworth/ch-9/s-44
-tag: "she said, smiling the smile of a woman who is already winning"
-era: 1880s
-persona-fit: [marguerite-bierce, armand-gaboriau]
-```
-
-### 4.4 Red-herring shapes
-
-Passages where an earlier suggestion turns out wrong. Hard to extract
-mechanically; heuristic: find consecutive chapter-pairs where an
-assertion in ch-N is contradicted in ch-M. Low-precision, high
-author-value. Accept false positives in this extractor.
-
-### 4.5 Victim / suspect / witness archetypes
-
-Named-entity spans with the longest surrounding description,
-clustered by role. Roles inferred from verbs used for them
-(victims get past-tense passive; suspects get present-tense active).
+`04-PERSONAS.md` now holds **source-cluster proposals**, not a
+finalized cast. A slot is finalized only after a cluster synthesis
+passes the gate in §7.
 
 ---
 
-## 5. Embed step
+## 3. Source-cluster curation
 
-```
-tools/brainstorm/embed.ts
+### 3.1 What a good cluster looks like
 
-for each card:
-  text = summary-of-the-card
-  embed with mxbai-embed-large (local Ollama)
-  write embedding to authoring.db (not game.db) → vec0 table
-```
+A cluster is 2-4 public-domain sources that:
 
-`authoring.db` is a separate SQLite lives in `authoring/` and is
-never shipped. It indexes all brainstorm cards + all authored case
-content (rooms, clues, retorts, claims) for **authoring-time
-retrieval**.
+1. **Share a bounded context.** Same century ± 30 years, same
+   cultural milieu, and/or same stated genre.
+2. **Diverge along an authorial axis.** Two first-person memoirs by
+   very different people, or a first-person diary paired with a
+   third-person novel of the same milieu. Enough divergence that
+   *no single source* can be mimicked without also excluding the
+   others.
+3. **Pass the PD test.** Every source in English (original or PD
+   translation) and US-PD at the date of the corpus manifest.
+4. **Have enough text to embed.** Minimum ~60,000 words combined,
+   sentence-segmentable. Less than this and the cluster's embedding
+   space is sparse and synthesis briefs come out thin.
 
-Authoring retrieval use cases:
-- "I'm writing the fire-escape clue. Give me 10 cards near its
-  context." → knn on card embeddings.
-- "This retort I just wrote is too close to an existing one." →
-  knn on current case's retorts to check for near-duplicates.
-- "Is this case's overall voice diverging from the persona's
-  voice-notes?" → center-of-mass comparison between the case's
-  prose and the persona's voice-notes block.
+### 3.2 Cluster curation is taste work
 
----
-
-## 6. Author-facing surfaces
-
-### 6.1 Markdown pile
-
-The primary surface is `authoring/brainstorm/` — a directory of
-per-flavor markdown files:
-
-```
-authoring/brainstorm/
-  detection-moves/
-    doyle/
-      study-in-scarlet.md   ← one card per section, in markdown
-    …
-  scene-transitions/
-  dialogue-tags/
-  red-herring-shapes/
-  archetypes/
-```
-
-An author flips through files when stuck. Random access via editor
-search. No UI required.
-
-### 6.2 CLI retrieval tool
-
-```
-pnpm brainstorm retrieve "a warm receiver, someone had been holding it"
-→ prints 10 nearest cards with source + flavor
-```
-
-Implemented as `tools/brainstorm/cli.ts`. Embeds the query via local
-Ollama, knn-searches `authoring.db`, prints cards.
-
-### 6.3 (1.0+) Inline editor plugin
-
-A VS Code extension that calls the CLI and shows results in a panel
-while the author edits a SCENE file. Out of scope for beta.
+The pipeline cannot pick clusters. Humans pick clusters. The cluster
+choices for the twelve slots are proposed in `04-PERSONAS.md` and
+the specifics of any given cluster are subject to revision as the
+pipeline runs and the synthesis brief reads back.
 
 ---
 
-## 7. Build artifacts
+## 4. Pipeline stages
 
-| Path | Purpose | Shipped? |
-|---|---|---|
-| `tools/brainstorm/raw/` | Cached fetched sources | No (in `.gitignore`) |
-| `tools/brainstorm/clean/` | Cleaned sources | No |
-| `tools/brainstorm/sentences/` | Sentence-split .jsonl | No |
-| `authoring/brainstorm/` | Human-readable markdown cards | **Yes, checked in** |
-| `authoring.db` | Vec-indexed authoring db | No (locally built) |
-| `authoring/brainstorm/rejected/` | Author-rejected cards | Yes |
+```
+tools/brainstorm/
+  fetch.ts            ← stage 1: fetch + cache PD sources
+  normalize.ts        ← stage 2: clean, strip PG headers, sentence-split
+  cluster.ts          ← stage 3: ingest cluster manifests → per-cluster corpora
+  signature.ts        ← stage 4: extract style signature per source + per cluster
+  embed.ts            ← stage 5: embed every sentence via local Ollama (mxbai-embed-large)
+  synthesize.ts       ← stage 6: emit per-cluster synthesis brief markdown
+  check.ts            ← stage 7: compare authored prose to cluster space; flag near-misses
+```
 
-Cards are checked in because (a) they're the authoring surface and
-(b) they're small text — the whole pile is <50 MB.
+### 4.1 Stage 1 — fetch
+
+Same as the prior doc. Gutenberg IDs + cached local copies under
+`tools/brainstorm/raw/`. Manifest at `tools/brainstorm/corpus-manifest.json`.
+
+### 4.2 Stage 2 — normalize
+
+Same as the prior doc. Strip PG headers/licenses, normalize
+whitespace and punctuation, sentence-split via RiTa, emit
+`tools/brainstorm/sentences/<author>/<work>.jsonl`.
+
+### 4.3 Stage 3 — cluster ingest
+
+```
+tools/brainstorm/clusters/
+  heian-court-women.cluster.json
+  la-noir-1940s.cluster.json
+  yukon-gold-rush.cluster.json
+  ...
+```
+
+Each cluster manifest:
+
+```json
+{
+  "id": "heian-court-women",
+  "slot_hour": null,
+  "title": "Heian Court Women's Prose",
+  "context": {
+    "period": "980-1020 CE",
+    "milieu": "imperial court, Heian-kyō",
+    "genre": "memoir / diary / novel"
+  },
+  "sources": [
+    {
+      "ref": "pillow-book-waley-1928",
+      "role": "primary",
+      "weight": 1.0
+    },
+    {
+      "ref": "tale-of-genji-waley-1925",
+      "role": "primary",
+      "weight": 0.9
+    },
+    {
+      "ref": "sarashina-diary-omori-doi-1920",
+      "role": "counterweight",
+      "weight": 0.6
+    }
+  ],
+  "exclude": [
+    "sections with explicit erotic content (author editorial choice for v1)"
+  ],
+  "notes": "Three voices, same century, same class, distinct temperaments."
+}
+```
+
+`clusters/*.cluster.json` files are hand-authored. The pipeline
+reads them; it does not generate them.
+
+### 4.4 Stage 4 — style signature extraction
+
+For each source AND for the cluster as a whole, compute:
+
+- **Sentence-length distribution** (p10, p50, p90, max).
+- **Vocabulary register**: Latinate % vs. Saxon %, type-token ratio.
+- **Modal verb frequency** — surrogate for certainty/uncertainty
+  register.
+- **Dialogue-to-narration ratio**.
+- **Sensory-channel mix**: visual / auditory / tactile / olfactory /
+  kinesthetic percentages (keyword-driven heuristic).
+- **POV prevalence**: 1st / 2nd / 3rd person percentages.
+- **Tense prevalence**: present / past / past-perfect / future-perfect.
+- **Signature bigrams / trigrams**: the phrases each source returns to.
+- **Motif inventory**: tagged re-occurring subjects (weather, letters,
+  lanterns, footprints, taxation …). Tag set is light-touch and
+  extensible; the synthesis brief is the real output.
+
+Output: `tools/brainstorm/signatures/<cluster-id>/signatures.json`
+
+### 4.5 Stage 5 — embed
+
+For each sentence in each cluster, embed with
+`mxbai-embed-large` via local Ollama (1024-dim). Cache hash-keyed by
+`sha256(sentence + model_id)` under
+`tools/brainstorm/embeddings-cache.json`. Store vectors into
+`authoring.db` per cluster table:
+
+```sql
+CREATE VIRTUAL TABLE cluster_sent_vec USING vec0(embedding float[1024]);
+CREATE TABLE cluster_sent_meta (
+  rowid      INTEGER PRIMARY KEY,
+  cluster_id TEXT NOT NULL,
+  source_ref TEXT NOT NULL,
+  sentence_idx INTEGER NOT NULL,
+  text       TEXT NOT NULL
+);
+```
+
+`authoring.db` is not shipped to players (reiterated from the prior
+version); it is a local tool database.
+
+### 4.6 Stage 6 — synthesize (emit the per-cluster brief)
+
+This is the new centerpiece. For each cluster, emit
+`authoring/briefs/<cluster-id>.md`:
+
+```markdown
+# Synthesis Brief — Heian Court Women's Prose
+
+## Context
+…period, milieu, sources cited with PD basis…
+
+## Shared Signature
+- Median sentence length: 19 words (p10=8, p90=38).
+- Vocabulary register: high Saxon/low Latinate (but note Waley's
+  Latinate inflection in his translation).
+- Sensory mix: visual 42% / auditory 18% / olfactory 9% / kinesthetic
+  22% / tactile 9%.
+- POV: 1st person dominates (72%).
+- Tense: present + past-perfect cohabit; habitual-past prevalent.
+- Signature bigrams shared across all sources: "it was the…",
+  "I remember…", "the moon of…", "nothing of his reply…".
+
+## Divergences
+- *Pillow Book* returns to small seasonal observations
+  ("beautiful things", "hateful things" — list-shaped entries).
+- *Genji* returns to letters delayed, misread, not sent.
+- *Sarashina* returns to dreams and disappointments.
+
+## What the synthesis permits that no single source does
+- You may write in list-shape, but with *Genji*'s stakes.
+- You may write a dream, but with *Pillow Book*'s dry cataloging.
+- You may write a failed letter-exchange, but with *Sarashina*'s
+  inwardness.
+
+## Forbidden registers
+- Direct paraphrase of any `signature bigram` above a frequency
+  threshold.
+- Any passage whose nearest-source-neighbor is < 0.15 cosine distance
+  — you are too close; revise.
+- Erotic content (author editorial choice; see cluster manifest).
+
+## Five seed passages for calibration
+… five short excerpts from across the sources, cited, as reading
+warm-up …
+
+## Ten authorial questions to ask yourself
+1. What is your detective doing when we first meet her? (Your
+   answer should not be "investigating." It should be a small task.
+   This is a cluster rule.)
+2. What season is it? (This cluster places season-reference in ~80%
+   of openings.)
+3. …
+```
+
+The brief is markdown, human-read. The author keeps it open while
+writing. The seed passages and authorial questions are generated
+from the cluster's own content, not invented by the pipeline.
+
+### 4.7 Stage 7 — sameness-check (the gate)
+
+Once the author has written a case (SCENE file), `check.ts` runs the
+author's prose against the cluster's embedding space:
+
+```
+pnpm brainstorm check scene/cases/02-a-cat-on-the-stairs.scene
+```
+
+For each authored prose block (room prose, clue prose, retort,
+verdict), it computes:
+
+1. Cosine distance to the nearest sentence in the cluster.
+2. If `< 0.18` (very close): **fails**, with a diff showing the
+   cluster sentence the block is shadowing. Author revises.
+3. If `0.18 ≤ x < 0.25`: **warns**. Borderline. Author decides.
+4. If `≥ 0.25`: clean. Written against the synthesis, not any one
+   source.
+
+This is the gate the case must pass before it merges.
+
+Thresholds are tunable per cluster; start values above.
 
 ---
 
-## 8. One-time vs continuous
+## 5. Author-facing surfaces
 
-- **Fetch + clean + normalize + extract** is one-time per corpus
-  addition. Running it again just re-populates stable card files.
-- **Embed** is one-time per card or when the embedding model
-  changes. Cache keyed by `sha256(card-text)`.
-- **Retrieve** (CLI) is on-demand per author query.
+### 5.1 The brief
 
-There is no daily / scheduled brainstorm run. Once the pile exists,
-it is the pile.
+`authoring/briefs/<cluster-id>.md` is the primary surface. Authors
+open it in their editor, leave it open, write the case against it.
+
+### 5.2 CLI retrieval
+
+```
+pnpm brainstorm query --cluster heian-court-women "a forged poem exchange"
+→ prints 10 nearest passages from the cluster sources only
+  with {source, sentence-idx, text, cosine-distance}
+```
+
+### 5.3 CLI sameness-check
+
+```
+pnpm brainstorm check scene/cases/02-a-cat-on-the-stairs.scene
+→ per-prose-block report, with FAIL/WARN/CLEAN status
+```
+
+### 5.4 (1.0+) editor plugin
+
+A VS Code / Zed language client that calls `query` and `check`
+inline while editing a SCENE file. Out of scope for beta.
 
 ---
 
-## 9. License safety
+## 6. Directory layout
 
-All sources in §1 are PD in the US as of the corpus date. The
-manifest records for each source:
-- Gutenberg ID
-- US PD basis (year of author death, year of first publication)
-- Included works
-- Excluded works (if any, with reason)
+```
+tools/brainstorm/
+  fetch.ts
+  normalize.ts
+  cluster.ts
+  signature.ts
+  embed.ts
+  synthesize.ts
+  check.ts
+  cli.ts                              ← pnpm brainstorm {…} entry
+  raw/                                ← .gitignore'd
+  clean/                              ← .gitignore'd
+  sentences/                          ← .gitignore'd
+  signatures/                         ← checked in (small, informative)
+  embeddings-cache.json               ← checked in
+  clusters/*.cluster.json             ← checked in, hand-authored
+  corpus-manifest.json                ← checked in
+authoring/
+  briefs/<cluster-id>.md              ← checked in, generated
+  retrieval-logs/                     ← optional; author-kept notes
+```
 
-If a new source is added that is only PD in some jurisdictions,
-it is tagged accordingly and not bundled into `authoring/brainstorm/`
-unless explicitly approved.
+---
+
+## 7. The cluster-sign-off gate
+
+A cluster is "ready" to receive a persona when:
+
+- [ ] Manifest exists and passes `cluster.ts` validation.
+- [ ] All sources fetched, cleaned, normalized.
+- [ ] Signatures extracted and emitted.
+- [ ] Embedded; `authoring.db` populated.
+- [ ] Synthesis brief emitted and read by at least one author.
+- [ ] At least one retrieval query run against the cluster; results
+      look well-scoped.
+- [ ] The brief's "What the synthesis permits…" section contains at
+      least 3 genuine authorial permissions (not platitudes).
+
+Without that checklist cleared, the cluster is not finalized and no
+case targeting it may be authored.
+
+---
+
+## 8. Relationship to `game.db`
+
+`authoring.db` and `game.db` are separate databases with separate
+schemas and separate lifecycles:
+
+- `authoring.db` holds cluster content, cluster embeddings, author-
+  facing retrieval indices. Not shipped. Local-only.
+- `game.db` holds case content, runtime-ready embeddings, progress.
+  Shipped to players.
+
+Nothing from the brainstorm pipeline reaches the player's game.db
+unless the author has written it into a SCENE file and it has passed
+the sameness-check gate.
+
+---
+
+## 9. License discipline
+
+The corpus manifest records for each source:
+- Gutenberg ID (or other PD source).
+- US-PD basis (year of author death, year of first publication,
+  translator death-year for translated texts — critical for
+  older-English translations like Waley and Giles).
+- Included works (and excluded works with reason).
+
+If a proposed source turns out to not be PD in the US at the date of
+the manifest, the cluster is revised before the source is used. The
+pipeline refuses to fetch sources not listed as US-PD in the manifest.
+
+The brainstorm pile itself (the briefs, the retrieval outputs, the
+check reports) is original authorial work product. Nothing
+verbatim-copied from a source ever appears in a brief; signatures
+and briefs synthesize.
+
+---
+
+## 10. One-time vs continuous
+
+- **Fetch + normalize + cluster-ingest + signature + embed + synthesize**
+  is one-time per cluster. Running it again is idempotent.
+- **Query** is on-demand per author query.
+- **Check** runs as part of every case PR; CI task wiring is a
+  simple `pnpm brainstorm check <path>`.
+
+There is no daily scheduled brainstorm run.
+
+---
+
+## 11. What the pipeline explicitly does NOT do
+
+- It does **not** write prose for the author. No LLM generation.
+  Retrieval only.
+- It does **not** pick clusters. Humans pick.
+- It does **not** ship anything to the player's browser or device.
+- It does **not** cache anything about the author's prose outside
+  the repo.
