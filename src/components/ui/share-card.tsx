@@ -17,7 +17,6 @@
 import type { ArgumentMapNode } from "@/components/ui/argument-map";
 import type { RhetoricalType } from "@/content";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 
 // ── canvas dimensions ────────────────────────────────────────────────────────
 const CARD_W = 1200;
@@ -207,7 +206,6 @@ export function ShareCard({
   phrase,
   turnCount,
 }: ShareCardProps) {
-  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "done" | "error">("idle");
   const [dataURL, setDataURL] = useState<string | null>(null);
@@ -234,11 +232,7 @@ export function ShareCard({
         const file = new File([blob], `petitio-${seed}.png`, { type: "image/png" });
         const shareData: ShareData = {
           title: "Petitio Principii",
-          text: t("share_card.share_message", {
-            defaultValue: `I closed the argument "${phrase}" in ${turnCount} turn${turnCount === 1 ? "" : "s"}.`,
-            phrase,
-            turnCount,
-          }),
+          text: `I closed the argument "${phrase}" in ${turnCount} turn${turnCount === 1 ? "" : "s"}.`,
           url: `${window.location.origin}${window.location.pathname}?seed=${seed}`,
         };
         if (navigator.canShare?.({ files: [file] })) {
@@ -264,7 +258,7 @@ export function ShareCard({
         setTimeout(() => setShareStatus("idle"), 3000);
       }
     }
-  }, [dataURL, seed, phrase, turnCount, t]);
+  }, [dataURL, seed, phrase, turnCount]);
 
   return (
     <div className="mt-4 flex flex-col items-center gap-3">
@@ -275,7 +269,7 @@ export function ShareCard({
       {dataURL && (
         <img
           src={dataURL}
-          alt={t("share_card.alt", { seed, phrase, turns: turnCount })}
+          alt={`Argument map for seed ${seed}: ${phrase}. ${turnCount} turns.`}
           className="w-full max-w-[480px] rounded-[4px] border border-[var(--color-panel-edge)] opacity-90"
           style={{ aspectRatio: "1200/630" }}
         />
@@ -286,7 +280,7 @@ export function ShareCard({
         type="button"
         onClick={handleShare}
         disabled={!dataURL || shareStatus === "sharing"}
-        aria-label={t("share_card.share")}
+        aria-label="Share your argument"
         className={`
           min-h-[44px] px-8 rounded-[5px]
           border border-[var(--color-violet)]
@@ -303,12 +297,12 @@ export function ShareCard({
         `}
       >
         {shareStatus === "sharing"
-          ? t("share_card.sharing")
+          ? "Sharing…"
           : shareStatus === "done"
-            ? t("share_card.shared")
+            ? "Shared!"
             : shareStatus === "error"
-              ? t("share_card.error")
-              : t("share_card.share")}
+              ? "Share failed"
+              : "Share your argument"}
       </button>
     </div>
   );

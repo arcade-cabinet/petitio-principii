@@ -104,7 +104,18 @@ export function useGame(): GameHandle {
 
   const startGame = useCallback(
     async (seed: number) => {
+      // CRITICAL — mobile audio: unlock the AudioContext FIRST, while we are
+      // still inside the synchronous user-gesture call stack from the Begin
+      // button. iOS Safari and Android Chrome refuse to start audio if any
+      // async work intervenes between the gesture and the first play() call.
+      // Then queue the BGM start IMMEDIATELY (also synchronous), before the
+      // expensive graph-generation and world-install work below. The fade-in
+      // means a brief silence is fine; the play() call itself must happen
+      // inside the gesture window.
+      audio.unlock();
       audio.stopBgm();
+      audio.playBgm();
+
       seedRef.current = seed;
       // Re-arm the Triumphant-haptic latch for the new game.
       triumphantFiredRef.current = false;
@@ -120,7 +131,6 @@ export function useGame(): GameHandle {
       const startRoom = graph.rooms.get(graph.startRoomId);
 
       world.install(graph);
-      audio.playBgm();
       if (startRoom) audio.playSfx(sfxForRhetoricalType(startRoom.rhetoricalType));
 
       // The seed + phrase used to print here as narration; the player

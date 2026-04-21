@@ -1,33 +1,17 @@
 /**
- * AppearanceControls — landing-screen settings for T85 + T86.
+ * AppearanceControls — landing-screen settings.
  *
- * T85: dyslexia-friendly font toggle (VT323 → OpenDyslexic)
- * T86: text-size step control (Small / Medium / Large)
- *
- * Rendered as a compact footer bar on the landing panel.
- * The incantation font (Yesteryear) is never affected.
- *
- * T82: labels go through i18next so they render in the active locale.
+ * Dyslexia-friendly font toggle (VT323 → OpenDyslexic) and a text-size
+ * step control (Small / Medium / Large). Rendered as a compact footer
+ * bar on the landing panel. The incantation font (Yesteryear) is never
+ * affected.
  */
 import type { AppearanceHandle, TextSize } from "@/hooks/use-appearance";
-import { useTranslation } from "react-i18next";
 
-const TEXT_SIZES: { labelKey: string; ariaKey: string; value: TextSize }[] = [
-  {
-    labelKey: "settings.text_size_small",
-    ariaKey: "settings.text_size_small_aria",
-    value: "small",
-  },
-  {
-    labelKey: "settings.text_size_medium",
-    ariaKey: "settings.text_size_medium_aria",
-    value: "medium",
-  },
-  {
-    labelKey: "settings.text_size_large",
-    ariaKey: "settings.text_size_large_aria",
-    value: "large",
-  },
+const TEXT_SIZES: { label: string; aria: string; value: TextSize }[] = [
+  { label: "S", aria: "Text size small", value: "small" },
+  { label: "M", aria: "Text size medium", value: "medium" },
+  { label: "L", aria: "Text size large", value: "large" },
 ];
 
 interface AppearanceControlsProps {
@@ -36,19 +20,17 @@ interface AppearanceControlsProps {
 
 export function AppearanceControls({ appearance }: AppearanceControlsProps) {
   const { dyslexia, textSize, toggleDyslexia, setTextSize } = appearance;
-  const { t } = useTranslation();
 
   return (
     <div
       className="mt-6 flex items-center justify-between gap-4 border-t border-[var(--color-panel-edge)] pt-4"
-      aria-label={t("settings.display_settings_label")}
+      aria-label="Display settings"
     >
-      {/* T85 — Dyslexia font toggle */}
       <button
         type="button"
         role="switch"
         aria-checked={dyslexia}
-        aria-label={t("settings.dyslexic_font_aria")}
+        aria-label="Toggle dyslexia-friendly font"
         onClick={toggleDyslexia}
         className={`
           flex items-center gap-2
@@ -65,20 +47,16 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
           `}
           aria-hidden="true"
         />
-        {t("settings.dyslexic_font")}
+        Dyslexic Font
       </button>
 
-      {/* T86 — Text size stepper */}
-      <fieldset
-        className="flex items-center gap-1 border-0 m-0 p-0"
-        aria-label={t("settings.text_size_label")}
-      >
-        {TEXT_SIZES.map(({ labelKey, ariaKey, value }) => (
+      <fieldset className="flex items-center gap-1 border-0 m-0 p-0" aria-label="Text size">
+        {TEXT_SIZES.map(({ label, aria, value }) => (
           <button
             key={value}
             type="button"
             aria-pressed={textSize === value}
-            aria-label={t(ariaKey)}
+            aria-label={aria}
             onClick={() => setTextSize(value)}
             className={`
               min-h-[28px] min-w-[28px] rounded-[3px]
@@ -92,7 +70,7 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
               }
             `}
           >
-            {t(labelKey)}
+            {label}
           </button>
         ))}
       </fieldset>

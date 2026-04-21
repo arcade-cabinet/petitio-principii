@@ -1,8 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@/design/globals.css";
-// T82 — initialise i18next before React mounts so useTranslation is ready.
-import "@/lib/i18n";
 import * as mobile from "@/lib/mobile";
 import { App } from "./App";
 

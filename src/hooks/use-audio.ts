@@ -1,5 +1,5 @@
 import { BGM_MANIFEST, type BgmKey, SFX_MANIFEST, type SfxKey } from "@/lib/audio-manifest";
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 import { useCallback, useEffect, useRef } from "react";
 
 /**
@@ -21,6 +21,23 @@ import { useCallback, useEffect, useRef } from "react";
 const sfxCache = new Map<SfxKey, Howl>();
 let bgmInstance: Howl | null = null;
 let bgmKeyLoaded: BgmKey | null = null;
+let audioUnlocked = false;
+
+/**
+ * Mobile browsers (iOS Safari, Android Chrome) suspend the AudioContext
+ * until a synchronous user gesture explicitly resumes it. Howler's
+ * autoUnlock helps but doesn't fire reliably when the first audio call
+ * is queued behind async work. Call this from a click/touch handler
+ * BEFORE any audio play to guarantee the context is alive.
+ */
+function unlockAudio(): void {
+  if (audioUnlocked) return;
+  const ctx = Howler.ctx;
+  if (ctx && ctx.state === "suspended") {
+    void ctx.resume();
+  }
+  audioUnlocked = true;
+}
 
 function getSfx(key: SfxKey): Howl {
   const cached = sfxCache.get(key);
@@ -28,7 +45,11 @@ function getSfx(key: SfxKey): Howl {
   const howl = new Howl({
     src: [SFX_MANIFEST[key]],
     preload: true,
-    html5: false,
+    // html5:true forces HTML <audio> playback. Web Audio (html5:false)
+    // is faster but on iOS it stays suspended unless every play call is
+    // a direct user-gesture continuation. HTML <audio> survives async
+    // boundaries and is the more reliable mobile path.
+    html5: true,
     volume: 0.7,
   });
   sfxCache.set(key, howl);
@@ -64,6 +85,14 @@ export interface AudioBus {
   toggleMute: () => boolean;
   /** Current mute state. */
   isMuted: () => boolean;
+  /**
+   * Resume the AudioContext from a synchronous user-gesture handler.
+   * Mobile browsers (iOS Safari, Android Chrome) keep the AudioContext
+   * suspended until this is called from inside a click/touch event. The
+   * landing-screen Begin button calls this BEFORE any async work so the
+   * subsequent BGM/SFX plays survive the async startGame chain.
+   */
+  unlock: () => void;
 }
 
 export function useAudio(): AudioBus {
@@ -83,13 +112,17 @@ export function useAudio(): AudioBus {
 
   const playSfx = useCallback((key: SfxKey) => {
     if (mutedRef.current) return;
+    unlockAudio();
     const howl = getSfx(key);
-    // Howler auto-dequeues to a pool; explicit .play() plays a new voice.
     howl.play();
   }, []);
 
   const playBgm = useCallback((key: BgmKey = "bgm.main") => {
-    if (mutedRef.current) return;
+    unlockAudio();
+    // Create the Howl unconditionally — even when muted — so a later
+    // unmute has something to resume. Without this, a player who starts
+    // a fresh session muted would never get music back when toggling
+    // unmute (the toggle has nothing to .play() on a null instance).
     if (!bgmInstance || bgmKeyLoaded !== key) {
       bgmInstance?.stop();
       bgmInstance = new Howl({
@@ -100,6 +133,7 @@ export function useAudio(): AudioBus {
       });
       bgmKeyLoaded = key;
     }
+    if (mutedRef.current) return;
     if (!bgmInstance.playing()) {
       bgmInstance.play();
       bgmInstance.fade(0, 0.4, 2000);
@@ -117,13 +151,21 @@ export function useAudio(): AudioBus {
     writeMutedPref(mutedRef.current);
     if (mutedRef.current) {
       bgmInstance?.pause();
-    } else {
-      bgmInstance?.play();
+    } else if (bgmInstance) {
+      // Resume from pause OR start fresh if BGM was never .play()'d
+      // (e.g., the session began muted and `playBgm` was a no-op past
+      // the early-return until the recent fix).
+      if (!bgmInstance.playing()) {
+        bgmInstance.play();
+        bgmInstance.fade(0, 0.4, 2000);
+      }
     }
     return mutedRef.current;
   }, []);
 
   const isMuted = useCallback(() => mutedRef.current, []);
 
-  return { playSfx, playBgm, stopBgm, toggleMute, isMuted };
+  const unlock = useCallback(() => unlockAudio(), []);
+
+  return { playSfx, playBgm, stopBgm, toggleMute, isMuted, unlock };
 }

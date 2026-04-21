@@ -1,11 +1,9 @@
-import { ConsentBanner } from "@/components/ui/consent-banner";
 import { CrystalField } from "@/components/ui/crystal-field";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { useGame } from "@/hooks/use-game";
 import { registerBackHandler } from "@/lib/mobile";
-import { initTelemetry, trackCircleClosed } from "@/lib/telemetry";
 import { isCircleClosed } from "@/world";
-import { Suspense, lazy, useEffect, useMemo, useRef } from "react";
+import { Suspense, lazy, useEffect, useMemo } from "react";
 
 // Lazy-load the in-game surface. TerminalDisplay is only shown once the
 // player clicks "Begin Argument" — keeping it out of the initial bundle
@@ -22,9 +20,6 @@ const TerminalDisplay = lazy(() =>
 const ShareCard = lazy(() =>
   import("@/components/ui/share-card").then((m) => ({ default: m.ShareCard }))
 );
-
-// T81 — initialise telemetry once on app boot (reads consent from localStorage).
-initTelemetry();
 
 /**
  * Suspense fallback for the landing→game transition. On a fast connection
@@ -58,7 +53,6 @@ function TerminalLoadingPill() {
  * card sitting directly on the nebula backdrop. The player presses
  * keys; nobody types. See docs/LORE.md.
  *
- * T81: Opt-in analytics via Plausible — consent banner on first launch.
  * T93: When the circle closes, a ShareCard overlay appears.
  *
  * Android back-button behaviour (T75):
@@ -81,19 +75,6 @@ export function App() {
     [game.world, game.state.transcript.length, game.state.currentRoomId]
   );
 
-  // T81 — fire circle_closed telemetry event once when the circle closes.
-  const circleTrackedRef = useRef(false);
-  useEffect(() => {
-    if (circleClosed && !circleTrackedRef.current) {
-      circleTrackedRef.current = true;
-      trackCircleClosed(game.state.seed, game.state.turnCount);
-    }
-    // Reset tracker when a new game starts.
-    if (!game.state.started) {
-      circleTrackedRef.current = false;
-    }
-  }, [circleClosed, game.state.started, game.state.seed, game.state.turnCount]);
-
   // Register the Android hardware back-button handler.
   // When the game is active, back → requestNewGame (return to landing).
   // When on the landing screen, pass null so the OS default applies
@@ -113,7 +94,7 @@ export function App() {
             <TerminalDisplay
               state={game.state}
               world={game.world}
-              onMove={game.submitMove}
+              onCommand={game.submitCommand}
               onNewGame={game.requestNewGame}
               onHintDismiss={game.dismissHint}
             />
@@ -142,9 +123,6 @@ export function App() {
           <NewGameIncantation onBegin={game.startGame} />
         )}
       </main>
-
-      {/* T81 — analytics consent banner (first launch only, defaults OFF) */}
-      <ConsentBanner />
     </div>
   );
 }
