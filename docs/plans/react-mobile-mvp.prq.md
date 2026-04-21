@@ -256,6 +256,17 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 
 - [ ] **T109** **Two hand-crafted worlds woven by seed — the foundational map model.** The current architecture is 100% PRNG: surrealist fragments + Tracery grammars generate every piece of prose per seed. This gives infinite variety but nothing anchors: no landmark a second player would recognize, no "remember when you walked through…", no load-bearing hand-authored story structure. Adventure and Zork work because someone *designed* their worlds — every room a deliberate choice, every dead-end a considered trap.
 
+    **This is a design undertaking, separated from other engineering work.** Worlds are the substance of the game; everything else (clock UI, chord input, audio, Capacitor, CI, platforms) is scaffolding that serves them. Rushing authored content into code is the wrong move. T109 runs as its own track, untimed, in this sequence:
+
+    1. **Macro design** (`docs/design/WORLDS-macro.md`) — the concept for A and B, voice guidelines, thematic pairing rationale, end-state definition.
+    2. **Meso design** (`docs/design/WORLDS-meso.md`) — regions within each world, puzzle-group placements (T110 blueprint), connection-node table, gnome ecology, pacing density curves.
+    3. **Micro design** (`docs/design/WORLDS-micro.md`) — authoring guide with 3-4 fully-designed sample rooms as models; reveals the exact shape authored room files will take.
+    4. **Schema + loader** — Zod schema fitted to the micro-level shape; JSON-per-room under `src/content/worlds/<world>/<room>.json`; build-time validator in `pnpm verify`; generated artifact (`src/content/worlds/generated/worlds.json`) emitted during the corpus build; thin `.ts` accessor consistent with `grammars.json` / `corpus.json`.
+    5. **Authoring** — ~40 rooms per world. Multiple passes, reviewed, revised. Each world ships only when it is playable standalone via `?world=<id>` and reads as designed.
+    6. **Weaver** — `WorldWeaver.ts` with T110 puzzle-group support, written *against finished worlds*, not before. Puts the braid together deterministically from the seed.
+
+    Clock/chord/UI work (T97-T103) and platform tasks (T72-T78) can run in parallel; they don't touch the worlds. Everything narrative-adjacent (T104-T108) is subordinate to or subsumed by T109 once authored worlds exist.
+
     **New model: two fully-authored worlds, combined per seed by weaving.**
 
     - **World A** — fully hand-crafted. ~40 rooms with a coherent identity (working title: *The Subterranean Library* — library basement / archive / cellar catacombs, the argument made as an underground descent). Edges hand-placed. Gnomes hand-placed. Prose hand-written, including the connective "you move north" lines, the dead-end responses, the examine bodies. False starts and backtracking designed as playable content. An attentive solo playthrough of World A alone takes hours.
