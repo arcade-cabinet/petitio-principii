@@ -29,8 +29,13 @@ import { useEffect, useRef, useState } from "react";
  * Duration in milliseconds of the melt-away transition. Exported so the
  * landing-screen `handleBegin` can wait the right amount before mounting
  * the in-game terminal (callers shouldn't hardcode the number twice).
+ *
+ * Bumped to 1800ms for the fluidic-blob melt — the earlier 1400ms was
+ * tuned for an opacity-fade-with-downward-slide that landed flat. The
+ * turbulence-displaced melt needs the extra time to fully liquefy
+ * before the scene changes.
  */
-export const HERO_CLOCK_MELT_MS = 1400;
+export const HERO_CLOCK_MELT_MS = 1800;
 
 /** Reduced-motion variant: shorter opacity fade only. */
 export const HERO_CLOCK_MELT_REDUCED_MS = 600;
@@ -293,7 +298,48 @@ export function HeroClock({
         <filter id="hc-hand-shadow" x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#000" floodOpacity="0.7" />
         </filter>
+
+        {/* ── Fluidic melt filter ── (applied only when melting=true)
+             Dalí soft-clock dissolve: feTurbulence generates a noise
+             field; feDisplacementMap warps the SVG paths along that
+             field. Both baseFrequency and scale animate from 0 to
+             their full amplitude over the 1.8s melt duration so the
+             clock appears to liquefy progressively rather than snap-
+             distort. The wider region around the SVG (-50% to 200%)
+             accommodates the geometry once it bulges past its
+             original bounding box. */}
+        <filter id="hc-melt-filter" x="-50%" y="-50%" width="200%" height="200%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.02"
+            numOctaves="2"
+            seed="3"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.005;0.02;0.06;0.1"
+              keyTimes="0;0.3;0.7;1"
+              dur={`${HERO_CLOCK_MELT_MS}ms`}
+              fill="freeze"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="0">
+            <animate
+              attributeName="scale"
+              values="0;6;28;80"
+              keyTimes="0;0.25;0.6;1"
+              dur={`${HERO_CLOCK_MELT_MS}ms`}
+              fill="freeze"
+            />
+          </feDisplacementMap>
+        </filter>
       </defs>
+
+      {/* All clock content gets wrapped in a single <g> so the melt
+          filter (when active) warps everything as one fluid mass.
+          Reduced-motion users skip the filter entirely. */}
+      <g filter={melting && !reducedMotion ? "url(#hc-melt-filter)" : undefined}>
 
       {/* ── Hung-from-the-ceiling bracket ── */}
       {/* A simple silver bar from the top of the SVG down to the pediment. */}
@@ -618,6 +664,66 @@ export function HeroClock({
 
       {/* ── Convex crystal sheen — last so it sits ON TOP of dial+hands ── */}
       <circle cx={CX} cy={CY} r={DIAL_R} fill="url(#hc-crystal)" pointerEvents="none" />
+
+      </g>{/* close melt-wrap group */}
+
+      {/* ── Falling droplets — three small wax beads detach during the
+           melt and fall to the bottom of the SVG with a cubic gravity
+           arc, suggesting the clock losing material. Only rendered
+           when melting=true && !reducedMotion. */}
+      {melting && !reducedMotion && (
+        <g>
+          {[
+            { x: CX - 30, delay: 0.35, drift: -8 },
+            { x: CX + 12, delay: 0.55, drift: 4 },
+            { x: CX + 35, delay: 0.7, drift: 12 },
+          ].map(({ x, delay, drift }) => (
+            <circle
+              key={`droplet-${x}`}
+              cx={x}
+              cy={CY + DIAL_R - 8}
+              r="6"
+              fill="url(#hc-bezel)"
+              opacity="0"
+            >
+              <animate
+                attributeName="opacity"
+                values="0;0.85;0.7;0"
+                keyTimes="0;0.2;0.7;1"
+                begin={`${delay}s`}
+                dur={`${(HERO_CLOCK_MELT_MS - delay * 1000) / 1000}s`}
+                fill="freeze"
+              />
+              <animate
+                attributeName="cy"
+                values={`${CY + DIAL_R - 8};${VB - 20}`}
+                keyTimes="0;1"
+                begin={`${delay}s`}
+                dur={`${(HERO_CLOCK_MELT_MS - delay * 1000) / 1000}s`}
+                fill="freeze"
+                calcMode="spline"
+                keySplines="0.5 0 1 0.5"
+              />
+              <animate
+                attributeName="cx"
+                values={`${x};${x + drift}`}
+                keyTimes="0;1"
+                begin={`${delay}s`}
+                dur={`${(HERO_CLOCK_MELT_MS - delay * 1000) / 1000}s`}
+                fill="freeze"
+              />
+              <animate
+                attributeName="r"
+                values="6;9;7;3"
+                keyTimes="0;0.3;0.6;1"
+                begin={`${delay}s`}
+                dur={`${(HERO_CLOCK_MELT_MS - delay * 1000) / 1000}s`}
+                fill="freeze"
+              />
+            </circle>
+          ))}
+        </g>
+      )}
     </motion.svg>
   );
 }
