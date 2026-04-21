@@ -50,125 +50,20 @@ honest about what's already in main.
 - **T37** CI APK job in `.github/workflows/ci.yml` (commit `93a5083`).
 - **Config split** — tunables live in `src/config/{game,rhetoric}.json` with a single typed `@/config` barrel; `RHETORICAL_FREQUENCIES` and `RHETORICAL_COST` Records retired (commit `5d56695`).
 
-## Act II — remaining work
+## Act II — shipped summary
 
-Everything below is new or reframed from the original T-series. Numbers
-continue (T41+) so referencing earlier commits still works.
-
-### P11 — Grammar pipeline (RiTa + Tracery actually running the show)
-
-The goal: every piece of generated text in the runtime expands from a
-Tracery grammar fed by RiTa's POS tags, driven by a **single seeded rng**
-that determinism can be proved for.
-
-- [ ] **T41** Verify `tracery-grammar` v2.8.4 responds to `tracery.setRng(fn)`. Confirmed API present at `node_modules/tracery-grammar/tracery.js:864`. Write a `src/lib/seeded-tracery.ts` thin wrapper:
-    - `withSeededRng(rng, fn)` — sets the process-global rng, runs `fn`, restores prior rng. Synchronous; no async inside.
-    - Guards against reentrancy (push/pop a stack if needed so nested flattens don't unseat each other).
-    - Unit test: 1000 runs with same seed → identical output; different seeds → ≥ 95% unique. **Verify**: `pnpm test` green; `grep "Math.random" src/content` shows zero hits outside of seeded-tracery.
-- [ ] **T42** Emit grammars as JSON from the build pipeline.
-    - `scripts/sources/grammars.ts` — hand-authored Tracery grammars, typed. Per `(type, act)` entry, and one `incantation` entry for the new-game phrase.
-    - Extend `scripts/build-corpus.ts` to:
-      - Read the typed grammars source.
-      - Inject POS-filtered lexicon slots (RiTa-emitted `nn` words into `#noun#`, `jj` into `#adjective#`, etc.) — the build picks which lexicon entries qualify for each slot.
-      - Inject surrealist fragments as `#fragment#` / `#phrase#` slots.
-      - Emit `src/content/generated/grammars.json` (and a small `.ts` accessor alongside `corpus.ts`/`surrealist.ts` for typed re-export).
-    - `pnpm verify-corpus` diffs `grammars.json` too.
-    - **Verify**: `pnpm build-corpus` regenerates; the JSON has `incantation` + 24 entries under `rooms.<type>.<act>` keys; each entry is a valid Tracery grammar object.
-- [ ] **T43** Replace runtime template-picking in `src/content/chaining.ts` with Tracery expansions.
-    - `chainDescription(room, { seed, visitCount, memory })` now:
-      1. Derives a per-call rng from `createSeededRandom(seed ^ hashRoomId(room.id) ^ visitCount)`.
-      2. Picks the right grammar entry by `(room.rhetoricalType, determineAct(...))`.
-      3. Calls `withSeededRng(rng, () => grammar.flatten("#origin#"))`.
-    - Memory-based acknowledgements become grammar slots (`#accepted-suffix#` → `""` or `"(Your acceptance is part of the room now.)"` depending on whether roomId ∈ memory.accepted).
-    - Delete the hardcoded `TEMPLATES` record in `chaining.ts`.
-    - **Verify**: existing chaining test still passes; new tests — (a) 1000 calls same (seed, room, visit) → identical text; (b) same seed different visit → reliably different; (c) RiTa-tagged plurals actually used when the grammar requests `#noun.plural#`.
-- [ ] **T44** `generatePhrase` (the new-game incantation) uses the `incantation` grammar.
-    - Replace the hand-written adj-adj-noun splice in `src/engine/core/NarrativeGenerator.ts` with `incantationGrammar.flatten("#phrase#")` under a seeded rng.
-    - **Verify**: existing `generatePhrase.test.ts` still passes (determinism + "three words separated by spaces" invariant preserved).
-- [ ] **T45** Agent response templates (in `src/engine/ai/argument-agent.ts`) move into the grammar JSON too.
-    - One grammar per `(ArgumentStateId, verb)` → 4 × 3 = 12 entries under `agent.<state>.<verb>`.
-    - `argument-agent.ts` loads them via the shared `@/content` accessor; `respondTo` calls `withSeededRng(this.rng, () => grammar.flatten("#origin#"))`.
-    - Still framework-agnostic — `argument-agent` imports only from `yuka`, `engine/core` types, and the grammar JSON.
-    - **Verify**: existing agent test passes; new test — same seed + same player acts = identical narration for 100 runs.
-
-### P12 — Display architecture (past / present / future)
-
-The transcript has been rendered as a single scrolling wall. It should
-split into *what's happening now*, *what has happened*, *what you can do*.
-
-- [ ] **T46** `docs/UX.md` — formalize the display spec.
-    - Three-projection model: present (last turn's lines, large), past (earlier turns, dim collapsible drawer), future (the keycaps themselves).
-    - Responsive breakpoints: portrait mobile (single column, past collapsed by default), landscape / tablet (two-column 65/35), desktop (same as landscape with more breathing room + always-visible past ledger).
-    - "Three concrete actions always visible" rule — keycaps don't vanish; they *telegraph* via emphasis.
-    - Onboarding hint system (below, T49).
-- [ ] **T47** `TurnMark` trait on `OutputLine` entities, so the display can project past vs present.
-    - `src/world/traits/index.ts` — add `TurnMark({ turnNumber: 0 })` trait, stamped by `appendOutput` callers when a new turn begins.
-    - `src/world/index.ts` — extend `appendOutput(world, kind, text, opts?)` with an optional `{ turnNumber }`; add `readTranscriptByTurn(world) → Map<number, TranscriptEntry[]>`.
-    - Reducer passes `state.turnCount + 1` to each append from a given verb; startGame's seed lines go under turn 0.
-    - **Verify**: unit test — a 5-turn walk yields 6 turn-keyed groups in the projection; start lines are in turn 0.
-- [ ] **T48** Rewrite `src/features/terminal/TerminalDisplay.tsx` to the past/present split.
-    - **Present pane** — `state.transcript` entries where `turnNumber === state.turnCount` (or turn 0 if nothing has happened yet). Big, VT323 @ `clamp(1.1rem, 2.6vw, 1.35rem)`, full glow. Room title is a separate hero element above.
-    - **Past drawer** — collapsed by default on portrait. A header strip: "▸ earlier — N turns". Tapping expands to a scrollable chronological list of past turns, each turn a visual block (echo + response group). Dim (`--color-dim`), 0.9rem, no glow. Collapses again on any new verb so the present is always the focus.
-    - **No always-visible exit list inside room descriptions** — "Exits: NORTH — a corridor" is redundant once the direction keycaps encode the same info. Remove from `describeRoom` output; the keycaps replace it.
-    - **Verify**: Playwright visual test (captured or written later) — on portrait viewport, past drawer is collapsed; on landscape, drawer is expanded and sits on the right.
-- [ ] **T49** Progressive onboarding hints.
-    - `src/engine/core/hints.ts` — pure function `computeHintToShow(state, memory, agent, hintsShown) → HintId | null`. Evaluates triggers in priority order (first-room → first-direction-available → first-fallacy → first-circular/meta → first-accept → first-question → first-trace-usable → first-map-≥4 → first-agent-out-of-composed → first-revisit). Priority-ordered so one hint shows at a time.
-    - `src/world/traits/index.ts` — `HintsShown({ ids: "" })` trait on the player entity (comma-separated string — koota traits can't hold `Set` directly; the reducer parses/serializes).
-    - Reducer — after each `applyCommand`, call `computeHintToShow`; if it returns an id not in `hintsShown`, mark it shown and surface on state as `state.activeHint: HintId | null`.
-    - `src/features/terminal/HintLine.tsx` — single-line DM Mono at `--color-dim`, 0.85rem. Fades in 400ms, auto-fades after 6s or on next keypress. Never blocks input. Dismissable via tap.
-    - Must NEVER hint twice for the same id in the same game; `requestNewGame` clears `HintsShown`.
-    - **Verify**: unit test — same seed + same actions produce the same hint sequence; each id fires at most once.
-
-### P13 — Contextual keycaps (emphasis, not disappearance)
-
-- [ ] **T50** `src/engine/core/keycap-layout.ts` — pure function `computeKeycapLayout(state, memory, agentState, room) → { verbs: KeyDescriptor[]; directions: KeyDescriptor[] }`.
-    - `KeyDescriptor = { id, label, shortcut, emphasis: "calm" | "charged" | "primary" }`.
-    - Always returns the full rhetorical-verb set (LOOK, EXAMINE, QUESTION, ASK, ACCEPT, REJECT, TRACE). No hiding. Contextual logic only shifts `emphasis`:
-      - `fallacy` / `circular` room → QUESTION + REJECT charged
-      - `premise` / `definition` / `conclusion` → ACCEPT charged
-      - `meta` → ACCEPT + QUESTION + REJECT all charged equally
-      - `agentState === "Triumphant"` → ACCEPT becomes `primary`
-    - Always returns compass-present directions only, plus a `present: boolean` for the ones the room lacks (UI renders a *silhouette* placeholder so the layout doesn't jump, not a gap).
-    - **Verify**: table-driven test — for each (rhetoricalType, agentState) pair, assert expected emphasis distribution.
-- [ ] **T51** Refactor `src/features/terminal/TerminalDisplay.tsx` keycaps to read `computeKeycapLayout`. The emphasis is passed to a new `<KeyCap emphasis="charged" />` prop; the keycap component's `pink-LED-pulse` visual treatment upgrades to full outer glow when `charged`, and to inner-pink-fill when `primary`.
-    - Direction silhouettes: a dimmed outline variant of `<KeyCap>` for the `present: false` slots — same footprint, no touch target (aria-hidden).
-    - **Verify**: snapshot or RTL assertion per room type that the expected cap has `data-emphasis="charged"`.
-
-### P14 — Proof of determinism
-
-- [ ] **T52** `src/engine/prng/seed-audit.test.ts` — a dedicated test that imports the engine, reducer, agent, and chainer, plays 100 turns of a fixed seed with a fixed action script, captures the full transcript, and asserts byte-for-byte equality across re-runs. Any `Math.random` in user-space is a bug and this test catches it.
-    - Also grep-asserts: `grep -rn "Math.random" src/` returns only `CrystalField` (decorative).
-    - **Verify**: test passes; grep assertion passes.
-
-### P15 — Release-quality polish
-
-- [ ] **T53** Move `src/content/generated/{corpus,surrealist}.ts` → `src/content/generated/{corpus,surrealist}.json` + a thin `.ts` accessor that imports them. Consistency with T42's grammars.json and the config principle. Bundle shrink expected: the giant `as const` literals drop a layer.
-- [ ] **T54** Remove `src/design/gameConfig.ts` deprecation shim. Audit consumers; flip them to `@/config.GAME_CONFIG.<nested>` directly. Delete the shim.
-- [ ] **T55** `src/features/terminal/__tests__/TerminalDisplay.test.tsx` — RTL. Verifies present pane, past drawer toggling, hint visibility rules, direction keycap presence/silhouette logic.
-- [ ] **T56** Playwright E2E smoke test — boot → enter custom seed → walk 6 rooms → ACCEPT in a circular room → assert circle-closed ring + "Petitio Principii" win text. Headless Chromium.
+P11 (grammar pipeline, T41-T45), P12 (past/present/future display, T46-T49),
+P13 (contextual keycaps, T50-T51), P14 (determinism proof, T52), P15
+(release-quality polish, T53-T56) all landed before Act III. See
+CHANGELOG.md for specifics.
 
 ## Dependencies
 
-Act II (shipped):
-```
-T41 → T42 → T43 → T44 → T45
-T46 → T47 → T48 (T49 lands alongside T48)
-T50 → T51
-T41..T45 completion → T52 grep assertion passes
-T53 any time (depends only on shipped content generation)
-T54 after T53
-T55 after T48 + T51
-T56 after T51 + T49
-```
-
 Act III (remaining, in execution order):
 ```
-T57 (APK CI fix) → T58 (release pipeline audit) → T59 (CHANGELOG) → T60 (squash-merge PR #1)
-T61 (verify-corpus grammars check) in parallel with T62/T63/T64 (UX polish)
-T62, T63, T64, T65, T66, T67 all post-merge; can land in parallel PRs
-T68 (playtest logs) after all P17 merged
-T69 (viewport screenshots) after T62/T64/T66
-T70 (Lighthouse) after Pages deploy from T60
+T68 (playtest logs) after T65/T66/T67 (shipped)
+T69 (viewport screenshots) after the Clock UI lands (P28)
+T70 (Lighthouse) after Pages deploy
 T71 (a11y) after T70
 T72 → T73 → T74 → T75 (Android full)
 T72 unblocks T76 (iOS scaffold) → T77 → T78 (TestFlight)
@@ -178,60 +73,18 @@ T82 → T83 (localization)
 T84 → T85 → T86 (a11y beyond minimum) in parallel with T82
 T87 → T88 (corpus v2)
 T89 → T90 (opponent)
-T91, T92, T93 (social) after T60
+T91, T92, T93 (social)
+T97 → T98 → T99 → T100 → T101 → T102 → T103 (railroad-clock + chord — P28)
 T94 (repo audit) → T95 (security) → T96 (v0.1.0 release)
 ```
-
-## Act II — Acceptance criteria summary
-
-- **T41**: `setRng` verified at `node_modules/tracery-grammar/tracery.js:864`; wrapper present and tested; no `Math.random` in runtime text generation.
-- **T43**: `chainDescription` uses `grammar.flatten("#origin#")` not template-string splicing; RiTa-tagged POS info available to the grammar via generated JSON slots.
-- **T48**: portrait mobile shows past drawer collapsed; "Exits: ..." text gone from `describeRoom`; present pane dominates the viewport.
-- **T49**: hints fire at most once per id per game; `requestNewGame` resets; `pnpm test` has a determinism assertion.
-- **T51**: keycaps never vanish; `emphasis` drives visual pulse; direction silhouettes fill missing-exit slots.
-- **T52**: 100-turn replay is byte-identical; `grep "Math.random" src/` shows only decorative CrystalField hits.
-- **T56**: E2E closes the circle and asserts the closing-edge is present.
 
 ---
 
 # Act III — ship, polish, and the platforms
 
-Act II proved the game can be written by an RNG-driven grammar and played
-through a three-zone display. Act III is "the game is actually finished,
-installable, and audited." No slices, no "v2," no follow-ups. Everything
-below must land before we cut the first release tag.
-
-### P16 — CI / release gates (nothing ships while these are red)
-
-- [ ] **T57** Fix the Android APK CI job — Capacitor CLI requires Node ≥22 and the current workflow pins an older toolchain. Bump `setup-node` to Node 22 LTS across `ci.yml`, `release.yml`, `cd.yml`. Re-run the APK pipeline; confirm the artifact uploads.
-    - **Verify**: PR #1 `Android debug APK` check goes green; the APK artifact is downloadable from the run.
-- [ ] **T58** Audit the release pipeline end-to-end — `release-please` config + manifest exist and fire on push to `main`; `release.yml` produces versioned artifacts (web bundle + Android APK); `cd.yml` deploys the web bundle to Pages and publishes the APK as a GitHub release asset. If any of these are missing or wrong, fix them.
-    - **Verify**: dry-run by squash-merging a no-op commit to `main`; a release-please PR opens; merging that PR emits a tag; the tag triggers `release.yml`; the resulting deploy reaches Pages + attaches the APK.
-- [ ] **T59** `CHANGELOG.md` bootstrapped with the full T01→T56 history grouped by phase per Keep a Changelog 1.1.0. Release-please manifest points at `0.1.0` with the correct commit range.
-    - **Verify**: `CHANGELOG.md` diff-validates against the squash-merged history; `release-please-config.json` + `.release-please-manifest.json` both lint.
-- [ ] **T60** Squash-merge PR #1 to `main`. Delete the `copilot/setup-monorepo-for-game` branch. Confirm CI stays green on `main`.
-    - **Verify**: `gh pr view 1` shows `MERGED`; `main` CI is green; `.release-please-manifest.json` reflects the new HEAD.
-
-### P17 — Real polish (the "promised but skipped" items)
-
-- [ ] **T61** `verify-corpus` script actually diff-fails on `grammars.json` drift — the current script is generic over `src/content/generated/`, but CI should *explicitly* exit non-zero if any of the three generated artifacts (`corpus.json`, `surrealist.json`, `grammars.json`) changes after running `build-corpus`. Wire into `pnpm verify`.
-    - **Verify**: artificially mutate `grammars.json`, run `pnpm verify-corpus`, confirm exit 1 with a diff printed.
-- [ ] **T62** T48 responsive past drawer — on portrait (≤ 640px) the past zone is **collapsed by default** to a single-line "▸ earlier — N turns" header; tap expands. Landscape (≥ 641px) keeps it expanded. The collapse state is *never* persisted across turns; opening the drawer is a deliberate act, not a setting.
-    - **Verify**: RTL test with `matchMedia("(max-width: 640px)")` mocked true shows the header and no entries until expanded. At ≥ 641px the header is absent and entries render inline.
-- [ ] **T63** T49 hint auto-fade via Motion One — hints currently append to the transcript and persist. Move them out of the transcript into a dedicated `<HintLine />` overlay in the PRESENT zone; fade in 400ms, auto-fade after 6s, tap to dismiss. `HintsShown` marks the id immediately (dismissal doesn't un-mark).
-    - **Verify**: RTL test — hint appears, advances through a `vi.useFakeTimers()` + 6100ms, is gone; subsequent hint with a different id fires.
-- [ ] **T64** T51 keycap visual upgrade — `charged` gets a subtle outer glow (drop-shadow), `primary` gets an inner-pink tint + the pulsing ring + stronger glow. Calm is opacity-only. Every emphasis level visually distinct at arm's length on a phone screen.
-    - **Verify**: visual-regression screenshot in Playwright — three keycaps, one per emphasis, pixel-diffed against a checked-in baseline.
-- [ ] **T65** T56 full E2E circle-close — extend the smoke test: scripted 12-turn session that ends with ACCEPT in a circular/meta room; assert (a) the argument-map SVG has a `data-testid="argument-map-closing-edge"` element; (b) the transcript contains "Petitio Principii"; (c) the BGM is no longer playing. Headless Chromium, no manual intervention.
-    - **Verify**: Playwright test passes; run three times in a row, same outcome each time.
-- [ ] **T66** Motion One integration — Motion is installed but currently unused at runtime. Wire it into:
-    - room-title crossfade on movement (300ms),
-    - the present-pane body crossfades on new verb (180ms),
-    - argument-map closing edge: animate `stroke-dashoffset` from length to 0 over 900ms when `circleClosed` flips true.
-    - All three honour `prefers-reduced-motion`.
-    - **Verify**: RTL test observes the animation start event; reduced-motion media query short-circuits all three.
-- [ ] **T67** Bundle audit — install `rollup-plugin-visualizer`, run against the prod build, confirm gzipped JS ≤ 180 kB (react + react-dom ≈ 50kB; koota + yuka + howler + tracery + our code must fit the remainder). If over, trim: lazy-load CrystalField's crystal generation, tree-shake unused Lucide icons.
-    - **Verify**: `dist/assets/index-*.js` gzipped size check in CI via a simple bash guard in `verify`.
+P16 (CI gates, T57-T60) and P17 (release polish, T61-T67) are shipped.
+Remaining work below is "the game is actually finished, installable,
+and audited." No slices, no "v2," no follow-ups.
 
 ### P18 — Manual verification loop (playthrough + screenshots)
 
@@ -315,7 +168,36 @@ below must land before we cut the first release tag.
 - [ ] **T93** Post-close share card — when the circle closes, present a shareable image (canvas-rendered) showing the argument map, the seed, and the win text. Copy/save/share.
     - **Verify**: image renders on Chromium + Safari + Android Webview; the seed in the image matches the seed played.
 
-### P28 — Final audit & release
+### P28 — Railroad-clock input + chord system (replaces PanelDeck + keycap row + contextual-surface hiding)
+
+The in-game surface becomes a single interactive railroad-watch clock. Two concentric rings share a 12-slot geometry, one for directions (outer) and one for rhetorical actions (inner). A mechanical spade hand sweeps to the last-committed slot. Inputs are **tap** (single-slot) or **chord** (two slots held together), giving the game a compositional input language that doubles as its rhetorical surface.
+
+The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was machinery; the game is memory and argument, which the clock expresses directly (time, revolution, the mechanical inevitability of a circular argument). Chord inputs let the vocabulary scale without slot clutter.
+
+**All slots are always visible.** Availability is communicated by shading only — enabled slots render in violet, disabled slots in near-black. This supersedes the prior `computeKeycapSurface` / contextual-hiding rule: buttons never appear or disappear, so the interface layout never jitters and the player always knows the full vocabulary. The diegetic tutorial (chord hints, T101) teaches the player *what* each slot does; the shading teaches *when* it is useful.
+
+- [ ] **T97** `src/components/ui/railroad-clock.tsx` — the SVG interface. Geometry: 60-tick minute track on the rim, 12 hour positions shared by both rings, an outer ring of 4 direction slots (UP at 12, RIGHT at 3, DOWN at 6, LEFT at 9) with 8 decorative hour positions, an inner ring of 7 action wedges (LOOK/EXAMINE/QUESTION/ASK WHY/ACCEPT/REJECT/TRACE BACK) laid out at 51.4° stride, a spade hand pivoting from centre with spring easing. Disabled slots render near-black; enabled render violet; the active slot (last activated) renders bright violet + white rim. Static face, rotating hand only — labels never move, so legibility is rock-stable.
+    - **Verify**: RTL test — 11 interactive slots reachable; clicking each dispatches exactly one `onCommit` with the correct slot id; hand rotation css-var updates; disabled slots refuse clicks. Visual snapshot committed under `docs/mockups/railroad-clock.png` at 600×600.
+
+- [ ] **T98** Chord input detection — pointer-tracking in the clock. When a slot is pressed and a second slot is pressed within a short chord window, the two fire as a compound move. `Move = { kind: 'tap', slot } | { kind: 'chord', slots: [a, b] }`. Both rings participate; cross-ring chords are valid (e.g. `UP + ACCEPT` = walk committing).
+    - **Verify**: unit test dispatches two rapid pointer-down events on distinct slots and asserts a single `onCommit({ kind: 'chord', … })`. A sequential non-chord fires two `{ kind: 'tap', … }` events.
+
+- [ ] **T99** `Move` type through the engine — `parseCommand` / `reducer.ts` gain chord awareness. Chord semantics: a chord is a new first-class verb, not two-in-sequence. Unknown chords fall through to emitting both single-slot effects sequentially plus a connective narration phrase. Determinism gate (T52-style) extended to cover chord inputs in the 100-turn replay.
+    - **Verify**: replay test — seeded session with 20 chord inputs replays byte-identical across two runs.
+
+- [ ] **T100** RiTa-enriched chord templates — `scripts/build-grammars.ts` emits a new `chord_templates` section. Hand-author ≥12 meaningful chord templates covering the most analytically interesting pairs (EXAMINE+QUESTION = scrutinize; ACCEPT+REJECT = provisional; QUESTION+ASK WHY = deep interrogation; TRACE BACK+REJECT = disavow; LOOK+EXAMINE = survey; ACCEPT+TRACE BACK = endorse chain; direction+ACCEPT = committed walk; etc). Templates get the same RiTa POS pass as single-verb templates.
+    - **Verify**: build output contains ≥12 chord-template entries; unit test asserts each chord key resolves to a distinct template (no dupes); manual playtest spot-check — a chord's prose reads compositional, not just "A. B." concatenation.
+
+- [ ] **T101** Diegetic chord tutorial — new hint catalogue entries in `src/features/terminal/hints.ts`. First time the player is in a room where a chord would be optimal (e.g., a fallacy room where EXAMINE+QUESTION unlocks a distinct template), a hint fires: *"Two can be held at once."* One hint per chord category (movement-chord / action-chord / cross-ring chord). Each fires at most once per game.
+    - **Verify**: hints-determinism test extended to cover the chord hints; 5-seed playtest log (linked under `docs/playtest/`) shows each chord hint fires exactly when it should.
+
+- [ ] **T102** Retire the PanelDeck + BezelPanel / Chassis / Inlay / Rivet / HeadingPanel / MapPanel / PresentPanel / GlowCard / CompassRose in-game UI, AND delete `src/features/terminal/keycapSurface.ts` plus its test — the clock's always-visible shaded-enabled/disabled slot model supersedes contextual-hiding entirely. TerminalDisplay becomes: CrystalField backdrop → compact reading panel (title + prose + hint) → RailroadClock → nothing else. Seed/phrase metadata moves to a slide-out HudMenu (the earlier-planned hamburger) triggered from the reading panel corner.
+    - **Verify**: `grep -r "BezelPanel\|PanelDeck\|HeadingPanel\|MapPanel\|PresentPanel\|GlowCard\|CompassRose\|keycapSurface" src/` returns zero hits outside of potentially-deleted files. `pnpm verify` green. Visual snapshot at desktop + portrait viewports committed under `docs/mockups/`.
+
+- [ ] **T103** Release-gate the clock — re-run T67 bundle audit (clock geometry is JSX-heavy), T70 Lighthouse, T71 a11y (each clock slot has an `aria-label` and is keyboard-focusable as a fallback for assistive tech, even though the game is touch-first).
+    - **Verify**: bundle ≤ 180 kB gzip; Lighthouse ≥ 95; axe clean.
+
+### P29 — Final audit & release
 
 - [ ] **T94** Repo convergence audit — every doc in `docs/` has current frontmatter and reflects shipped state. `CLAUDE.md` + `AGENTS.md` + `README.md` + `CHANGELOG.md` + `STANDARDS.md` all reviewed. Broken links fixed. `docs/STATE.md` reflects all completed tasks.
     - **Verify**: `find docs -name '*.md' | xargs grep -L '^status: current'` is empty; `markdown-link-check` passes on everything in `docs/`.
@@ -330,7 +212,7 @@ below must land before we cut the first release tag.
 
 The project is complete when **all of the following are simultaneously true**:
 
-1. Every task T01 through T96 is marked VERIFIED_DONE in the batch state.
+1. Every task T01 through T103 is marked VERIFIED_DONE in the batch state.
 2. `pnpm verify` passes locally and in CI.
 3. A v0.1.0 release tag exists on `main` with signed artifacts for web, Android, and iOS.
 4. Five distinct seeds have been played to the circle-close end state and logged under `docs/playtest/`.
