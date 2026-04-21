@@ -293,9 +293,15 @@ export function TerminalDisplay({
         <HintLine hint={state.activeHint} onDismiss={onHintDismiss} />
       </div>
 
-      {/* ── CLOCK ── */}
+      {/* ── CLOCK ── primary input surface; commands the viewport */}
       <div className="flex-shrink-0 flex items-center justify-center">
-        <div className="w-full max-w-[340px] mx-auto">
+        <div
+          className="mx-auto w-full"
+          style={{
+            // Desktop: min(60vh, 600px). Mobile: fills width (≤ viewport).
+            maxWidth: "min(60vh, 600px)",
+          }}
+        >
           <RailroadClock
             availableDirections={availableDirections}
             availableActions={availableActions}
