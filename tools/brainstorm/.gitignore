@@ -2,4 +2,8 @@ raw/
 clean/
 sentences/
 authoring.db
+authoring.db-wal
+authoring.db-shm
+authoring.db-journal
 embeddings-cache.json
+flagged/

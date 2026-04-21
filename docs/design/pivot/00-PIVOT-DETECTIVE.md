@@ -63,12 +63,25 @@ The detective is **remembering**, not re-enacting. Rooms are
   the case *and* about the detective. One case in the 12 centers
   this explicitly; others use it as texture.
 
-### 2.2 Zero runtime PRNG
+### 2.2 Zero runtime PRNG (target state)
 
-No shuffles, no template chains, no procedural rhetoric, no
-RiTa/Tracery at runtime. Every word the player reads was written by a
-person. RiTa and Tracery migrate to **authoring-time** tools (see
+**Target architecture:** no shuffles, no template chains, no
+procedural rhetoric, no RiTa/Tracery at runtime. Every word the
+player reads was written by a person. RiTa and Tracery migrate to
+**authoring-time** tools (see
 `docs/design/pivot/05-BRAINSTORM-PIPELINE.md`).
+
+**Migration checkpoints** (current code still holds some of these):
+1. Delete `src/engine/core/ArgumentGraph.ts`'s seeded-PRNG weave.
+2. Delete `src/content/grammar.ts`, `src/content/chaining.ts`, and
+   `src/content/generated/grammars.json` runtime uses.
+3. Remove any `tracery-grammar` import from the runtime bundle.
+4. Remove the daily-seed UI on the landing.
+5. First build of `game.db` passes without any runtime template
+   invocation.
+
+Each checkpoint is a commit/PR in the implementation sequence; the
+"zero runtime PRNG" property holds only after all five land.
 
 ### 2.3 Every case is fully authored, fully bundled
 
@@ -126,8 +139,11 @@ When the player taps a word, the engine:
 1. Captures the tapped word plus its **sentence-scoped context**
    (falling back to ±8 words if the sentence is a fragment or very
    long).
-2. Embeds that context at runtime (local mxbai-embed-large via the
-   build-baked vector tables — see `01-ARCHITECTURE-DB.md`).
+2. Embeds that context at runtime (browser-bundled
+   `all-MiniLM-L6-v2` via `onnxruntime-web` — ~80 MB, lazy-loaded
+   after landing; see `01-ARCHITECTURE-DB.md` §6.1 for why the
+   runtime model is MiniLM while the authoring-time model is
+   mxbai-embed-large).
 3. knn-searches the current room's authored hotspot vectors.
 4. If the best hit exceeds **cosine similarity 0.80** (tunable), the
    verb panel renders the verbs that apply to that hotspot's target

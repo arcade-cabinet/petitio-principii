@@ -7,7 +7,19 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["dist", "node_modules", "*.tsbuildinfo", "android", "ios", "src/content/generated"]
+    "ignore": [
+      "dist",
+      "node_modules",
+      "*.tsbuildinfo",
+      "android",
+      "ios",
+      "src/content/generated",
+      "tools/brainstorm/embeddings-cache.json",
+      "tools/brainstorm/raw",
+      "tools/brainstorm/clean",
+      "tools/brainstorm/sentences",
+      "authoring/briefs"
+    ]
   },
   "formatter": {
     "enabled": true,

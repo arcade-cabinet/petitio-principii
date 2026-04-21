@@ -389,6 +389,44 @@ and briefs synthesize.
 
 ---
 
+## 9a. Content safety — human review is the gate
+
+Period sources contain material this project will not reproduce in
+any form visible to the author: period racist slurs, dialect
+caricature, stereotyped ethnic speech, eugenic framings, colonial-
+romance tropes. A blocklist-only filter is **not** a sufficient
+safeguard — harmful phrasings mutate across sources and the machine
+cannot catch them reliably.
+
+The pipeline therefore requires **human review before any seed
+material, retrieval output, or synthesis fragment is checked in**
+under `authoring/`:
+
+1. The **scrape → synthesize** path produces **drafts** under
+   `authoring/briefs/<cluster-id>.md`. On first generation and on
+   every regeneration, the author reviews the brief end-to-end
+   before staging it.
+2. **Retrieval output** (`pnpm brainstorm query`) is ephemeral —
+   it prints to stdout, never writes to disk. Nothing retrieved is
+   checked in unless the author quotes it into a brief, at which
+   point it is subject to brief review.
+3. A **blocklist filter** (racial/ethnic slurs, stereotyped
+   dialect markers, known-problematic phrases per cluster) is
+   applied at the **normalize** stage as a first-pass filter —
+   its role is to reduce the volume of material the human reviews,
+   not to certify safety. Any flagged sentence is written to
+   `tools/brainstorm/flagged/<cluster-id>.jsonl` for audit.
+4. The **author's review** is the certifying step. A brief is
+   `status: generated` by the pipeline. A human author manually
+   marks it `status: reviewed` in the frontmatter after reading it
+   end-to-end. **This is currently a manual-culture gate, not a
+   technical one.** A future `tools/brainstorm/check-brief-reviewed.ts`
+   pre-commit hook is planned to enforce the status field, but that
+   script does not yet exist — until it lands, honor the gate
+   yourself; the audit trail is in git history + the feedback log.
+
+---
+
 ## 10. One-time vs continuous
 
 - **Fetch + normalize + cluster-ingest + signature + embed + synthesize**

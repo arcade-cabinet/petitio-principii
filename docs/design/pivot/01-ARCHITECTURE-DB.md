@@ -7,11 +7,15 @@ domain: technical
 
 # Architecture — `game.db` as Single Source of Truth
 
-> One SQLite file per player. Ships with all 12 cases' content and
-> embeddings baked in at build time. Gains progress and settings as
+> One SQLite file per player. Ships with every authored case's
+> content and embeddings baked in at build time (note: in the beta
+> release only the Midnight case is fully authored; the seed db still
+> contains the schema + empty shells for the other 11 hours so the
+> landing can render them as locked). Gains progress and settings as
 > the player plays. Follows the established arcade-cabinet pattern
-> (grailguard, marmalade-drops): `sql.js` on web (OPFS-backed),
-> `capacitor-sqlite` on native.
+> (grailguard, marmalade-drops): `wa-sqlite` on web (OPFS-backed,
+> chosen over `sql.js` because sqlite-vec requires extension loading
+> — see §3), `capacitor-sqlite` on native.
 
 ---
 
@@ -25,7 +29,8 @@ domain: technical
 2. **Progress tables** — which cases started, which clues discovered,
    which claims committed, transcript. Read/write at runtime.
 3. **Settings** — volume, dyslexic font, text size, etc. Read/write
-   at runtime; single wide row.
+   at runtime; stored as key-value rows in a single `settings` table
+   (see §4.4).
 
 One file, one schema, one connection at boot.
 
@@ -76,15 +81,19 @@ migration explicitly modifies them).
 
 ## 3. Client library
 
-- **Web**: `sql.js` (WASM build of SQLite, ~600 KB gzipped). Persists
-  via OPFS (Origin Private File System) on modern browsers. On
-  browsers without OPFS, falls back to IndexedDB-chunk persistence.
+- **Web**: **`wa-sqlite`** (WASM build of SQLite with extension
+  support, ~600 KB gzipped total). Persists via OPFS (Origin
+  Private File System) on modern browsers. On browsers without
+  OPFS, falls back to IndexedDB-chunk persistence. We choose
+  wa-sqlite over `sql.js` specifically because `sqlite-vec`
+  requires extension loading, which sql.js doesn't support
+  out-of-the-box.
 - **Native (iOS/Android)**: `capacitor-sqlite`. Uses the platform's
   native sqlite; db file lives in app-private storage.
 - `sqlite-vec` extension for vector search (~80 KB). Available as a
-  compile-time addition to both client paths. On web, a `wa-sqlite`
-  build with `vec0` is straightforward; on native, capacitor-sqlite
-  supports extensions via its native plugin.
+  compile-time addition to both client paths. On web, we ship a
+  custom `wa-sqlite` build with `vec0` linked in; on native,
+  capacitor-sqlite supports extensions via its native plugin.
 
 ### 3.1 Abstraction
 
@@ -108,9 +117,10 @@ platform.
 
 ### 3.2 First-paint concern
 
-`sql.js` is ~600 KB + `sqlite-vec` ~80 KB. The landing page's current
-first-paint budget is 180 KB gzipped (2.25 KB headroom post-pivot
-stash). **Solution: lazy-load the db after landing renders.**
+`wa-sqlite` is ~600 KB + `sqlite-vec` ~80 KB. The landing page's
+current first-paint budget is 180 KB gzipped (2.25 KB headroom
+post-pivot stash). **Solution: lazy-load the db after landing
+renders.**
 
 - The landing page doesn't need the db. It needs 12 case-card
   metadata (hour, title, persona name, era, one-line, lock state).
@@ -119,15 +129,15 @@ stash). **Solution: lazy-load the db after landing renders.**
 - The db (+ sqlite-vec + the seed) loads only when the player
   commits to entering a case (taps a case card). Loading happens
   during the case-card → terminal transition animation, which is
-  ~1.5s on the current design — plenty for sql.js init + db fetch
-  from service-worker cache.
+  ~1.5s on the current design — plenty for wa-sqlite init + db
+  fetch from service-worker cache.
 
 ### 3.3 Lazy load wiring
 
 ```
 landing-cards.json               ← 4KB static, always
 public/game.db                   ← 30-50MB, fetched on first case-entry
-src/lib/db.ts                    ← dynamic import('sql.js') on first call
+src/lib/db.ts                    ← dynamic import('wa-sqlite') on first call
 ```
 
 Cached by the service worker; subsequent loads are instant.
@@ -154,9 +164,16 @@ CREATE TABLE personas (
   proximity_first  TEXT NOT NULL,
   proximity_middle TEXT NOT NULL,
   proximity_late   TEXT NOT NULL,
-  proximity_last   TEXT NOT NULL,
-  FOREIGN KEY (case_id) REFERENCES cases(id)
+  proximity_last   TEXT NOT NULL
+  -- NOTE: personas.case_id is a plain column with an index, NOT a
+  -- foreign key. The FK direction is `cases.persona_id → personas.id`
+  -- only; making both FK'd creates a circular NOT-NULL dependency
+  -- that can't be inserted in a single statement. The build's
+  -- insert order is personas-first, then cases, so the forward FK
+  -- from cases to personas is valid; the reverse link is expressed
+  -- by denormalized `personas.case_id` + index.
 );
+CREATE INDEX personas_by_case ON personas(case_id);
 
 CREATE TABLE cases (
   id         TEXT PRIMARY KEY,          -- e.g. 'midnight'
@@ -494,11 +511,15 @@ player taps word
   ↓
 capture (word + sentence-context) → MiniLM embed → Float32Array
   ↓
-SELECT rowid, target_kind, target_ref_id, phrase
-  FROM hotspot_vec_mini
-  WHERE case_id = ? AND room_id = ?
-  ORDER BY vec_distance_cosine(embedding, ?) ASC
-  LIMIT 1
+-- hotspot_vec_mini is a vec0 virtual table with only the `embedding`
+-- column; metadata (case_id, room_id, target) lives in hotspot_meta
+-- keyed by rowid. Join on rowid to filter by case_id + room_id.
+SELECT hm.rowid, hm.target_kind, hm.target_ref_id, hm.phrase
+  FROM hotspot_vec_mini hv
+  JOIN hotspot_meta hm ON hm.rowid = hv.rowid
+ WHERE hm.case_id = ? AND hm.room_id = ?
+ ORDER BY vec_distance_cosine(hv.embedding, ?) ASC
+ LIMIT 1
   ↓
 if cosine_similarity < 0.75:
    silent miss — verb panel stays default
@@ -546,7 +567,7 @@ be diffed/merged with CRDT tools. Out of scope for launch.
 
 ## 10. Testing
 
-- **Unit**: db-bound logic gets an in-memory `sql.js` fixture seeded
+- **Unit**: db-bound logic gets an in-memory `wa-sqlite` fixture seeded
   from a tiny golden `tests/fixtures/tiny-case.db`.
 - **Integration**: full build → spin up a test db → drive the
   reducer through a scripted tap trail → assert transcripts.
