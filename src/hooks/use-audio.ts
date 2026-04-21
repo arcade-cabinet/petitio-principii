@@ -118,8 +118,11 @@ export function useAudio(): AudioBus {
   }, []);
 
   const playBgm = useCallback((key: BgmKey = "bgm.main") => {
-    if (mutedRef.current) return;
     unlockAudio();
+    // Create the Howl unconditionally — even when muted — so a later
+    // unmute has something to resume. Without this, a player who starts
+    // a fresh session muted would never get music back when toggling
+    // unmute (the toggle has nothing to .play() on a null instance).
     if (!bgmInstance || bgmKeyLoaded !== key) {
       bgmInstance?.stop();
       bgmInstance = new Howl({
@@ -130,6 +133,7 @@ export function useAudio(): AudioBus {
       });
       bgmKeyLoaded = key;
     }
+    if (mutedRef.current) return;
     if (!bgmInstance.playing()) {
       bgmInstance.play();
       bgmInstance.fade(0, 0.4, 2000);
@@ -147,8 +151,14 @@ export function useAudio(): AudioBus {
     writeMutedPref(mutedRef.current);
     if (mutedRef.current) {
       bgmInstance?.pause();
-    } else {
-      bgmInstance?.play();
+    } else if (bgmInstance) {
+      // Resume from pause OR start fresh if BGM was never .play()'d
+      // (e.g., the session began muted and `playBgm` was a no-op past
+      // the early-return until the recent fix).
+      if (!bgmInstance.playing()) {
+        bgmInstance.play();
+        bgmInstance.fade(0, 0.4, 2000);
+      }
     }
     return mutedRef.current;
   }, []);

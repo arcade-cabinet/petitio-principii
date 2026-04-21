@@ -1,5 +1,9 @@
 import { AppearanceControls } from "@/components/ui/appearance-controls";
-import { HeroClock } from "@/components/ui/hero-clock";
+import {
+  HERO_CLOCK_MELT_MS,
+  HERO_CLOCK_MELT_REDUCED_MS,
+  HeroClock,
+} from "@/components/ui/hero-clock";
 import { generatePhrase, generateSeed } from "@/engine";
 import { useAppearance } from "@/hooks/use-appearance";
 import { useAudio } from "@/hooks/use-audio";
@@ -122,7 +126,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
     const reducedMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const delayMs = reducedMotion ? 600 : 1400;
+    const delayMs = reducedMotion ? HERO_CLOCK_MELT_REDUCED_MS : HERO_CLOCK_MELT_MS;
     setTimeout(() => {
       void onBegin(seed);
     }, delayMs);

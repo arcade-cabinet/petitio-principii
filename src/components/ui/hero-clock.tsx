@@ -13,11 +13,25 @@
  * obscuring it). A subtle breathing animation respects prefers-reduced-
  * motion.
  *
- * In a follow-up commit this component will gain a `melting` prop that
- * triggers the dissolve transition referenced by docs/VOICE.md
- * ("therefore the watch melts").
+ * The optional `melting` prop triggers a one-shot dissolve transition
+ * — opacity fade, downward gravity, slight rotation, scale-down,
+ * horizontal skew, and a Gaussian blur — that lands the lore line
+ * `*therefore the watch melts*` (docs/VOICE.md). The parent (the
+ * landing screen's `handleBegin`) sets `melting=true` on Begin click,
+ * waits ~1.4s, then unmounts the landing in favor of the in-game
+ * terminal. Reduced-motion users get a 0.6s opacity fade only.
  */
 import { motion, useReducedMotion } from "motion/react";
+
+/**
+ * Duration in milliseconds of the melt-away transition. Exported so the
+ * landing-screen `handleBegin` can wait the right amount before mounting
+ * the in-game terminal (callers shouldn't hardcode the number twice).
+ */
+export const HERO_CLOCK_MELT_MS = 1400;
+
+/** Reduced-motion variant: shorter opacity fade only. */
+export const HERO_CLOCK_MELT_REDUCED_MS = 600;
 
 const VB = 600;
 const CX = VB / 2;
@@ -99,7 +113,10 @@ export function HeroClock({
   // opacity fade only — no movement.
   const animateProps = melting
     ? reducedMotion
-      ? { animate: { opacity: 0 }, transition: { duration: 0.6, ease: "easeIn" as const } }
+      ? {
+          animate: { opacity: 0 },
+          transition: { duration: HERO_CLOCK_MELT_REDUCED_MS / 1000, ease: "easeIn" as const },
+        }
       : {
           animate: {
             opacity: 0,
@@ -109,7 +126,10 @@ export function HeroClock({
             skewX: 6,
             filter: "blur(4px)",
           },
-          transition: { duration: 1.4, ease: [0.55, 0.04, 0.7, 0.95] as const },
+          transition: {
+            duration: HERO_CLOCK_MELT_MS / 1000,
+            ease: [0.55, 0.04, 0.7, 0.95] as const,
+          },
         }
     : reducedMotion
       ? {}
