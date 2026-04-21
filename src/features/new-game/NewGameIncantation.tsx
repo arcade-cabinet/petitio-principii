@@ -4,7 +4,7 @@ import { generatePhrase, generateSeed } from "@/engine";
 import { useAppearance } from "@/hooks/use-appearance";
 import { SUPPORTED_LANGUAGES, setLanguage } from "@/lib/i18n";
 import type { SupportedLanguage } from "@/lib/i18n";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 const LANG_LABELS: Record<SupportedLanguage, string> = {
@@ -114,7 +114,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
     setShareStatus("idle");
   };
 
-  const handleCustomSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCustomSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parsed = Number.parseInt(customInput, 10);
     if (Number.isNaN(parsed) || parsed < 0 || parsed > 0xffffffff) {
