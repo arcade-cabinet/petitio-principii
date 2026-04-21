@@ -75,9 +75,8 @@ T87 → T88 (corpus v2)
 T89 → T90 (opponent)
 T91, T92, T93 (social)
 T97 → T98 → T99 → T100 → T101 → T102 → T103 (railroad-clock + chord — P28)
-T104 (full pipeline coverage) — unblocks T105/T106 (pacing/3D)
-T104 → T105 (pacing histogram) → T107 (blackboard test) → T108 (gnomes)
-T104 → T106 (3D depth)
+T109 (two hand-crafted worlds woven by seed — P28) — foundational; supersedes large parts of T104-T108
+T104/T105/T106/T107/T108 — scope narrows once T109 lands (only fill gaps T109 doesn't cover)
 T94 (repo audit) → T95 (security) → T96 (v0.1.0 release)
 ```
 
@@ -255,6 +254,33 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
     The gnomes need `docs/BESTIARY.md` documenting each one: appearance, behaviour, room affinities, sample lines. The point is that an attentive player starts to *know* them — "oh, the Tautologist is here again, she's farther along in her sentence this time."
     - **Verify**: (1) `grammars.json` contains a `gnomes.<id>` section per cast member, each with ≥ 8 line variants. (2) Determinism audit extended: gnome presence + line choice byte-identical across runs of the same seed. (3) A 5-seed playthrough captures every gnome at least once across the seeds; each encounter's line is distinct from the prior encounter in the same seed. (4) The Mirror Figure's lines verifiably reflect the player's memory state (scripted test with controlled memory profile, assert the commentary matches). (5) `docs/BESTIARY.md` committed with all five gnomes described.
 
+- [ ] **T109** **Two hand-crafted worlds woven by seed — the foundational map model.** The current architecture is 100% PRNG: surrealist fragments + Tracery grammars generate every piece of prose per seed. This gives infinite variety but nothing anchors: no landmark a second player would recognize, no "remember when you walked through…", no load-bearing hand-authored story structure. Adventure and Zork work because someone *designed* their worlds — every room a deliberate choice, every dead-end a considered trap.
+
+    **New model: two fully-authored worlds, combined per seed by weaving.**
+
+    - **World A** — fully hand-crafted. ~40 rooms with a coherent identity (working title: *The Subterranean Library* — library basement / archive / cellar catacombs, the argument made as an underground descent). Edges hand-placed. Gnomes hand-placed. Prose hand-written, including the connective "you move north" lines, the dead-end responses, the examine bodies. False starts and backtracking designed as playable content. An attentive solo playthrough of World A alone takes hours.
+    - **World B** — fully hand-crafted. ~40 rooms with a contrasting identity (working title: *The Celestial Court* — high vaulted atrium, observatories, mirrored chambers, the argument made as an ascent through crystal). Edges hand-placed. Gnomes hand-placed. Prose hand-written. Equally playable standalone.
+    - **Connection node set** — ~12 rooms that exist in both worlds at equivalent rhetorical positions (Circular Atrium is in A and in B, each hand-authored differently; same for Premise Hall, Fallacy Cellar/Fallacy Observatory, etc.). These are the *weave-anchors*.
+    - **Weaving**: per seed, the PRNG starts at a random connection-node and takes a ~30-room walk. At each step, the PRNG decides whether to remain in the current world or hop across a connection-node to the sibling world. Result: 30 rooms, every one of them hand-crafted, but the order and which-world-at-each-cell varies per seed. No two seeds produce the same walk; every seed produces a walk that reads as designed, not procedural.
+    - **Tracery demotion**: surrealist fragments become **texture** — inscriptions on walls, overheard lines, objects the player can EXAMINE — not primary prose. The hand-crafted room body is the load-bearing text; Tracery fills slots the author marked as `#surrealist-inscription#` / `#overheard#`.
+
+    Scope: major content undertaking. Breakdown:
+    - `src/content/worlds/a.ts` — World A as a typed module: rooms, exits, gnome placements, prose bodies, connection-node markings.
+    - `src/content/worlds/b.ts` — World B, same shape.
+    - `src/engine/core/WorldWeaver.ts` — takes (worldA, worldB, seed) → a single `WeavedGraph` of 30 rooms. Maintains "which world am I in" state per cell; hops on connection-nodes per seeded rng.
+    - `src/engine/core/ArgumentGraph.ts` — keep its current type shape; the weaver outputs this type so the rest of the engine is untouched.
+    - `docs/WORLDS.md` — author-facing doc describing both worlds' identities, their connection-node set, their gnome rosters, their design intents (what argument each one makes; what emotional arc).
+    - Retire surrealist-primary generation from the prose pipeline — it becomes slot-filler for author-marked positions only.
+
+    This supersedes substantial parts of T104-T108:
+    - T104 (full pipeline coverage) narrows to "the 20% of prose that's grammar-driven is pipeline-driven" — the 80% is authored.
+    - T105 (pacing) — median turns-to-close is tuned by authoring hands, not a generator knob.
+    - T106 (3D depth) — the hand-written prose *is* 3D because authors wrote it that way.
+    - T107 (blackboard test) — passes trivially because Worlds A and B are drawn on paper before code.
+    - T108 (gnomes) — authored per-world, placed by hand in specific rooms.
+
+    - **Verify**: (1) World A playable standalone via a `?world=a` url param, full 40-room solo tour holds together; tester reads it aloud and reports coherent voice + discoverable throughline. (2) World B same. (3) 10 seeded weaves produce 10 distinct walks; all 10 playable start-to-close; manual review by a reader unfamiliar with the project confirms each reads as a designed walk, not a random tour. (4) Blackboard test (from T107) passes when a player draws a map after a seeded playthrough — the drawn map is correctly labelled with World A + World B rooms even though they were braided. (5) **Narrative density test** — every room has at least one of: a memorable description, a gnome encounter, a meaningful dead-end, a callback to another room, a pun or turn of phrase that someone would quote. Zork's test: can you describe any single room to a friend in a way that makes them want to visit it? Apply to every authored room. (6) **Voice audit** — blind-read test — given 10 random rooms, a tester can correctly assign each to World A or World B from the prose alone ≥ 90% of the time. The worlds have distinct authorial voices. (7) `docs/WORLDS.md` committed with full design of both worlds + connection-node table + voice guidelines.
+
 ### P29 — Final audit & release
 
 - [ ] **T94** Repo convergence audit — every doc in `docs/` has current frontmatter and reflects shipped state. `CLAUDE.md` + `AGENTS.md` + `README.md` + `CHANGELOG.md` + `STANDARDS.md` all reviewed. Broken links fixed. `docs/STATE.md` reflects all completed tasks.
@@ -270,7 +296,7 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 
 The project is complete when **all of the following are simultaneously true**:
 
-1. Every task T01 through T108 is marked VERIFIED_DONE in the batch state.
+1. Every task T01 through T109 is marked VERIFIED_DONE in the batch state.
 2. `pnpm verify` passes locally and in CI.
 3. A v0.1.0 release tag exists on `main` with signed artifacts for web, Android, and iOS.
 4. Five distinct seeds have been played to the circle-close end state and logged under `docs/playtest/`.
