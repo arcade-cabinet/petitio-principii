@@ -101,6 +101,23 @@ against current main; any issues get addressed in that PR's scope.
   is called out in doc 05 as a planned pre-commit hook but not yet
   implemented. Currently a manual-culture gate.
 
+## PR #28 — SCENE parser (in-flight)
+
+### User correction (2026-04-21)
+
+- **Doc drift on client library**. Earlier commits on this PR said
+  "wa-sqlite on web", which contradicts the locked-in choice of
+  `@capacitor-community/sqlite` everywhere. User flagged that the
+  Capacitor plugin's web adapter `jeep-sqlite` is itself sql.js-backed
+  internally, so the accurate framing is: Capacitor plugin is the
+  single API; we never import sql.js or wa-sqlite directly; web
+  runtime IS sql.js-via-jeep-sqlite under the Capacitor surface.
+  - ✅ Fixed: doc 01 §1 blockquote, §3 client-library section, §3.1
+    abstraction sketch (one code path, plugin-handles-platform-split),
+    §3.2 first-paint bundle notes, §3.3 lazy-load wiring, §10 unit
+    test description. Added explicit "we **never import sql.js or
+    wa-sqlite directly**" sentence to §1.
+
 ## Landed since prior audit
 
 - **Embedding + sameness-check stages (5 + 7)** — landed in PR #27.

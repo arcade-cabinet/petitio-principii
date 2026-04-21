@@ -13,9 +13,14 @@ domain: technical
 > contains the schema + empty shells for the other 11 hours so the
 > landing can render them as locked). Gains progress and settings as
 > the player plays. Follows the established arcade-cabinet pattern
-> (grailguard, marmalade-drops): `wa-sqlite` on web (OPFS-backed,
-> chosen over `sql.js` because sqlite-vec requires extension loading
-> — see §3), `capacitor-sqlite` on native.
+> (grailguard, marmalade-drops): **`@capacitor-community/sqlite`**
+> is the single API on BOTH web and native. On web the plugin uses
+> its `jeep-sqlite` web-component adapter (which is sql.js-backed
+> internally); on mobile it's the native iOS/Android sqlite plugin.
+> We **never import sql.js or wa-sqlite directly** — the Capacitor
+> plugin is the only surface the runtime knows about. sqlite-vec
+> ships as a native extension on mobile and through jeep-sqlite's
+> extension path on web.
 
 ---
 
@@ -40,7 +45,7 @@ One file, one schema, one connection at boot.
 
 ```
 first launch:
-  if (no user game.db exists in OPFS / capacitor-sqlite storage):
+  if (no user game.db exists in @capacitor-community/sqlite storage):
     fetch('/game.db')                    # shipped seed (content only)
     write to persistent storage
   open user game.db readwrite
@@ -81,24 +86,34 @@ migration explicitly modifies them).
 
 ## 3. Client library
 
-- **Web**: **`wa-sqlite`** (WASM build of SQLite with extension
-  support, ~600 KB gzipped total). Persists via OPFS (Origin
-  Private File System) on modern browsers. On browsers without
-  OPFS, falls back to IndexedDB-chunk persistence. We choose
-  wa-sqlite over `sql.js` specifically because `sqlite-vec`
-  requires extension loading, which sql.js doesn't support
-  out-of-the-box.
-- **Native (iOS/Android)**: `capacitor-sqlite`. Uses the platform's
-  native sqlite; db file lives in app-private storage.
-- `sqlite-vec` extension for vector search (~80 KB). Available as a
-  compile-time addition to both client paths. On web, we ship a
-  custom `wa-sqlite` build with `vec0` linked in; on native,
-  capacitor-sqlite supports extensions via its native plugin.
+- **Both web and native**: `@capacitor-community/sqlite`. One API,
+  one import, one set of bindings. Under the hood:
+  - **Web**: the plugin's `jeep-sqlite` web component. `jeep-sqlite`
+    is backed by `sql.js` internally — we do **not** import sql.js
+    ourselves. Persistence via OPFS on modern browsers; IndexedDB
+    fallback on older engines. Total web bundle (plugin wrapper +
+    jeep-sqlite + sql.js WASM) is ~600 KB gzipped, lazy-loaded
+    after the landing paints.
+  - **Native (iOS/Android)**: the plugin's native sqlite backend.
+    db file lives in app-private storage. sqlite-vec linked as a
+    native extension via the plugin's extension-loading API.
+- `sqlite-vec` extension for vector search (~80 KB). Available on
+  web through jeep-sqlite's extension path (loaded as a WASM
+  addon alongside sql.js), and on native through the Capacitor
+  plugin's extension API. Neither path requires a custom sqlite
+  build.
 
 ### 3.1 Abstraction
 
+A single thin wrapper around the Capacitor plugin. Same code path on
+web and native — the plugin's own web/native dispatch (jeep-sqlite
+vs. native sqlite) happens below our wrapper, invisibly.
+
 ```ts
 // src/lib/db.ts
+import { CapacitorSQLite, SQLiteConnection } from "@capacitor-community/sqlite";
+import { Capacitor } from "@capacitor/core";
+
 export interface GameDb {
   run(sql: string, params?: unknown[]): Promise<ResultSet>;
   vecSearch(table: string, query: Float32Array, k: number): Promise<VecHit[]>;
@@ -106,18 +121,34 @@ export interface GameDb {
 }
 
 export async function openGameDb(): Promise<GameDb> {
-  return Capacitor.isNativePlatform()
-    ? openCapacitorDb()
-    : openWebDb();
+  // On web only: register the jeep-sqlite web component + initialize
+  // the WASM store. No-op on native (the plugin handles it).
+  if (Capacitor.getPlatform() === "web") {
+    await import("jeep-sqlite/loader").then((m) => m.defineCustomElements(window));
+    await CapacitorSQLite.initWebStore();
+  }
+  // Same API on both platforms from here on.
+  const conn = await new SQLiteConnection(CapacitorSQLite).createConnection(
+    "game",
+    /*encrypted*/ false,
+    "no-encryption",
+    /*version*/ 1,
+    /*readonly*/ false
+  );
+  await conn.open();
+  await conn.loadExtension("sqlite-vec"); // same call path web + native
+  return wrap(conn);
 }
 ```
 
-One interface, two platform adapters. Callers don't branch on
-platform.
+One interface, one code path. The web/native branch is a single
+initialization line at startup — everything after is platform-
+agnostic.
 
 ### 3.2 First-paint concern
 
-`wa-sqlite` is ~600 KB + `sqlite-vec` ~80 KB. The landing page's
+The Capacitor plugin's web bundle (plugin wrapper + jeep-sqlite +
+sql.js WASM) is ~600 KB + `sqlite-vec` ~80 KB. The landing page's
 current first-paint budget is 180 KB gzipped (2.25 KB headroom
 post-pivot stash). **Solution: lazy-load the db after landing
 renders.**
@@ -129,15 +160,15 @@ renders.**
 - The db (+ sqlite-vec + the seed) loads only when the player
   commits to entering a case (taps a case card). Loading happens
   during the case-card → terminal transition animation, which is
-  ~1.5s on the current design — plenty for wa-sqlite init + db
-  fetch from service-worker cache.
+  ~1.5s on the current design — plenty for the Capacitor plugin's
+  web initialization + db fetch from service-worker cache.
 
 ### 3.3 Lazy load wiring
 
 ```
 landing-cards.json               ← 4KB static, always
 public/game.db                   ← 30-50MB, fetched on first case-entry
-src/lib/db.ts                    ← dynamic import('wa-sqlite') on first call
+src/lib/db.ts                    ← dynamic import('@capacitor-community/sqlite') on first call
 ```
 
 Cached by the service worker; subsequent loads are instant.
@@ -567,7 +598,7 @@ be diffed/merged with CRDT tools. Out of scope for launch.
 
 ## 10. Testing
 
-- **Unit**: db-bound logic gets an in-memory `wa-sqlite` fixture seeded
+- **Unit**: db-bound logic gets an in-memory Capacitor-sqlite-web fixture seeded
   from a tiny golden `tests/fixtures/tiny-case.db`.
 - **Integration**: full build → spin up a test db → drive the
   reducer through a scripted tap trail → assert transcripts.
