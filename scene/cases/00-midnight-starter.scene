@@ -1,0 +1,160 @@
+# SCENE starter — Midnight (la-noir-1929 cluster)
+#
+# This is a minimal well-formed case used to exercise the parser
+# end-to-end. Not the authored final Midnight case; that lands after
+# the author works against the cluster's synthesis brief at
+# authoring/briefs/la-noir-1929.md. This file's prose is intentionally
+# thin (close-to-cluster failures would be fine during scaffolding).
+
+case midnight {
+  title     "A Voice Before Dawn"
+  hour      0
+  one-line  "A voice before dawn, counting rings."
+  opens     room:office
+
+  persona {
+    name         "Harrison Drake"
+    era          "Los Angeles, 1946"
+    biography <<<
+      Discharged 1945. One lung half-useful since Anzio. Licensed as
+      a private investigator in June 1946 by lying on the health
+      affidavit.
+    >>>
+    voice-notes <<<
+      Short sentences. Dry. Never uses three words where two will cut.
+    >>>
+    notices-first { physical-trace, posture, absence, weather }
+    theme-chord {
+      root       "A-flat-minor"
+      intervals  [ 0, 3, 7, 10 ]
+      instrument "bowed-double-bass and muted-piano"
+    }
+    proximity-first  <<< Could feel this one sliding off the table. >>>
+    proximity-middle <<< There's a version of this I didn't live. >>>
+    proximity-late   <<< Somewhere she'd have said it quieter. >>>
+    proximity-last   <<< This is it. I'm sure. That's the hell of it. >>>
+  }
+
+  retorts {
+    retort {
+      prose <<< Your own desk. The kind of wood that doesn't keep secrets. >>>
+      tags { idle, furniture }
+    }
+    retort {
+      prose <<< You want to ask about that, but the thought slips. >>>
+      tags { near-miss }
+    }
+  }
+
+  named-entity evelyn {
+    kind person
+    display-name     "Evelyn Carr"
+    phrases-in-prose [ "Evelyn", "Evelyn Carr", "she", "her" ]
+    verbs            { question, ask-why }
+  }
+
+  room office {
+    title "Your Office — 11:47 PM"
+    prose <<<
+      The phone had rung seven times before you answered.
+      Seven felt like a number someone had counted.
+    >>>
+    rhetorical premise
+
+    exit east -> hall {
+      prose "The door to the hall."
+    }
+
+    exit down -> alley {
+      prose "The fire escape — you remember it now."
+      gate { all: [ clue:receiver-warm ] }
+    }
+
+    clue receiver-warm {
+      on       examine thing:phone | examine thing:receiver
+      prose <<<
+        The bakelite is still warm. She had been holding it a while.
+      >>>
+      hotspots [ "the phone", "the receiver", "bakelite" ]
+      tags     { physical, indoor, warmth }
+      supports claim:caller-was-here
+    }
+
+    clue perfume-faint {
+      on       examine thing:chair
+      reveal   { clue:receiver-warm }
+      prose <<<
+        Jasmine. Or something pretending to be.
+      >>>
+      hotspots    [ "the chair", "jasmine", "perfume" ]
+      tags        { olfactory }
+      supports    claim:it-was-evelyn
+      contradicts claim:a-stranger
+    }
+  }
+
+  room hall {
+    title "Hall Outside Your Office"
+    prose <<<
+      Your shoes on wood, no one else's.
+    >>>
+    rhetorical premise
+
+    exit west -> office {
+      prose "Back the way you came."
+    }
+  }
+
+  room alley {
+    title "Alley, Below the Fire Escape"
+    prose <<<
+      Wet asphalt. The iron smell of the city after rain.
+    >>>
+    rhetorical objection
+
+    exit up -> office {
+      prose "Climb back."
+    }
+  }
+
+  connect she-was-alone {
+    from   [ clue:receiver-warm, clue:perfume-faint ]
+    yields fact:she-was-alone
+    prose <<<
+      Warm phone, fading jasmine. She was alone, and recent.
+    >>>
+  }
+
+  claim caller-was-here    "Someone used this phone tonight."
+  claim it-was-evelyn      "It was Evelyn, not a stranger."
+  claim a-stranger         "It was someone you don't know."
+
+  verdict she-came-and-went {
+    requires {
+      all: [
+        claim_state:it-was-evelyn @ accepted
+      ]
+    }
+    moral  unsettled
+    atmos  quiet
+    prose <<<
+      You close the case in the way you can close a case like this —
+      which is to say, not really.
+    >>>
+    card-comment "I let that one go home."
+  }
+
+  verdict you-never-heard-the-phone {
+    requires {
+      all: [
+        claim_state:caller-was-here @ rejected
+      ]
+    }
+    moral  mistaken
+    atmos  hollow
+    prose <<<
+      The phone hadn't rung. You had. You'd been counting.
+    >>>
+    card-comment "I won't sleep on that one."
+  }
+}

@@ -72,6 +72,14 @@ export default defineConfig({
           environment: "node",
         },
       },
+      {
+        extends: true,
+        test: {
+          name: "tools",
+          include: ["tools/**/*.test.ts"],
+          environment: "node",
+        },
+      },
     ],
   },
 });
