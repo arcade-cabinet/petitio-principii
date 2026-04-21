@@ -20,7 +20,6 @@
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.2",
     "@biomejs/biome": "^1.9.4",
     "@capacitor/cli": "^8.3.1",
     "@tailwindcss/vite": "^4.2.2",
@@ -58,6 +57,7 @@
     "clsx": "^2.1.1",
     "howler": "^2.2.4",
     "i18next": "^26.0.6",
+    "i18next-resources-to-backend": "^1.2.1",
     "koota": "^0.6.6",
     "lucide-react": "^1.8.0",
     "motion": "^12.38.0",

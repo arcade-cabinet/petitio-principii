@@ -1,8 +1,7 @@
 /**
  * i18n — i18next configuration for Petitio Principii.
  *
- * Supported locales: en (canon), es, fr.
- *   T83 adds ar (RTL) in the follow-up pass.
+ * Supported locales: en (canon), es, fr, ar (RTL).
  *
  * Grammar-slot policy (documented in docs/i18n.md):
  *   - UI chrome strings (buttons, labels, errors, banners) → fully translated.
@@ -14,14 +13,19 @@
  *
  * Language detection: honours `?lng=` URL param, then `localStorage`, then
  * browser preference, then falls back to `en`.
+ *
+ * Bundle strategy (QA item #3):
+ *   - `en` is statically imported as the always-loaded fallback.
+ *   - `es`, `fr`, `ar` are loaded on demand via `i18next-resources-to-backend`
+ *     so the main chunk doesn't carry ~25 kB of locales the player won't read.
+ *   - Vite code-splits each `./locales/*.json` import into its own chunk.
  */
 import i18next from "i18next";
+import resourcesToBackend from "i18next-resources-to-backend";
 import { initReactI18next } from "react-i18next";
 
-import ar from "./locales/ar.json";
+// `en` stays in the main chunk as the fallback. Everything else is dynamic.
 import en from "./locales/en.json";
-import es from "./locales/es.json";
-import fr from "./locales/fr.json";
 
 export const SUPPORTED_LANGUAGES = ["en", "es", "fr", "ar"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
@@ -63,20 +67,39 @@ function applyDir(lang: string) {
   document.documentElement.setAttribute("lang", lang);
 }
 
-i18next.use(initReactI18next).init({
-  lng: detectLanguage(),
-  fallbackLng: "en",
-  resources: {
-    en: { translation: en },
-    es: { translation: es },
-    fr: { translation: fr },
-    ar: { translation: ar },
-  },
-  interpolation: {
-    // React already escapes values.
-    escapeValue: false,
-  },
+// Dynamic backend: only the active (non-en) locale is fetched; Vite splits
+// each JSON import into its own chunk.
+const backend = resourcesToBackend((language: string, _ns: string) => {
+  // `en` is already bundled — short-circuit to avoid a needless network request.
+  if (language === "en") return Promise.resolve(en);
+  switch (language) {
+    case "es":
+      return import("./locales/es.json").then((m) => m.default);
+    case "fr":
+      return import("./locales/fr.json").then((m) => m.default);
+    case "ar":
+      return import("./locales/ar.json").then((m) => m.default);
+    default:
+      return Promise.resolve(en);
+  }
 });
+
+i18next
+  .use(backend)
+  .use(initReactI18next)
+  .init({
+    lng: detectLanguage(),
+    fallbackLng: "en",
+    // Seed `en` so the first render never waits on the backend.
+    resources: {
+      en: { translation: en },
+    },
+    partialBundledLanguages: true,
+    interpolation: {
+      // React already escapes values.
+      escapeValue: false,
+    },
+  });
 
 // Apply dir on init and on every language change.
 applyDir(i18next.language);

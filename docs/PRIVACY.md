@@ -50,7 +50,9 @@ We never send: player name, email, seed phrase, transcript content, or any perso
 
 #### Self-hosted instance
 
-The Plausible instance is self-hosted at `VITE_PLAUSIBLE_HOST` (configured at build time). The analytics data never leaves infrastructure we control. If `VITE_PLAUSIBLE_HOST` is not set at build time, the public Plausible instance is used as a fallback.
+The Plausible instance is self-hosted at `VITE_PLAUSIBLE_HOST` (configured at build time). The analytics data never leaves infrastructure we control.
+
+If `VITE_PLAUSIBLE_HOST` is not set at build time, the analytics script is **never loaded** and no events are sent. We explicitly refuse to fall back to the public `plausible.io` instance — a missing host means "this deploy has no analytics endpoint configured," not "silently exfiltrate events to a third party."
 
 ## Opting out
 

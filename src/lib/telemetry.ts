@@ -7,29 +7,38 @@
  *   • No cookies, no cross-site tracking (Plausible design).
  *   • Events are minimal: page_view, verb_used, circle_closed.
  *   • No IP logging on a self-hosted Plausible instance.
+ *   • Self-hosted ONLY: if VITE_PLAUSIBLE_HOST is unset the script is never
+ *     injected — we refuse to silently fall back to the public plausible.io
+ *     instance (T81 acceptance: "self-hosted"). No host → no beacon.
  *   • Full policy is documented in docs/PRIVACY.md.
  *
  * Integration:
  *   - Call `initTelemetry()` once on app boot.
  *   - It checks consent (localStorage) and injects the Plausible script
- *     only if granted.
+ *     only if consent is granted AND VITE_PLAUSIBLE_HOST is configured.
  *   - Use `trackEvent(name, props)` anywhere in the app.
  *   - Call `setConsent(true)` from the consent banner → loads script + persists.
- *
- * Plausible domain: derived from the Pages deploy host.
- * When self-hosted, set VITE_PLAUSIBLE_HOST to your instance URL.
  */
 
 const CONSENT_KEY = "pp.analytics";
-const PLAUSIBLE_HOST =
-  // biome-ignore lint/suspicious/noExplicitAny: Vite augments ImportMeta but the type is environment-specific
-  (typeof (import.meta as any).env?.VITE_PLAUSIBLE_HOST === "string"
-    ? // biome-ignore lint/suspicious/noExplicitAny: same as above
-      (import.meta as any).env.VITE_PLAUSIBLE_HOST
-    : undefined) ?? "https://plausible.io";
+
+function readPlausibleHost(): string | null {
+  try {
+    // biome-ignore lint/suspicious/noExplicitAny: Vite augments ImportMeta but the type is environment-specific
+    const env = (import.meta as any).env as Record<string, unknown> | undefined;
+    const raw = env?.VITE_PLAUSIBLE_HOST;
+    if (typeof raw === "string" && raw.trim().length > 0) return raw.trim();
+  } catch {
+    /* ignore (non-Vite contexts) */
+  }
+  return null;
+}
+
+const PLAUSIBLE_HOST: string | null = readPlausibleHost();
 
 let scriptInjected = false;
 let consentGranted = false;
+let warnedMissingHost = false;
 
 function readConsent(): boolean {
   try {
@@ -41,6 +50,21 @@ function readConsent(): boolean {
 
 function injectScript(): void {
   if (scriptInjected || typeof document === "undefined") return;
+
+  // T81 guardrail: refuse to beacon to the public plausible.io instance.
+  // A missing VITE_PLAUSIBLE_HOST means this deploy hasn't configured a
+  // self-hosted endpoint — stay silent rather than exfiltrate events.
+  if (!PLAUSIBLE_HOST) {
+    if (!warnedMissingHost) {
+      warnedMissingHost = true;
+      console.warn(
+        "[telemetry] VITE_PLAUSIBLE_HOST is not set; analytics beacon will not be loaded. " +
+          "Set VITE_PLAUSIBLE_HOST to your self-hosted Plausible instance to enable."
+      );
+    }
+    return;
+  }
+
   scriptInjected = true;
 
   const domain = window.location.hostname;
