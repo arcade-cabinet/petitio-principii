@@ -5,10 +5,9 @@ on:
   # `pull_request` is intentionally suppressed by GitHub for PRs opened by
   # github-actions[bot] (loop-prevention). release-please opens PRs as that
   # bot, so its release PRs would otherwise never run CI and would stay
-  # UNSTABLE forever. `pull_request_target` fires for bot-opened PRs; we
-  # explicitly check out the PR head SHA below so the proposed changes are
-  # validated, not the base branch. Safe because release-please always opens
-  # from a branch in this repo (never an external fork).
+  # UNSTABLE forever. `pull_request_target` fires for bot-opened PRs.
+  # Job-level `if:` below scopes this trigger to release-please branches
+  # only, so human-opened same-repo PRs don't double-trigger CI.
   pull_request_target:
     branches:
       - main
@@ -16,21 +15,40 @@ on:
 permissions:
   contents: read
 
+# concurrency.group must include the PR number, not just `github.ref`,
+# because `pull_request_target` resolves `github.ref` to the BASE branch
+# (`refs/heads/main`) — using `github.ref` alone would cancel every CI
+# run on every release-please PR. The PR number falls back to the ref
+# for any non-PR events.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   verify:
     name: Verify (mirrors `pnpm verify` locally)
     runs-on: ubuntu-latest
+    # Run for all `pull_request` events. For `pull_request_target`, only
+    # run on release-please bot PRs — that's the only event this trigger
+    # exists to handle. Same-repo human PRs use the regular `pull_request`
+    # event and skip this job under `pull_request_target` to avoid
+    # double-triggering. The `startsWith` gate also closes the security
+    # surface for arbitrary fork PRs (we'd want a different model entirely
+    # before allowing those — out of scope here).
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request_target' &&
+       startsWith(github.head_ref, 'release-please--'))
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # Validate the PR head SHA, not the base — required because
-          # `pull_request_target` defaults to checking out the base ref.
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # For `pull_request_target` (release-please bot), explicitly check
+          # out the PR head SHA so the proposed changes are validated, not
+          # the base branch. For regular `pull_request`, leaving `ref` empty
+          # uses the default merge ref (`refs/pull/.../merge`) which catches
+          # merge-commit failures the head SHA alone would miss.
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@71c92474e7e4f5bca283fb17ef80fba9cdb2b4b1 # v6.0.2
@@ -54,11 +72,15 @@ jobs:
   android-apk:
     name: Android debug APK
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request_target' &&
+       startsWith(github.head_ref, 'release-please--'))
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
 
       - name: Setup JDK 21 (Temurin)
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
