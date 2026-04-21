@@ -20,7 +20,7 @@
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.4.12",
     "@capacitor/cli": "^8.3.1",
     "@tailwindcss/vite": "^4.2.2",
     "@testing-library/jest-dom": "^6.9.1",
