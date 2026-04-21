@@ -2,6 +2,14 @@ name: CI
 
 on:
   pull_request:
+  # pull_request_target fires even when the PR is opened by github-actions[bot]
+  # (e.g. release-please). pull_request does NOT fire for bot-created PRs due to
+  # GitHub's loop-prevention rules. We explicitly checkout the PR head SHA so
+  # the actual changed code is tested — this is safe because release-please
+  # branches always originate from this repo (never an external fork).
+  pull_request_target:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -17,6 +25,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # For pull_request_target (bot PRs like release-please), explicitly
+          # check out the PR head so we validate the proposed changes, not the
+          # base branch. Safe: release-please always opens from the same repo.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@71c92474e7e4f5bca283fb17ef80fba9cdb2b4b1 # v6.0.2
@@ -43,6 +56,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup JDK 21 (Temurin)
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
