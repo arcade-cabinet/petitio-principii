@@ -209,11 +209,14 @@ function SlotCircle({
   const lineHeight = LABEL_FONT_SIZE * 1.05;
   const firstLineDY = lines.length === 1 ? 0 : -lineHeight * 0.45;
 
-  // Glow style: pink is stronger than violet-active to read as distinct feedback.
+  // Glow / inset style:
+  // - chord-pending: strong pink glow (pulse already handled by fill color)
+  // - active: inset shadow (pressed-in look) via SVG filter + subtle glow
+  // - enabled: soft ambient glow
   const glowStyle: React.CSSProperties | undefined = isChordPending
     ? { filter: "drop-shadow(0 0 10px rgba(236,72,153,0.95))" }
     : isActive
-      ? { filter: "drop-shadow(0 0 8px rgba(168,85,247,0.9))" }
+      ? { filter: "url(#rc-slot-inset) drop-shadow(0 0 6px rgba(168,85,247,0.7))" }
       : isEnabled
         ? { filter: "drop-shadow(0 0 4px rgba(124,58,237,0.5))" }
         : undefined;
@@ -433,13 +436,23 @@ export function RailroadClock({
           <stop offset="100%" stopColor="#f8f9fa" />
         </linearGradient>
 
-        {/* Brushed-silver bezel ring */}
+        {/* Brushed-silver bezel ring — stronger contrast, top-left highlight */}
         <linearGradient id="rc-bezel-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#d8dde6" />
-          <stop offset="25%" stopColor="#7a8392" />
-          <stop offset="50%" stopColor="#3a4252" />
-          <stop offset="75%" stopColor="#8a93a4" />
-          <stop offset="100%" stopColor="#eef1f5" />
+          <stop offset="0%" stopColor="#f0f4f8" />
+          <stop offset="12%" stopColor="#ffffff" />
+          <stop offset="28%" stopColor="#8a93a4" />
+          <stop offset="50%" stopColor="#252d3a" />
+          <stop offset="72%" stopColor="#7a8392" />
+          <stop offset="88%" stopColor="#9aa3b2" />
+          <stop offset="100%" stopColor="#dde3eb" />
+        </linearGradient>
+
+        {/* Polished edge highlight ring gradient — bright top-left, dark bottom-right */}
+        <linearGradient id="rc-bezel-highlight" x1="15%" y1="10%" x2="85%" y2="90%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+          <stop offset="40%" stopColor="rgba(255,255,255,0.3)" />
+          <stop offset="60%" stopColor="rgba(0,0,0,0.2)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0.5)" />
         </linearGradient>
 
         {/* Dial background — recessed radial */}
@@ -448,7 +461,47 @@ export function RailroadClock({
           <stop offset="100%" stopColor="#050108" />
         </radialGradient>
 
-        {/* Silver glow filter for major ticks and hub */}
+        {/* Dial ambient-occlusion ring — darkens the dial perimeter to sell depth */}
+        <radialGradient id="rc-dial-ao" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="70%" stopColor="transparent" />
+          <stop offset="88%" stopColor="rgba(0,0,0,0.45)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0.85)" />
+        </radialGradient>
+
+        {/* Hub jewel radial gradient — bright rim annulus, dark recessed centre */}
+        <radialGradient id="rc-hub-jewel" cx="38%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#8090a8" />
+          <stop offset="30%" stopColor="#c8d4e0" />
+          <stop offset="55%" stopColor="#4a5568" />
+          <stop offset="80%" stopColor="#1a1f2a" />
+          <stop offset="100%" stopColor="#0a0d14" />
+        </radialGradient>
+
+        {/* Hub depth filter — drop shadow + inner rim-light highlight */}
+        <filter id="rc-hub-depth" x="-80%" y="-80%" width="260%" height="260%">
+          {/* Outer drop shadow — hub sits proud of the dial */}
+          <feDropShadow
+            dx="0"
+            dy="3"
+            stdDeviation="4"
+            floodColor="#000"
+            floodOpacity="0.85"
+            result="drop"
+          />
+          {/* Inner rim-light: blur alpha, offset toward top-left, clip inside shape */}
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="hub-blur" />
+          <feOffset in="hub-blur" dx="-1" dy="-2" result="hub-offset" />
+          <feComposite in="hub-offset" in2="SourceAlpha" operator="in" result="hub-inner" />
+          <feFlood floodColor="rgba(200,212,224,0.6)" result="hub-light" />
+          <feComposite in="hub-light" in2="hub-inner" operator="in" result="hub-rim" />
+          <feMerge>
+            <feMergeNode in="drop" />
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="hub-rim" />
+          </feMerge>
+        </filter>
+
+        {/* Silver glow filter for major ticks */}
         <filter id="rc-silver-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur1" />
           <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur2" />
@@ -459,9 +512,27 @@ export function RailroadClock({
           </feMerge>
         </filter>
 
-        {/* Hand drop shadow */}
+        {/* Hand drop shadow — bumped intensity for clear elevation over dial */}
         <filter id="rc-hand-shadow" x="-40%" y="-40%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="10" stdDeviation="7" floodColor="#000" floodOpacity="0.9" />
+          <feDropShadow dx="2" dy="12" stdDeviation="8" floodColor="#000" floodOpacity="0.95" />
+        </filter>
+
+        {/* Slot inset shadow — pressed-in appearance for active slots */}
+        <filter id="rc-slot-inset" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="slot-blur" />
+          <feOffset in="slot-blur" dx="0" dy="3" result="slot-offset" />
+          <feComposite in="slot-offset" in2="SourceAlpha" operator="in" result="slot-inner" />
+          <feFlood floodColor="rgba(0,0,0,0.7)" result="slot-shadow-color" />
+          <feComposite
+            in="slot-shadow-color"
+            in2="slot-inner"
+            operator="in"
+            result="slot-colored"
+          />
+          <feMerge>
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="slot-colored" />
+          </feMerge>
         </filter>
 
         {/* Whole dial drop-shadow → "recessed into watch body" illusion */}
@@ -474,11 +545,49 @@ export function RailroadClock({
 
       {/* ── Watch body / case ── */}
       <circle cx={CX} cy={CY} r={248} fill="url(#rc-bezel-ring)" />
+      {/* Outer rim catch light — thin bright arc at very edge */}
+      <circle cx={CX} cy={CY} r={247} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth={1} />
+      {/* Polished highlight inner edge — bright top-left, dark bottom-right */}
+      <circle
+        cx={CX}
+        cy={CY}
+        r={240}
+        fill="none"
+        stroke="url(#rc-bezel-highlight)"
+        strokeWidth={3}
+      />
       {/* Case-edge silver stroke */}
-      <circle cx={CX} cy={CY} r={240} fill="none" stroke="url(#rc-silver)" strokeWidth={2.5} />
+      <circle cx={CX} cy={CY} r={238} fill="none" stroke="url(#rc-silver)" strokeWidth={1.5} />
 
       {/* ── Dial background (recessed, radial gradient) ── */}
       <circle cx={CX} cy={CY} r={236} fill="url(#rc-dial-bg)" filter="url(#rc-dial-depth)" />
+      {/* Ambient occlusion overlay — darkens perimeter to read as inset/recessed */}
+      <circle cx={CX} cy={CY} r={236} fill="url(#rc-dial-ao)" style={{ pointerEvents: "none" }} />
+      {/* Shadow arc — top-left light source casts shadow on lower-right dial rim */}
+      <circle
+        cx={CX}
+        cy={CY}
+        r={230}
+        fill="none"
+        stroke="rgba(0,0,0,0.5)"
+        strokeWidth={10}
+        strokeDasharray="450 1000"
+        strokeDashoffset={-100}
+        style={{ pointerEvents: "none" }}
+        opacity={0.65}
+      />
+      {/* Highlight arc — bright rim catch on the upper-left dial edge */}
+      <circle
+        cx={CX}
+        cy={CY}
+        r={235}
+        fill="none"
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth={3}
+        strokeDasharray="280 1000"
+        strokeDashoffset={-480}
+        style={{ pointerEvents: "none" }}
+      />
 
       {/* ── 60-tick minute ring ── */}
       <g>
@@ -644,11 +753,18 @@ export function RailroadClock({
         </g>
       </g>
 
-      {/* ── Centre hub (pivot cap) ── */}
-      <g filter="url(#rc-silver-glow)">
-        <circle cx={CX} cy={CY} r={10} fill="url(#rc-silver)" />
-        <circle cx={CX} cy={CY} r={4} fill="#060309" />
-        <circle cx={CX} cy={CY} r={1.5} fill="#c4b5fd" />
+      {/* ── Centre hub (pivot cap — jewel-like recessed cap with depth) ── */}
+      <g filter="url(#rc-hub-depth)">
+        {/* Outer silver rim — raised ring that forms the cap edge */}
+        <circle cx={CX} cy={CY} r={11} fill="url(#rc-silver)" />
+        {/* Jewel face — radial gradient simulates concave faceted gem surface */}
+        <circle cx={CX} cy={CY} r={10} fill="url(#rc-hub-jewel)" />
+        {/* Dark recessed centre well */}
+        <circle cx={CX} cy={CY} r={4.5} fill="#04060c" />
+        {/* Specular highlight — off-centre to reinforce top-left light source */}
+        <circle cx={CX - 1.5} cy={CY - 2} r={1.8} fill="rgba(255,255,255,0.75)" />
+        {/* Violet iris point */}
+        <circle cx={CX} cy={CY} r={1} fill="#c4b5fd" />
       </g>
 
       {/* ── Brand label — moved further toward centre to clear DOWN slot ── */}
