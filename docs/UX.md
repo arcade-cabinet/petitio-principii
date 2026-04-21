@@ -10,16 +10,85 @@ domain: product
 > A wall of text is a wall of text. The argument doesn't have a map; it has a
 > shape. That shape is time.
 
-The terminal display is the game's only window on the argument. Everything
-else (the argument-map overlay, the keycaps) exists in service of it. This
-document specifies how the display turns the transcript — which will grow
-unboundedly across a session — into a surface a player can still read after
-the fifth room.
+The game has two surfaces:
+
+1. **The landing** — a Victorian station clock hung above an editorial
+   article that reads as a memory-palace threshold. The player chooses a
+   seed (or accepts today's argument), then commits with **Begin
+   Argument**, which melts the clock and steps the player into the in-game
+   terminal.
+2. **The terminal display** — the in-game reading surface. Everything else
+   (the argument-map overlay, the keycaps) exists in service of it. This
+   document specifies how the display turns the transcript — which will
+   grow unboundedly across a session — into a surface a player can still
+   read after the fifth room.
 
 The target is **not** a chat log. The target is a reading surface where
 **the player's attention always rests on the present**, the **recent past**
 remains retrievable without scrolling, and the **future** (what's about to
 happen) is telegraphed by the keycap row.
+
+---
+
+## 0. LANDING — the threshold
+
+Before the three in-game zones, the landing screen establishes the
+diegetic frame: this is a memory palace, you are about to enter an
+argument you once made.
+
+### 0.1 Hero clock
+
+A Victorian English railway-station clock (Gents of Leicester /
+Smiths Enfield lineage, restyled in our purple/silver/black palette)
+floats inside the landing article. Brushed-silver bezel, convex
+crystal sheen, deep-violet enamel dial, Roman numerals (IIII not IV,
+per clock-face convention) set in **Yesteryear** at hero scale,
+silver filigree pediment with trefoil + acanthus curls, a
+hung-from-the-ceiling bracket, an engraved bezel ring reading
+*PETITIO · PRINCIPII · MMXXVI · QUOD · ERAT · DEMONSTRANDUM*, a
+calendar window at 3 o'clock showing today's MM-DD, a sub-dial near
+9 o'clock showing the current seed in hex, and spade hands resting
+at 10:10. A subtle breathing animation respects
+`prefers-reduced-motion`.
+
+### 0.2 Editorial-fluid layout
+
+The clock floats in the article via CSS `shape-outside: circle()`,
+so the title (Petitio Principii in Yesteryear), subtitle, optional
+*Today's Argument* callout, the seeded incantation phrase, and the
+seed all flow alongside the clock like a magazine pull-quote. On
+mobile portrait (<640px) the layout collapses to a single column —
+the clock sits at the top, the article flows beneath. **No long
+vertical stack** even at narrow widths: actions cluster after the
+text, not under each other in turn.
+
+### 0.3 Melt-away transition
+
+When the player presses **Begin Argument**, the clock dissolves over
+~1.4s — opacity fades, downward gravity, slight rotation, scale
+down, horizontal skew, a Gaussian blur. A single foley *whoosh*
+plays as `ui.melt-away`. Reduced-motion users get a 0.6s opacity
+fade only. The lore line that motivates this transition lives in
+[VOICE.md §1](VOICE.md):
+
+> *therefore the watch melts*
+
+Once the melt completes, `onBegin(seed)` fires and the in-game
+terminal mounts.
+
+### 0.4 What the landing is NOT
+
+- Not a settings hub. The single appearance row at the bottom
+  (dyslexia-font toggle + S/M/L text size) is the only configuration
+  that lives here.
+- Not multilingual. The game ingests no foreign-language content; the
+  surface is English-only, no language switcher.
+- Not analytics-instrumented. There is no consent banner, no opt-in
+  analytics, no Plausible. Privacy is the absence of a question.
+- Not the railroad clock. An earlier interface direction made the
+  watch face the in-game input surface; that direction has been
+  retired (it violated the three-zone keycap spec). The clock is now
+  exclusively a hero motif on the landing.
 
 ---
 
