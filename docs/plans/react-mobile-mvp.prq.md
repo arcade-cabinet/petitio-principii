@@ -318,6 +318,70 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
     Authoring: each of World A and World B gets 2-3 puzzle groups hand-authored in `src/content/worlds/a.ts` / `b.ts`. Groups register their `kind`, member rooms, and any puzzle-state initializer.
     - **Verify**: (1) Koota integration test — PuzzleGroup trait round-trips correctly; state mutations persist across room re-entries within the same session. (2) Each of the 5 `kind`s has a dedicated scripted test walking through a hand-authored example group and asserting the solution condition fires at the right beat. (3) A 5-seed playthrough log (in T68) captures at least one puzzle-group encounter per seed; the player's session transcript shows the group's narrative shape (entry → working through → solution → exit). (4) `docs/WORLDS.md` extended with a PUZZLE GROUPS section listing each kind + each authored instance per world.
 
+### P28b — Authored-Worlds Sprint (engine seam + T109 micro fan-out)
+
+**Status: in flight, started 2026-04-21.** The current `ArgumentGraph` generator
+is a generic-PRNG-over-templates design (`ROOM_TEMPLATES` + `PASSAGE_TEMPLATES`
+shuffled into a 6-room ring) that has **no concept of authored worlds, regions,
+hinges, puzzle groups, path patterns, or A/B**. This is fundamentally
+incompatible with the meso commitments. Before the 10 region authors can
+fan out, the engine seam must be replaced.
+
+#### Architectural decision
+
+Replace `generateArgumentGraph()` (random template shuffle) with
+`weaveArgumentGraph(seed, worldsContent)` that walks one of two
+hand-authored worlds via monotonic Dijkstra cost-bias toward closing
+chambers, inserts hinge-cross transitions to the sibling world via
+connection nodes, binds the player into puzzle groups when the seed
+lands them in a group entry, classifies the verb pattern as the walk
+progresses, and routes to the correct closing chamber on Act III entry.
+Engine fallback (macro §6 req 4) catches the &lt;1% of seeds that don't
+naturally close within 40 turns.
+
+#### Wave plan
+
+| Wave | Agents | Blocks | Wait condition |
+|---|---|---|---|
+| **0** (small fixes, parallel) | A: T15 React 19 FormEvent fix; B: T28b release-please CI trigger; C: T106 clock 3D depth | none | parallel ignite |
+| **1** (engine architect, single, blocking) | Authored-worlds seam: types, Zod schema, build-time loader, weaver, fallback router, schema doc, placeholder content, wire-up to `use-game.ts`, full test coverage | Wave 2 | merge before Wave 2 |
+| **2** (10 region authors, parallel after Wave 1) | A.1, A.2, A.3, A.4 (+A.6 puzzle), A.5 (+closings), B.1, B.2, B.3, B.4 (+AB-PG-1), B.5 (+closings) | Wave 3 | wait for Wave 1 merge |
+| **3** (3 system agents, parallel after Wave 2) | T108 gnome ecology wiring; T99 weaver 10k-seed sweep + reachability bound; T107 blackboard test instrumentation | none | wait for Wave 2 ≥80% merged |
+
+#### Wave 1 deliverables (engine architect)
+
+One PR titled `feat(engine): authored-worlds seam` containing:
+
+- **Type extensions** — `Room` adds `worldId`, `regionId`, `nodeRole`, `hingeSentence?`, `puzzleGroupId?`, `pathPatternFamily?`, `dijkstraCostBias?`. `Exit` adds `costWeight`, `isHingeCross?`. New `Region`, `ConnectionNode`, `PuzzleGroup`, `ClosingChamber`, `World`, `WorldsContent` types.
+- **Zod schema** at `src/engine/world/schema.ts`, strict, no passthrough.
+- **Build-time loader** at `src/engine/world/loader.ts` — validates, freezes, asserts every region has a path to a closing chamber.
+- **Weaver** at `src/engine/world/weaver.ts` — per-seed world choice, monotonic Dijkstra walk, hinge crosses, puzzle-group binding, path-pattern classification.
+- **Fallback router** at `src/engine/world/fallback.ts` — macro §6 req 4.
+- **Schema doc** at `docs/design/WORLDS-schema.md` — the authoring contract.
+- **Placeholder content** at `src/engine/world/content/worlds-content.json` — minimal valid content (1 room per region) so loader assertions pass; explicit `[PLACEHOLDER — region X — author per meso §...]` text so micro authors know what to fill.
+- **Wire-up** — `use-game.ts` calls `weaveArgumentGraph` instead of `generateArgumentGraph`; old generic template generator deleted.
+- **Tests** — schema round-trip, loader assertions, weaver determinism, fallback trigger.
+
+#### Wave 2 region author contracts
+
+Each agent receives:
+- The frozen schema doc (Wave 1's `docs/design/WORLDS-schema.md`)
+- The exact meso §§ commitments for their region (region table from §2 or §3, hinge sentences from §5, gnome anchors from §7, puzzle-group memberships from §6, closing-chamber assignments from §9)
+- A skeleton `worlds-content.<region-id>.json` with placeholder slots to fill
+- One PR per region, ~7 rooms of content, ~50KB JSON
+
+#### Wave 3 system agent contracts
+
+- **Gnome ecology (T108)** — wires the 5 gnomes (Scholar-Mouse, Tautologist, Strawmen, Chorus, Figure Behind the Mirror) into the now-existing room data via the `gnomeAnchorId` field in the schema. Per-gnome Tracery line repertoire.
+- **Weaver sweep (T99)** — runs 10,000 seeds through the weaver, asserts ≥99% reach a closing within 40 turns. Surfaces the &lt;1% failures as test fixtures for the fallback router. This is the empirical bound the meso §10.4 explicitly defers to T99.
+- **Blackboard test (T107)** — instruments the weaver to emit a serialized "this is the map you walked" artifact per seed; a tester can draw it and the drawing should be a recognizable subset of World A or B's authored geography.
+
+#### Sprint state file
+
+Live state lives at `.claude/state/sprint-authored-worlds.json` (gitignored)
+and is flushed by the `task-batch-flush.sh` PreCompact hook. Inspect with
+`cat .claude/state/sprint-authored-worlds.json | jq .`
+
 ### P29 — Final audit & release
 
 - [ ] **T94** Repo convergence audit — every doc in `docs/` has current frontmatter and reflects shipped state. `CLAUDE.md` + `AGENTS.md` + `README.md` + `CHANGELOG.md` + `STANDARDS.md` all reviewed. Broken links fixed. `docs/STATE.md` reflects all completed tasks.
