@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 (2026-04-21)
+
+
+### Features
+
+* petitio principii — Act I + Act II complete ([7ea65ce](https://github.com/arcade-cabinet/petitio-principii/commit/7ea65ced37c6ebadb9160d0d697f9acddf75aafe))
+
+
+### Bug Fixes
+
+* **keycap:** match parsed verbs in usedVerbs lookup ('ask why' / 'trace back') ([#21](https://github.com/arcade-cabinet/petitio-principii/issues/21)) ([67490b7](https://github.com/arcade-cabinet/petitio-principii/commit/67490b797a6c32b57864e49c095b8404b4c63bca))
+
 ## [Unreleased]
 
 ### Added
