@@ -365,8 +365,13 @@ Both gates are mandatory.
       during authoring.
 - [ ] `pnpm brainstorm check scene/cases/<case>.scene` passes with
       zero failures. Warnings are acknowledged in the PR description.
-- [ ] `pnpm build-scene <path>` succeeds without linter warnings
-      (or warnings are explicitly waived in the PR description).
+- [ ] `pnpm build-game-db` (from `tools/build-game-db/`, introduced
+      alongside the SCENE parser in the pivot implementation)
+      succeeds without linter warnings, or warnings are explicitly
+      waived in the PR description. **Planned script**: authored
+      alongside the engine-seam PR; see
+      `docs/design/pivot/03-SCENE-LANGUAGE.md` §7 for the parser
+      entry point.
 - [ ] The case has ≥ 6 verdicts, spread across at least 3 distinct
       `moral` tags and at least 3 distinct `atmos` tags.
 - [ ] Every claim is used in at least one verdict's `requires`
@@ -379,7 +384,12 @@ Both gates are mandatory.
 - [ ] Blind-read test has been performed with at least one human
       who has not read the cluster's source material.
 - [ ] Maestro smoke flow `walk-<case-id>.yaml` exists and passes
-      against the built APK on a booted emulator.
+      against the built APK on a booted emulator. **Path**:
+      `.maestro/flows/walk-<case-id>.yaml`. Required once Maestro
+      flows land for the pivot (see `scripts/maestro-smoke.sh`
+      scaffolding in the prior QA branch); currently there are no
+      walk-* flows in-tree, so this gate is marked NOT-YET-ENFORCED
+      until the midnight case's flow lands.
 
 ---
 

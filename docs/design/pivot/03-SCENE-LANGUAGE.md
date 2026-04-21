@@ -56,12 +56,21 @@ tokenizer + parser.
   verbatim. Leading newline after `<<<` is stripped; common leading
   whitespace is stripped (same rules as Python textwrap.dedent).
 - **Block**: `{ ... }`. Opens after a keyword + optional id.
+- **List**: `[ elem, elem, ... ]`. Comma-separated. Trailing comma
+  permitted. Elements are *strings*, *references*, *tags*, or
+  *predicate-atoms* depending on context. The element type is fixed
+  per keyword; the parser does not accept mixed-type lists.
+  Examples:
+    - string list: `phrases-in-prose [ "Evelyn", "her", "the woman" ]`
+    - reference list: `from [ clue:receiver-warm, clue:perfume-faint ]`
+    - predicate-atom list: `all: [ clue:receiver-warm, fact:she-was-alone ]`
 - **Keyword**: reserved words (see §3). Keywords are lowercase.
 
 Operators:
 - `->` exit target (`east -> hall`)
 - `|` alternative in `on` clauses (`on examine thing:phone | thing:receiver`)
-- `+` conjunction in `requires` / `connect from` (`from { clue:A, clue:B }`)
+- `+` conjunction in `requires` / `connect from`
+  (`from [ clue:receiver-warm, clue:perfume-faint ]`)
 
 ---
 
@@ -145,9 +154,18 @@ against tap-context for near-misses and idle beats.
 
 ```
 retorts {
-  <<< Your own desk. The kind of mahogany that doesn't keep secrets. >>> { tags: [idle, furniture] }
-  <<< You want to ask about that, but the thought slips. >>> { tags: [near-miss] }
-  <<< Not everything that glitters is evidence. >>> { tags: [idle] }
+  retort {
+    prose <<< Your own desk. The kind of mahogany that doesn't keep secrets. >>>
+    tags { idle, furniture }
+  }
+  retort {
+    prose <<< You want to ask about that, but the thought slips. >>>
+    tags { near-miss }
+  }
+  retort {
+    prose <<< Not everything that glitters is evidence. >>>
+    tags { idle }
+  }
   ...
 }
 ```
@@ -356,9 +374,9 @@ reveal { clue:receiver-warm }
 # requires: "verdict/connection requirements"
 requires {
   all: [
-    clue:A,
-    any: [ fact:B, claim_state:C @ accepted ],
-    none: [ fact:D ]
+    clue:receiver-warm,
+    any: [ fact:she-was-alone, claim_state:it-was-evelyn @ accepted ],
+    none: [ fact:you-hallucinated-the-call ]
   ]
 }
 ```
@@ -440,5 +458,5 @@ pass). Sketched-not-authored contents are in this doc's examples.
 ## 9. Editor support
 
 v1: textmate-grammar for VS Code (`tools/scene-syntax/`). Syntax
-highlight + basic fold folding. A language-server with goto-definition
+highlight + basic code folding. A language-server with goto-definition
 for references is a nice-to-have for 1.0+.

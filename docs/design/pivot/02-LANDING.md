@@ -41,7 +41,7 @@ domain: product
  │  └─────────────┘          │       │          └─────────────┘ │
  │                           └───────┘                          │
  │                                                              │
- │                  [ BEGIN ARGUMENT ]                          │
+ │                  [ OPEN THE CASE ]                           │
  │                                                              │
  └──────────────────────────────────────────────────────────────┘
 ```
@@ -53,7 +53,7 @@ domain: product
   the header strip sits separated from the card bed by a fine silver
   line; the pane has subtle frosted translucence and a faint
   outer glow.
-- A single **BEGIN** button, under the clock, enters the currently-
+- A single **OPEN THE CASE** button, under the clock, enters the currently-
   selected case.
 
 On mobile (portrait phones):
@@ -167,7 +167,7 @@ Lock states:
 - Hovering a card (desktop) lifts it 2px and fades its glow up.
 - Tapping a card selects it — equivalent to dragging the clock hand
   to that hour. The hand animates to the card's hour over 400 ms.
-- Tapping an unlocked card a *second time* (or tapping BEGIN) enters
+- Tapping an unlocked card a *second time* (or tapping OPEN) enters
   the case.
 - Tapping a locked card does nothing mechanically; the card jiggles
   very slightly with a desaturated flash (not a negative-feedback
@@ -178,7 +178,7 @@ Lock states:
 
 ## 4. Entering a case
 
-Sequence when BEGIN is tapped on an unlocked case:
+Sequence when OPEN is tapped on an unlocked case:
 
 1. Selected case's card **expands and slides** toward the clock until
    it occludes the clock face (700 ms, ease-out-expo).
@@ -231,7 +231,7 @@ terminal is covered in `00-PIVOT-DETECTIVE.md` §4.
 - Hour hand is keyboard-operable: Tab focuses it; ArrowLeft /
   ArrowRight steps by 30°; Enter commits to the nearest hour and
   highlights the card; Space (or Enter while a card is selected) is
-  BEGIN.
+  OPEN.
 - Screen reader: clock has `role="slider"`, `aria-valuemin=1`,
   `aria-valuemax=12`, `aria-valuenow=<current hour>`. Reads as
   "clock hand, 12 o'clock, midnight case selected: A Voice Before Dawn

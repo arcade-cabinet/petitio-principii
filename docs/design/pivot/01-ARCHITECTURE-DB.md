@@ -7,8 +7,11 @@ domain: technical
 
 # Architecture — `game.db` as Single Source of Truth
 
-> One SQLite file per player. Ships with all 12 cases' content and
-> embeddings baked in at build time. Gains progress and settings as
+> One SQLite file per player. Ships with every authored case's
+> content and embeddings baked in at build time (note: in the beta
+> release only the Midnight case is fully authored; the seed db still
+> contains the schema + empty shells for the other 11 hours so the
+> landing can render them as locked). Gains progress and settings as
 > the player plays. Follows the established arcade-cabinet pattern
 > (grailguard, marmalade-drops): `sql.js` on web (OPFS-backed),
 > `capacitor-sqlite` on native.
@@ -25,7 +28,8 @@ domain: technical
 2. **Progress tables** — which cases started, which clues discovered,
    which claims committed, transcript. Read/write at runtime.
 3. **Settings** — volume, dyslexic font, text size, etc. Read/write
-   at runtime; single wide row.
+   at runtime; stored as key-value rows in a single `settings` table
+   (see §4.4).
 
 One file, one schema, one connection at boot.
 
@@ -76,15 +80,19 @@ migration explicitly modifies them).
 
 ## 3. Client library
 
-- **Web**: `sql.js` (WASM build of SQLite, ~600 KB gzipped). Persists
-  via OPFS (Origin Private File System) on modern browsers. On
-  browsers without OPFS, falls back to IndexedDB-chunk persistence.
+- **Web**: **`wa-sqlite`** (WASM build of SQLite with extension
+  support, ~600 KB gzipped total). Persists via OPFS (Origin
+  Private File System) on modern browsers. On browsers without
+  OPFS, falls back to IndexedDB-chunk persistence. We choose
+  wa-sqlite over `sql.js` specifically because `sqlite-vec`
+  requires extension loading, which sql.js doesn't support
+  out-of-the-box.
 - **Native (iOS/Android)**: `capacitor-sqlite`. Uses the platform's
   native sqlite; db file lives in app-private storage.
 - `sqlite-vec` extension for vector search (~80 KB). Available as a
-  compile-time addition to both client paths. On web, a `wa-sqlite`
-  build with `vec0` is straightforward; on native, capacitor-sqlite
-  supports extensions via its native plugin.
+  compile-time addition to both client paths. On web, we ship a
+  custom `wa-sqlite` build with `vec0` linked in; on native,
+  capacitor-sqlite supports extensions via its native plugin.
 
 ### 3.1 Abstraction
 
@@ -154,9 +162,16 @@ CREATE TABLE personas (
   proximity_first  TEXT NOT NULL,
   proximity_middle TEXT NOT NULL,
   proximity_late   TEXT NOT NULL,
-  proximity_last   TEXT NOT NULL,
-  FOREIGN KEY (case_id) REFERENCES cases(id)
+  proximity_last   TEXT NOT NULL
+  -- NOTE: personas.case_id is a plain column with an index, NOT a
+  -- foreign key. The FK direction is `cases.persona_id → personas.id`
+  -- only; making both FK'd creates a circular NOT-NULL dependency
+  -- that can't be inserted in a single statement. The build's
+  -- insert order is personas-first, then cases, so the forward FK
+  -- from cases to personas is valid; the reverse link is expressed
+  -- by denormalized `personas.case_id` + index.
 );
+CREATE INDEX personas_by_case ON personas(case_id);
 
 CREATE TABLE cases (
   id         TEXT PRIMARY KEY,          -- e.g. 'midnight'
@@ -494,11 +509,15 @@ player taps word
   ↓
 capture (word + sentence-context) → MiniLM embed → Float32Array
   ↓
-SELECT rowid, target_kind, target_ref_id, phrase
-  FROM hotspot_vec_mini
-  WHERE case_id = ? AND room_id = ?
-  ORDER BY vec_distance_cosine(embedding, ?) ASC
-  LIMIT 1
+-- hotspot_vec_mini is a vec0 virtual table with only the `embedding`
+-- column; metadata (case_id, room_id, target) lives in hotspot_meta
+-- keyed by rowid. Join on rowid to filter by case_id + room_id.
+SELECT hm.rowid, hm.target_kind, hm.target_ref_id, hm.phrase
+  FROM hotspot_vec_mini hv
+  JOIN hotspot_meta hm ON hm.rowid = hv.rowid
+ WHERE hm.case_id = ? AND hm.room_id = ?
+ ORDER BY vec_distance_cosine(hv.embedding, ?) ASC
+ LIMIT 1
   ↓
 if cosine_similarity < 0.75:
    silent miss — verb panel stays default
