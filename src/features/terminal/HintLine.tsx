@@ -52,15 +52,20 @@ export function HintLine({ hint, onDismiss }: HintLineProps) {
             type="button"
             onClick={onDismiss}
             className={cn(
-              "pointer-events-auto inline-flex items-center gap-2 px-2 py-0.5 rounded-sm",
-              "font-[family-name:var(--font-commandline)] text-[0.85rem]",
-              "text-[var(--color-dim)] hover:text-[var(--color-highlight)]",
-              "border border-[var(--color-panel-edge)]/40",
-              "bg-[var(--color-panel)]/60 backdrop-blur-sm"
+              "pointer-events-auto inline-flex items-center gap-2 px-3 py-1 rounded-sm",
+              "font-[family-name:var(--font-commandline)] text-[0.95rem]",
+              // Was --color-dim with --panel-edge/40 border — readable as
+              // "dim marginalia" but unreadable in screenshots at desktop
+              // distance. Bump to --color-silver text + violet accent border
+              // so the chip earns its real estate.
+              "text-[var(--color-silver)] hover:text-[var(--color-highlight)]",
+              "border border-[var(--color-violet)]/50 hover:border-[var(--color-violet)]",
+              "bg-[var(--color-panel)]/85 backdrop-blur-sm",
+              "shadow-[0_0_8px_rgba(122,92,255,0.25)]"
             )}
             aria-label={`Dismiss hint: ${hint.text}`}
           >
-            <span aria-hidden className="text-[var(--color-violet)]">
+            <span aria-hidden className="text-[var(--color-pink)] text-[1.05rem] leading-none">
               ›
             </span>
             <span>{hint.text}</span>

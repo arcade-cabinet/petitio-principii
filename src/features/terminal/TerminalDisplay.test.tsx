@@ -177,7 +177,7 @@ describe("TerminalDisplay three-zone projection", () => {
     }
   });
 
-  it("includes every rhetorical verb keycap regardless of availability", () => {
+  it("reveals rhetorical verbs contextually — LOOK plus at most one teaching verb on turn 0", () => {
     const transcript = [
       entry({ kind: "title", text: "Opening", turnId: 0 }),
       entry({ kind: "narration", text: "Start.", turnId: 0 }),
@@ -191,7 +191,37 @@ describe("TerminalDisplay three-zone projection", () => {
         onHintDismiss={vi.fn()}
       />
     );
-    // Per docs/UX.md §1.3: keycaps never vanish.
+    // Per the contextual-surface design brief: on a brand-new game, only
+    // LOOK plus a single pedagogical verb (the keycap layout's primary)
+    // should be visible. The other rhetorical verbs unlock as the player
+    // uses them or once they've used ≥3 distinct verbs / turnCount ≥ 8.
+    expect(screen.getByRole("button", { name: /Look/i })).toBeInTheDocument();
+    const verbButtons = Array.from(
+      document.querySelectorAll('button[data-variant="verb"]')
+    ) as HTMLElement[];
+    expect(verbButtons.length).toBeLessThanOrEqual(2);
+    const labels = verbButtons.map((b) => b.textContent?.toLowerCase() ?? "");
+    expect(labels.some((l) => /look/.test(l))).toBe(true);
+  });
+
+  it("opens the full rhetorical verb set once the tutorial window has ended", () => {
+    // Tutorial ends after ≥3 distinct non-LOOK verbs OR turnCount ≥ 8.
+    const transcript = [
+      entry({ kind: "title", text: "Opening", turnId: 0 }),
+      entry({ kind: "narration", text: "Start.", turnId: 0 }),
+      entry({ kind: "echo", text: "> examine", turnId: 1 }),
+      entry({ kind: "echo", text: "> question", turnId: 2 }),
+      entry({ kind: "echo", text: "> accept", turnId: 3 }),
+    ];
+    render(
+      <TerminalDisplay
+        state={{ ...mockState(transcript), turnCount: 3 }}
+        world={mockWorld()}
+        onCommand={vi.fn()}
+        onNewGame={vi.fn()}
+        onHintDismiss={vi.fn()}
+      />
+    );
     for (const label of [
       "Look",
       "Examine",
@@ -205,7 +235,7 @@ describe("TerminalDisplay three-zone projection", () => {
     }
   });
 
-  it("disables direction keycaps for exits that don't exist on the current room", () => {
+  it("renders cardinal direction keycaps that appear anywhere in the graph as disabled silhouettes when unavailable here", () => {
     const transcript = [entry({ kind: "narration", text: "You are here.", turnId: 0 })];
     render(
       <TerminalDisplay
@@ -216,12 +246,17 @@ describe("TerminalDisplay three-zone projection", () => {
         onHintDismiss={vi.fn()}
       />
     );
-    // mockRoom() exposes only "north" — south/east/west/up/down/back/forward
-    // must be disabled silhouettes, not hidden.
-    const south = screen.getByRole("button", { name: /^S$/ });
-    expect(south).toBeDisabled();
+    // mockRoom() exposes only "north" from current room, but the graph
+    // may contain other cardinals — and cardinals always render so the
+    // compass grid doesn't jitter. Non-cardinals (Up/Down/Back/Fwd),
+    // however, only render when available as an exit from this room.
     const north = screen.getByRole("button", { name: /^N$/ });
     expect(north).not.toBeDisabled();
+    // Non-cardinals should NOT be present on a room whose only exit is north.
+    expect(screen.queryByRole("button", { name: /^Up$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Down$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Back$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Fwd$/ })).toBeNull();
   });
 
   // ─────────────────────────────────────────────────────────────────────

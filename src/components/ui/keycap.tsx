@@ -4,12 +4,13 @@ import type { ReactNode } from "react";
 /**
  * KeyCap — one key on the HUD.
  *
- * Amendment to the prompt: the player does not type. Mobile-first.
- * Keycap chrome borrows the inset-shadow / LED / bg-glow vocabulary from
- * the bluetooth-key reference but is rewritten as a plain React button
- * so it's accessible, keyboard-reachable on desktop, and tap-responsive
- * on touch. Labels use VT323 — the display typeface — so they read as
- * part of the same surface as the output text.
+ * The player does not type. Mobile-first; the web harness is for testing
+ * only. Keycap chrome borrows the inset-shadow / LED / bg-glow vocabulary
+ * from the bluetooth-key reference but is rewritten as a plain React
+ * button. Tap-responsive on touch; assistive tech reads the visible label
+ * via the button's text content (no shortcut chrome, no keyboard hooks).
+ * Labels use VT323 — the display typeface — so they read as part of the
+ * same surface as the output text.
  *
  * Variants:
  *   - "direction" — compass icons from lucide (N/S/E/W/Up/Down/Back)
@@ -37,8 +38,6 @@ export interface KeyCapProps {
    * key. Ignored for non-direction variants.
    */
   traversed?: boolean;
-  /** Optional shortcut hint shown beneath the label (e.g. "N", "L") */
-  shortcut?: string;
   "aria-label"?: string;
 }
 
@@ -50,7 +49,6 @@ export function KeyCap({
   disabled = false,
   emphasis = "charged",
   traversed = false,
-  shortcut,
   "aria-label": ariaLabel,
 }: KeyCapProps) {
   const tonal = {
@@ -141,11 +139,6 @@ export function KeyCap({
         >
           {label}
         </span>
-        {shortcut ? (
-          <span className="text-[0.6rem] tracking-[0.2em] text-[var(--color-muted)]">
-            {shortcut}
-          </span>
-        ) : null}
       </span>
     </button>
   );

@@ -106,9 +106,30 @@ describe("App end-to-end smoke", () => {
     await user.click(screen.getByRole("button", { name: /begin argument/i }));
     await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument());
 
+    // The contextual keycap surface only exposes LOOK + one teaching verb
+    // at a time during the tutorial window (≤ 3 distinct non-LOOK verbs
+    // used AND turnCount < 8). TRACE BACK is late in the pedagogy order,
+    // so we first burn three distinct non-LOOK verbs to unlock the full
+    // set. Any verb visible on the current turn counts — we iterate the
+    // currently-rendered verb buttons until we've clicked three distinct.
+    const clicked = new Set<string>();
+    for (let i = 0; i < 20 && clicked.size < 3; i++) {
+      const verbButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
+      );
+      const pickable = verbButtons.find((b) => {
+        const label = (b.textContent ?? "").toLowerCase();
+        return !/look/.test(label) && !clicked.has(label.trim());
+      });
+      if (!pickable) break;
+      const label = (pickable.textContent ?? "").toLowerCase().trim();
+      clicked.add(label);
+      await user.click(pickable);
+    }
+
     // Drive TRACE BACK until present zone says "circular-atrium" / contains
     // a circular-room cue, or up to 12 hops (safety bound).
-    const traceBtn = screen.getByRole("button", { name: /Trace Back/i });
+    const traceBtn = await screen.findByRole("button", { name: /Trace Back/i });
     let inCircle = false;
     for (let i = 0; i < 12 && !inCircle; i++) {
       await user.click(traceBtn);

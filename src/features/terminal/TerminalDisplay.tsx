@@ -6,6 +6,7 @@ import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
 import { HintLine } from "@/features/terminal/HintLine";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
+import { computeKeycapSurface } from "@/features/terminal/keycapSurface";
 import { useViewport } from "@/hooks/use-viewport";
 import type { WorldHandle } from "@/hooks/use-world";
 import { isCircleClosed } from "@/world";
@@ -45,14 +46,16 @@ export interface TerminalDisplayProps {
   onHintDismiss: () => void;
 }
 
-const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string; hint?: string }> = [
-  { label: "Look", verb: "look", hint: "L" },
-  { label: "Examine", verb: "examine", hint: "X" },
-  { label: "Question", verb: "question", hint: "Q" },
+// The game is click/tap-only (mobile-first, no keyboard). Keycap labels
+// stand on their own; there are no keyboard shortcuts to display.
+const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string }> = [
+  { label: "Look", verb: "look" },
+  { label: "Examine", verb: "examine" },
+  { label: "Question", verb: "question" },
   { label: "Ask Why", verb: "ask why" },
   { label: "Accept", verb: "accept" },
   { label: "Reject", verb: "reject" },
-  { label: "Trace Back", verb: "trace back", hint: "T" },
+  { label: "Trace Back", verb: "trace back" },
 ];
 
 /**
@@ -145,6 +148,21 @@ export function TerminalDisplay({
     );
   }, [currentRoom, state.turnCount, usedVerbs, traversedDirections, world]);
 
+  // Contextual keycap surfacing — pure state → visible-set projection.
+  // The *what shows* logic lives in keycapSurface.ts so this component
+  // stays presentational. Re-derived per render; the function is cheap.
+  const surface = useMemo(
+    () =>
+      computeKeycapSurface({
+        rooms: state.rooms,
+        currentRoom,
+        turnCount: state.turnCount,
+        usedVerbs,
+        layout,
+      }),
+    [state.rooms, currentRoom, state.turnCount, usedVerbs, layout]
+  );
+
   const turns = useMemo(() => groupByTurn(state.transcript), [state.transcript]);
   const past = turns.slice(0, -1);
   const present = turns.at(-1);
@@ -159,42 +177,6 @@ export function TerminalDisplay({
   useEffect(() => {
     if (pastRef.current) pastRef.current.scrollTop = pastRef.current.scrollHeight;
   }, [pastLength, pastExpanded]);
-
-  // Keyboard parity — desktop users can still use the keyboard even though
-  // the primary input model is taps. Movement, L, X, Q, T, A, R, ?.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") return;
-      const keys: Record<string, string> = {
-        n: "north",
-        s: "south",
-        e: "east",
-        w: "west",
-        ArrowUp: "north",
-        ArrowDown: "south",
-        ArrowLeft: "west",
-        ArrowRight: "east",
-        u: "up",
-        d: "down",
-        l: "look",
-        x: "examine",
-        q: "question",
-        t: "trace back",
-        b: "back",
-        a: "accept",
-        r: "reject",
-        "?": "ask why",
-      };
-      const verb = keys[e.key] ?? keys[e.key.toLowerCase()];
-      if (verb) {
-        e.preventDefault();
-        onCommand(verb);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onCommand]);
 
   return (
     <div className="relative z-10 flex h-full w-full flex-col gap-4 p-4 md:p-6">
@@ -357,28 +339,32 @@ export function TerminalDisplay({
       {/* FUTURE zone — rhetorical verbs, directions */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap justify-center gap-2">
-          {RHETORICAL_VERBS.map((v) => (
+          {RHETORICAL_VERBS.filter((v) => surface.verbs.has(v.verb)).map((v) => (
             <KeyCap
               key={v.verb}
               label={v.label}
               variant="verb"
-              shortcut={v.hint}
               emphasis={layout?.rhetorical[emphasisKeyFor(v.verb)] ?? "charged"}
               onPress={() => onCommand(v.verb)}
             />
           ))}
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          {DIRECTION_KEYS.map((d) => {
-            const state = layout?.directions[d.dir];
+          {DIRECTION_KEYS.filter((d) => {
+            const isCardinal =
+              d.dir === "north" || d.dir === "south" || d.dir === "east" || d.dir === "west";
+            if (isCardinal) return surface.cardinals.has(d.dir);
+            return surface.nonCardinals.has(d.dir);
+          }).map((d) => {
+            const dirState = layout?.directions[d.dir];
             return (
               <KeyCap
                 key={d.dir}
                 label={d.label}
                 icon={d.icon}
                 variant="direction"
-                disabled={!state?.available}
-                traversed={state?.alreadyTraversed ?? false}
+                disabled={!dirState?.available}
+                traversed={dirState?.alreadyTraversed ?? false}
                 onPress={() => onCommand(d.dir)}
               />
             );
