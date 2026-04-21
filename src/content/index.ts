@@ -5,8 +5,6 @@ export { FALLACY_TEMPLATES } from "./templates/fallacyTemplates";
 export { PASSAGE_TEMPLATES } from "./templates/passageTemplates";
 export { ROOM_TEMPLATES, type RhetoricalType, type RoomTemplate } from "./templates/roomTemplates";
 export { LOCAL_CORPUS, type FallacyEntry } from "./corpus/localCorpus";
-export { fetchPhilosophyEntry, type PhilosophyEntry } from "./corpus/philosophyApiClient";
-export { fetchFallacyArticle, type WikipediaArticle } from "./corpus/wikipediaClient";
 export { createGrammar, generateAbsurdArgument, type GeneratedNarrative } from "./grammar";
 export {
   GENERATED_CORPUS,

@@ -1,4 +1,5 @@
 import type { CommandVerb, GameState, Room } from "@/engine";
+import type { VerbId } from "./VerbPanel";
 import type { KeycapLayout } from "./keycapLayout";
 
 /**
@@ -22,13 +23,8 @@ import type { KeycapLayout } from "./keycapLayout";
  * Pure, testable, stateless. TerminalDisplay.tsx imports the result.
  */
 
-export type RhetoricalVerb =
-  | "examine"
-  | "question"
-  | "ask why"
-  | "accept"
-  | "reject"
-  | "trace back";
+/** Non-LOOK rhetorical verbs — subset of VerbId (the UI-level verb vocabulary). */
+export type RhetoricalVerb = Exclude<VerbId, "look">;
 
 /**
  * Each pedagogy entry pairs the **display label** (what the UI renders)
@@ -63,7 +59,7 @@ const NON_CARDINAL_DIRECTIONS = new Set(["up", "down"]);
 
 export interface KeycapSurface {
   /** Verbs the UI should render, including "look". */
-  readonly verbs: ReadonlySet<string>;
+  readonly verbs: ReadonlySet<VerbId>;
   /** Cardinal directions (N/S/E/W) that appear anywhere in the graph. Always pinned. */
   readonly cardinals: ReadonlySet<string>;
   /** Non-cardinals currently available as an exit from the present room. */
@@ -99,10 +95,10 @@ export function computeKeycapSurface(ctx: KeycapSurfaceContext): KeycapSurface {
   }
 
   // Verbs — LOOK is always visible.
-  const verbs = new Set<string>(["look"]);
+  const verbs = new Set<VerbId>(["look"]);
 
   // Every verb the player has already used stays visible.
-  const nonLookUsed: string[] = [];
+  const nonLookUsed: VerbId[] = [];
   for (const v of PEDAGOGY) {
     if (usedVerbs.has(v.parsedVerb)) {
       verbs.add(v.verb);
@@ -139,7 +135,7 @@ export function computeKeycapSurface(ctx: KeycapSurfaceContext): KeycapSurface {
 function pickTutorialVerb(
   layout: KeycapLayout,
   usedVerbs: ReadonlySet<CommandVerb>
-): string | null {
+): VerbId | null {
   for (const v of PEDAGOGY) {
     if (usedVerbs.has(v.parsedVerb)) continue;
     if (layout.rhetorical[v.key] === "primary") return v.verb;

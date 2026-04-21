@@ -183,9 +183,6 @@ export function useGame(): GameHandle {
       // feel the weight). Success haptic is NOT fired here; it's gated on
       // the Triumphant circle-closing response, watched for in the effect
       // below.
-      // TODO(T98): rewire when Move type lands — the clock-ui agent will
-      // replace string-based dispatch with `Move` objects, and this
-      // stringly-typed verb check will silently stop matching.
       const verb = raw.trim().toLowerCase();
       if (verb === "reject") void mobile.hapticWarning();
       setState((prev) => {
