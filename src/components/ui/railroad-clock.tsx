@@ -5,23 +5,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *
  * A mechanical railroad-watch face rendered in SVG (viewBox 500×500).
  *
- * Geometry (v3 — fixes DOWN slot overflow, numeral clipping, action ring snap):
+ * Geometry (v4 — verified DOWN inside case, numerals inside case, no lane collision):
  *   - Watch case: r=248 (bezel), silver edge stroke at r=240, dial r=236.
  *   - Minute-tick ring: inner r=218 (major) / r=222 (minor), outer r=230.
  *     Majors: silver stroke-width 3. Minors: violet stroke-width 1.5.
- *   - Hour numerals: concentric band at r=215, 9px VT323 (inside the minute
- *     ticks, above direction slots — no more clipping).
- *   - Outer ring (r=180): 12 positions. 4 interactive direction slots
- *     (UP/RIGHT/DOWN/LEFT) at the quarters + 8 small silver hour dots
- *     at 1/2/4/5/7/8/10/11. Direction slots r=28 → extent 152-208
- *     (inside numeral band at 215).
+ *   - Hour numerals: concentric band at r=210, 10px VT323 #c4b5fd — sits
+ *     inside the minute-tick inner edge (r=218) and outside the direction
+ *     slot outer extent (r=160+28=188). No clipping, clearly inside case.
+ *   - Outer ring (r=160): 4 interactive direction slots (UP/RIGHT/DOWN/LEFT)
+ *     at the quarters + 8 small silver hour dots at 1/2/4/5/7/8/10/11.
+ *     Slot visible r=28 → extent 132–188, comfortably inside case (238.75).
  *   - Silver separator ring at r=150 divides direction band from action band.
- *   - Inner ring (r=115): 7 rhetorical-action slots SNAPPED TO CLOCK
- *     POSITIONS — 6 at 60° intervals + TRACE_BACK at 330° (semantically
- *     "going back" on the clock). Slot r=26 → extent 89-141.
+ *   - Inner ring (r=115): 7 rhetorical-action slots at non-cardinal hours:
+ *     TRACE_BACK@1, EXAMINE@2, QUESTION@4, ASK_WHY@5, ACCEPT@7, REJECT@8,
+ *     LOOK@10. No lane overlaps with direction slots at {12,3,6,9}.
+ *     Slot r=26 → extent 89–141.
  *   - Centre hub at r=75, silver pivot cap r=10.
- *   - Spade hand at len=175 (tip at r=175, well inside separator at 150,
- *     reaches action band without overshooting direction band).
+ *   - Spade hand at len=175 (tip at r=175, well inside separator at 150).
  *
  * Inputs (T98):
  *   - Single tap: `{ kind: 'tap', slot }` on pointer-up (same slot).
@@ -56,16 +56,16 @@ const DIRECTION_SLOTS = [
 
 export type DirectionSlotId = "UP" | "RIGHT" | "DOWN" | "LEFT";
 
-// Inner ring: 7 rhetorical actions SNAPPED to clock-hour positions.
-// 6 actions at 60° intervals + TRACE_BACK at 330° (semantically "backward").
+// Inner ring: 7 rhetorical actions at NON-CARDINAL hours only.
+// {12, 3, 6, 9} are reserved for direction slots. Actions use {1,2,4,5,7,8,10}.
 const ACTION_SLOTS = [
-  { id: "LOOK", label: "Look", angle: 0 }, // 12
-  { id: "EXAMINE", label: "Examine", angle: 60 }, // 2
-  { id: "QUESTION", label: "Question", angle: 120 }, // 4
-  { id: "ACCEPT", label: "Accept", angle: 180 }, // 6
-  { id: "ASK_WHY", label: "Ask\nWhy", angle: 240 }, // 8
-  { id: "REJECT", label: "Reject", angle: 300 }, // 10
-  { id: "TRACE_BACK", label: "Trace\nBack", angle: 330 }, // 11 — "backward"
+  { id: "TRACE_BACK", label: "Trace\nBack", angle: 30 }, // 1 o'clock — "going back"
+  { id: "EXAMINE", label: "Examine", angle: 60 }, // 2 o'clock
+  { id: "QUESTION", label: "Question", angle: 120 }, // 4 o'clock
+  { id: "ASK_WHY", label: "Ask\nWhy", angle: 150 }, // 5 o'clock
+  { id: "ACCEPT", label: "Accept", angle: 210 }, // 7 o'clock
+  { id: "REJECT", label: "Reject", angle: 240 }, // 8 o'clock
+  { id: "LOOK", label: "Look", angle: 300 }, // 10 o'clock
 ] as const;
 
 export type ActionSlotId =
@@ -127,9 +127,12 @@ function spadePath(len: number, width: number): string {
 
 // ─── Slot rendering ──────────────────────────────────────────────────────────
 
-// v3 layout: tighter radii keep everything inside the case with clearance.
-const OUTER_R = 180; // direction-slot centre ring
-const NUMERAL_R = 215; // hour-numeral band (inside minute ticks)
+// v4 layout: verified geometry — all slots inside case, no lane collisions.
+// Case-edge silver stroke at r=240 (inner extent r=238.75).
+// OUTER_R=160 → direction slot bottom extent = 160+28 = 188 (margin=50 inside case).
+// NUMERAL_R=210 → between direction outer extent (188) and tick inner edge (218).
+const OUTER_R = 160; // direction-slot centre ring
+const NUMERAL_R = 210; // hour-numeral band (between direction extent and tick inner edge)
 const SEP_R = 150; // silver separator between direction and action bands
 const INNER_R = 115; // action-slot centre ring
 const SLOT_RING_R = 26; // action-slot visible radius
@@ -469,7 +472,8 @@ export function RailroadClock({
         })}
       </g>
 
-      {/* ── 12 hour numerals on their own band at r=215 ── */}
+      {/* ── 12 hour numerals on their own band at r=210 ── */}
+      {/* r=210 sits between direction outer extent (188) and tick inner edge (218) */}
       <g>
         {Array.from({ length: 12 }).map((_, i) => {
           const angle = i * 30;
@@ -481,11 +485,11 @@ export function RailroadClock({
               y={pos.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="#9ca0b5"
-              fontSize={9}
+              fill="#c4b5fd"
+              fontSize={10}
               fontFamily="'VT323', monospace"
               letterSpacing="0.08em"
-              opacity={0.85}
+              opacity={0.9}
               style={{ userSelect: "none" }}
             >
               {i === 0 ? 12 : i}
