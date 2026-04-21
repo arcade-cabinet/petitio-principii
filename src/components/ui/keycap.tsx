@@ -70,8 +70,13 @@ export function KeyCap({
     calm: "opacity-55",
     charged:
       "opacity-95 [box-shadow:inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_-6px_1px_-4px_rgba(122,92,255,0.45),inset_0_-15px_6px_-8px_rgba(30,10,60,0.9),0_0_0_1px_rgba(5,1,10,0.6),0_0_10px_rgba(122,92,255,0.25)]",
+    // The violet outline is composed into the arbitrary box-shadow as a
+    // 1px spread. Tailwind v4: ring-* and an arbitrary [box-shadow:…] both
+    // emit `box-shadow` declarations and the later cascade position wins,
+    // so mixing `ring-1` with a custom box-shadow loses the ring entirely.
+    // Baking the outline into the shadow keeps it guaranteed-visible.
     primary:
-      "opacity-100 ring-1 ring-[var(--color-violet)] [box-shadow:inset_0_1px_1px_rgba(255,255,255,0.12),inset_0_-6px_1px_-4px_rgba(155,127,255,0.7),inset_0_-15px_6px_-8px_rgba(30,10,60,0.9),0_0_0_1px_rgba(5,1,10,0.6),0_0_18px_rgba(255,209,250,0.55)] motion-safe:[animation:pulse-violet_2s_ease-in-out_infinite] before:absolute before:inset-0 before:rounded-[5px] before:bg-gradient-to-b before:from-transparent before:via-transparent before:to-[rgba(255,209,250,0.18)] before:pointer-events-none",
+      "opacity-100 [box-shadow:inset_0_1px_1px_rgba(255,255,255,0.12),inset_0_-6px_1px_-4px_rgba(155,127,255,0.7),inset_0_-15px_6px_-8px_rgba(30,10,60,0.9),0_0_0_1px_var(--color-violet),0_0_18px_rgba(255,209,250,0.55)] motion-safe:[animation:pulse-violet_2s_ease-in-out_infinite] before:absolute before:inset-0 before:rounded-[5px] before:bg-gradient-to-b before:from-transparent before:via-transparent before:to-[rgba(255,209,250,0.18)] before:pointer-events-none",
   }[emphasis];
 
   // Direction silhouettes: disabled + already-traversed keeps the slot in
