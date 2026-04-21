@@ -159,3 +159,13 @@ docs/playtest/*.mp4
 src/**/*.d.ts
 app/**/*.d.ts
 !src/types/**/*.d.ts
+
+# Claude Code git worktrees (other agents — not part of this project's source)
+.claude/worktrees/
+
+# Lighthouse raw artifacts — only the curated summary (lighthouse-YYYY-MM-DD.json)
+# should be committed. report.html/report.json and report.report.* (lighthouse
+# CLI's default naming) are machine-generated outputs.
+docs/audits/*.html
+docs/audits/report.json
+docs/audits/report.report.*

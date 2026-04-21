@@ -1,6 +1,18 @@
+import { AppearanceControls } from "@/components/ui/appearance-controls";
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { generatePhrase, generateSeed } from "@/engine";
-import { useMemo, useState } from "react";
+import { useAppearance } from "@/hooks/use-appearance";
+import { SUPPORTED_LANGUAGES, setLanguage } from "@/lib/i18n";
+import type { SupportedLanguage } from "@/lib/i18n";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+const LANG_LABELS: Record<SupportedLanguage, string> = {
+  en: "EN",
+  es: "ES",
+  fr: "FR",
+  ar: "AR",
+};
 
 /**
  * NewGameIncantation — the landing display.
@@ -12,37 +24,121 @@ import { useMemo, useState } from "react";
  * Three actions: BEGIN (press the incantation into the argument),
  * REGENERATE (another phrase), CUSTOM SEED (specify the reproducible
  * argument-journey you want to play).
+ *
+ * T91: If `?seed=XXXX` is present in the URL on landing, that seed is loaded
+ * immediately. The "Share" button copies
+ * `window.location.origin + base + "?seed=" + currentSeed` to the clipboard.
+ *
+ * T92: Each day a date-derived seed surfaces as "Argument of the Day". The
+ * seed is derived from `hash(YYYY-MM-DD)` so every device on the same UTC
+ * date plays the same argument.
+ *
+ * T82: All player-facing strings go through react-i18next (en/es/fr).
  */
+
+/** Derive a deterministic u32 seed from a UTC date string "YYYY-MM-DD". */
+function dateSeed(dateStr: string): number {
+  // FNV-1a 32-bit
+  let h = 0x811c9dc5;
+  for (let i = 0; i < dateStr.length; i++) {
+    h ^= dateStr.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** Return today's UTC date as "YYYY-MM-DD". */
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Parse ?seed= from the current URL; returns null if absent/invalid. */
+function seedFromURL(): number | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("seed");
+    if (!raw) return null;
+    const n = Number.parseInt(raw, 10);
+    if (Number.isNaN(n) || n < 0 || n > 0xffffffff) return null;
+    return n;
+  } catch {
+    return null;
+  }
+}
+
+/** Build the shareable URL for a given seed. */
+function buildShareURL(seed: number): string {
+  const url = new URL(window.location.href);
+  url.searchParams.set("seed", String(seed));
+  // Strip any hash fragment so the shared link lands on landing
+  url.hash = "";
+  return url.toString();
+}
+
 export interface NewGameIncantationProps {
   onBegin: (seed: number) => void | Promise<void>;
 }
 
 export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
-  const [seed, setSeed] = useState<number>(() => generateSeed());
+  const { t, i18n } = useTranslation();
+  const appearance = useAppearance();
+  const urlSeed = useMemo(() => seedFromURL(), []);
+  const todaySeedValue = useMemo(() => dateSeed(todayUTC()), []);
+
+  const [seed, setSeed] = useState<number>(() => urlSeed ?? todaySeedValue);
+  /** true when the currently-shown seed is today's date-derived seed */
+  const [isArgumentOfDay, setIsArgumentOfDay] = useState<boolean>(
+    () => urlSeed === null || urlSeed === todaySeedValue
+  );
   const [customOpen, setCustomOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [customError, setCustomError] = useState("");
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">("idle");
 
   const phrase = useMemo(() => generatePhrase(seed), [seed]);
 
+  // Keep the URL bar in sync with the current seed so the page is always shareable.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("seed", String(seed));
+    window.history.replaceState(null, "", url.toString());
+  }, [seed]);
+
   const handleRegenerate = () => {
-    setSeed(generateSeed());
+    const nextSeed = generateSeed();
+    setSeed(nextSeed);
+    setIsArgumentOfDay(nextSeed === todaySeedValue);
     setCustomInput("");
     setCustomError("");
     setCustomOpen(false);
+    setShareStatus("idle");
   };
 
   const handleCustomSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parsed = Number.parseInt(customInput, 10);
     if (Number.isNaN(parsed) || parsed < 0 || parsed > 0xffffffff) {
-      setCustomError("Seed must be between 0 and 4294967295");
+      setCustomError(t("landing.seed_error"));
       return;
     }
     setCustomError("");
     setSeed(parsed);
+    setIsArgumentOfDay(parsed === todaySeedValue);
     setCustomOpen(false);
     setCustomInput("");
+    setShareStatus("idle");
+  };
+
+  const handleShare = async () => {
+    const shareURL = buildShareURL(seed);
+    try {
+      await navigator.clipboard.writeText(shareURL);
+      setShareStatus("copied");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    } catch {
+      setShareStatus("error");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    }
   };
 
   return (
@@ -57,14 +153,29 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
             textShadow: "0 0 8px rgba(255,209,250,0.55), 0 0 22px rgba(122,92,255,0.5)",
           }}
         >
-          Petitio Principii
+          {t("landing.title")}
         </h1>
         <p className="mt-4 font-[family-name:var(--font-display)] text-[1.05rem] tracking-[0.14em] text-[var(--color-dim)]">
-          a text adventure through a self-justifying argument
+          {t("landing.subtitle")}
         </p>
 
+        {/* T92 — Argument of the Day banner */}
+        {isArgumentOfDay && (
+          <div
+            className="mt-5 rounded-[4px] border border-[var(--color-panel-edge)] bg-[var(--color-ink)]/60 px-4 py-2"
+            aria-live="polite"
+          >
+            <p className="font-[family-name:var(--font-display)] text-[0.88rem] tracking-[0.16em] text-[var(--color-violet-bright)] uppercase">
+              {t("landing.argument_of_day_label")} &mdash; {todayUTC()}
+            </p>
+            <p className="mt-0.5 font-[family-name:var(--font-display)] text-[0.78rem] tracking-[0.1em] text-[var(--color-muted)]">
+              {t("landing.argument_of_day_note")}
+            </p>
+          </div>
+        )}
+
         {/* Incantation — the seeded phrase, drawn in Yesteryear */}
-        <div className="mt-10 flex flex-col items-center gap-2">
+        <div className="mt-8 flex flex-col items-center gap-2">
           <div
             className="font-[family-name:var(--font-incantation)] text-[clamp(1.8rem,5vw,2.4rem)] leading-tight text-[var(--color-silver)]"
             style={{ textShadow: "0 0 6px rgba(192,192,255,0.45)" }}
@@ -72,7 +183,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
             {phrase}
           </div>
           <div className="font-[family-name:var(--font-display)] text-[0.95rem] tracking-[0.18em] text-[var(--color-muted)]">
-            SEED <span className="text-[var(--color-dim)]">{seed}</span>
+            {t("landing.seed_label")} <span className="text-[var(--color-dim)]">{seed}</span>
           </div>
         </div>
 
@@ -92,7 +203,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               active:translate-y-[1px]
             `}
           >
-            Begin Argument
+            {t("landing.begin")}
           </button>
           <div className="flex gap-3">
             <button
@@ -107,7 +218,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
                 hover:text-[var(--color-highlight)] hover:border-[var(--color-violet)]
               `}
             >
-              Regenerate
+              {t("landing.regenerate")}
             </button>
             <button
               type="button"
@@ -121,9 +232,30 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
                 hover:text-[var(--color-dim)]
               `}
             >
-              Custom Seed
+              {t("landing.custom_seed")}
             </button>
           </div>
+
+          {/* T91 — Share button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            aria-label={t("landing.share_seed_aria")}
+            className={`
+              min-h-[40px] rounded-[5px]
+              border border-transparent
+              bg-transparent
+              font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.16em] uppercase
+              transition-colors duration-150
+              ${shareStatus === "copied" ? "text-[var(--color-silver)]" : "text-[var(--color-muted)] hover:text-[var(--color-dim)]"}
+            `}
+          >
+            {shareStatus === "copied"
+              ? t("landing.share_copied")
+              : shareStatus === "error"
+                ? t("landing.share_error")
+                : t("landing.share_seed")}
+          </button>
         </div>
 
         {customOpen && (
@@ -132,8 +264,8 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               type="number"
               value={customInput}
               onChange={(e) => setCustomInput(e.currentTarget.value)}
-              placeholder="enter a numeric seed…"
-              aria-label="Custom seed"
+              placeholder={t("landing.seed_input_placeholder")}
+              aria-label={t("landing.seed_input_aria")}
               min={0}
               max={0xffffffff}
               className={`
@@ -155,7 +287,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
                 hover:text-[var(--color-highlight)] hover:border-[var(--color-violet)]
               `}
             >
-              Apply
+              {t("landing.seed_input_apply")}
             </button>
           </form>
         )}
@@ -164,6 +296,37 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
             {customError}
           </p>
         )}
+
+        {/* T85/T86 appearance settings */}
+        <AppearanceControls appearance={appearance} />
+
+        {/* T82/T83 language switcher */}
+        <fieldset
+          className="mt-3 flex items-center justify-center gap-2 border-0 m-0 p-0"
+          aria-label={t("landing.language_switcher_aria")}
+        >
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              aria-pressed={i18n.language === lang}
+              onClick={() => setLanguage(lang as SupportedLanguage)}
+              className={`
+                min-h-[24px] min-w-[30px] rounded-[3px]
+                border
+                font-[family-name:var(--font-display)] text-[0.75rem] tracking-[0.12em] uppercase
+                transition-colors duration-150
+                ${
+                  i18n.language === lang
+                    ? "border-[var(--color-violet)] bg-[var(--color-violet)]/20 text-[var(--color-violet-bright)]"
+                    : "border-transparent bg-transparent text-[var(--color-muted)] hover:text-[var(--color-dim)]"
+                }
+              `}
+            >
+              {LANG_LABELS[lang]}
+            </button>
+          ))}
+        </fieldset>
       </GlowingPanel>
     </div>
   );

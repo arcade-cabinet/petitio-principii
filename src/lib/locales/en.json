@@ -1,0 +1,43 @@
+{
+  "landing": {
+    "title": "Petitio Principii",
+    "subtitle": "a text adventure through a self-justifying argument",
+    "seed_label": "SEED",
+    "begin": "Begin Argument",
+    "regenerate": "Regenerate",
+    "custom_seed": "Custom Seed",
+    "share_seed": "Share this seed",
+    "share_seed_aria": "Copy shareable link to this seed",
+    "share_copied": "Link copied!",
+    "share_error": "Copy failed — try again",
+    "seed_input_placeholder": "enter a numeric seed…",
+    "seed_input_aria": "Custom seed",
+    "seed_input_apply": "Apply",
+    "seed_error": "Seed must be between 0 and 4294967295",
+    "language_switcher_aria": "Language",
+    "argument_of_day_label": "Today's Argument",
+    "argument_of_day_note": "Everyone playing today shares this seed."
+  },
+  "settings": {
+    "dyslexic_font": "Dyslexic Font",
+    "dyslexic_font_aria": "Toggle dyslexia-friendly font",
+    "display_settings_label": "Display settings",
+    "text_size_label": "Text size",
+    "text_size_small": "S",
+    "text_size_medium": "M",
+    "text_size_large": "L",
+    "text_size_small_aria": "Text size small",
+    "text_size_medium_aria": "Text size medium",
+    "text_size_large_aria": "Text size large"
+  },
+  "share_card": {
+    "share": "Share your argument",
+    "sharing": "Sharing…",
+    "shared": "Shared!",
+    "error": "Share failed",
+    "alt": "Argument map for seed {{seed}}: {{phrase}}. {{turns}} turns."
+  },
+  "terminal": {
+    "new_game": "New Game"
+  }
+}

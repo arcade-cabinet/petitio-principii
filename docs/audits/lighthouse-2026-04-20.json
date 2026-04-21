@@ -1,0 +1,28 @@
+{
+  "url": "http://127.0.0.1:4173/petitio-principii/",
+  "date": "2026-04-20",
+  "device": "desktop",
+  "lighthouse_version": "13.1.0",
+  "preset": "desktop",
+  "scores": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "metrics": {
+    "first-contentful-paint": "0.4 s",
+    "largest-contentful-paint": "0.5 s",
+    "speed-index": "0.8 s",
+    "total-blocking-time": "0 ms",
+    "cumulative-layout-shift": 0.004,
+    "interactive": "0.5 s"
+  },
+  "notes": [
+    "Audit run against the PR build served via vite preview (the production Pages deploy still reflects pre-PR code).",
+    "Previous audit (2026-04-20 first run) omitted performance; this is the full four-category result.",
+    "Accessibility rose 96 → 100 after adding the <main> landmark in App.tsx.",
+    "Performance 100 is largely due to lazy-splitting TerminalDisplay + ShareCard + locales; the initial JS payload is 145.66 kB gzipped (34 kB under the 180 kB T67 budget).",
+    "Raw report.html + report.json are gitignored; re-run `npx lighthouse ...` to regenerate."
+  ]
+}
