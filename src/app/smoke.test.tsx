@@ -53,10 +53,16 @@ describe("App end-to-end smoke", () => {
     const begin = screen.getByRole("button", { name: /begin argument/i });
     await user.click(begin);
 
-    // The terminal's verb keycaps appear once the game starts.
+    // The terminal's verb keycaps appear once the game starts. Contextual
+    // surface only exposes LOOK + one pedagogical verb on the opening
+    // turn (which one depends on the starting room), so we assert on
+    // LOOK + the presence of *some* rhetorical verb keycap.
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /look/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /examine/i })).toBeInTheDocument();
+      const verbButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
+      );
+      expect(verbButtons.length).toBeGreaterThanOrEqual(2);
     });
   });
 

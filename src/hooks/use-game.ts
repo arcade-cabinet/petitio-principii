@@ -101,10 +101,11 @@ export function useGame(): GameHandle {
       audio.playBgm();
       if (startRoom) audio.playSfx(sfxForRhetoricalType(startRoom.rhetoricalType));
 
+      // The seed + phrase used to print here as narration; the player
+      // already picks them on the splash screen and they now live in the
+      // STATUS panel of the HUD deck. Keeping them in the diegetic feed
+      // broke the fiction — the game opens directly with the threshold.
       const seedLines = [
-        "Petitio Principii",
-        `Seed: ${seed} — "${phrase}"`,
-        "",
         "You find yourself at the threshold of an argument.",
         "The premise smells faintly of tautology.",
         "",
