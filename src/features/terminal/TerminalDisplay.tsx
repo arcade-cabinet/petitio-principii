@@ -1,4 +1,4 @@
-import type { CompassHeading } from "@/components/ui/compass-rose";
+import type { CompassDirection, CompassHeading } from "@/components/ui/compass-rose";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
@@ -6,22 +6,14 @@ import { HeadingPanel } from "@/features/terminal/HeadingPanel";
 import { MapPanel } from "@/features/terminal/MapPanel";
 import { type DeckPanel, PanelDeck } from "@/features/terminal/PanelDeck";
 import { PresentPanel } from "@/features/terminal/PresentPanel";
+import { VerbPanel } from "@/features/terminal/VerbPanel";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
 import { computeKeycapSurface } from "@/features/terminal/keycapSurface";
 import { useViewport } from "@/hooks/use-viewport";
 import type { WorldHandle } from "@/hooks/use-world";
 import { isCircleClosed } from "@/world";
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ChevronDown,
-  ChevronUp,
-  MoveDiagonal,
-  RotateCcw,
-} from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
@@ -46,18 +38,6 @@ export interface TerminalDisplayProps {
   /** Clear the active onboarding hint (tap-dismiss + auto-fade). */
   onHintDismiss: () => void;
 }
-
-// The game is click/tap-only (mobile-first, no keyboard). Keycap labels
-// stand on their own; there are no keyboard shortcuts to display.
-const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string }> = [
-  { label: "Look", verb: "look" },
-  { label: "Examine", verb: "examine" },
-  { label: "Question", verb: "question" },
-  { label: "Ask Why", verb: "ask why" },
-  { label: "Accept", verb: "accept" },
-  { label: "Reject", verb: "reject" },
-  { label: "Trace Back", verb: "trace back" },
-];
 
 /**
  * Group transcript entries by turnId. This is the UI-side mirror of
@@ -122,26 +102,69 @@ export function TerminalDisplay({
     return set;
   }, [state.transcript]);
 
-  // Last cardinal heading the player committed to — drives the compass
-  // rose's rotation in the PRESENT underlay. Purely derived from the
-  // transcript; null until the player moves.
+  // Last horizontal direction the player committed to — drives the compass
+  // rose's rotation. 8 cardinals (N/NE/E/SE/S/SW/W/NW). Purely derived
+  // from the transcript; null until the player moves horizontally.
   const lastCardinalHeading = useMemo<CompassHeading>(() => {
-    const CARDINALS = new Set(["north", "south", "east", "west"]);
+    const HORIZ = new Set([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+    ]);
     for (let i = state.transcript.length - 1; i >= 0; i--) {
       const entry = state.transcript[i];
       if (entry.kind !== "echo") continue;
       const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
-      if (CARDINALS.has(raw)) return raw as CompassHeading;
+      if (HORIZ.has(raw)) return raw as CompassHeading;
     }
     return null;
   }, [state.transcript]);
 
+  // Set of horizontal cardinals available as exits from the current room.
+  // Drives the compass-rose's enabled/disabled wedges.
+  const availableCompassDirections = useMemo<Set<CompassDirection>>(() => {
+    const set = new Set<CompassDirection>();
+    if (!currentRoom) return set;
+    const HORIZ = new Set<CompassDirection>([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+    ]);
+    for (const exit of currentRoom.exits) {
+      if (HORIZ.has(exit.direction as CompassDirection)) {
+        set.add(exit.direction as CompassDirection);
+      }
+    }
+    return set;
+  }, [currentRoom]);
+
   // Exits already traversed from this room (via movement-verb echoes in
   // the current room). Used to draw the faint trail-glow on direction
-  // keycaps — the UX half of the argument map's geometry.
+  // keycaps.
   const traversedDirections = useMemo(() => {
     const set = new Set<string>();
-    const DIRS = new Set(["north", "south", "east", "west", "up", "down", "back", "forward"]);
+    const DIRS = new Set([
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "up",
+      "down",
+    ]);
     for (const entry of state.transcript) {
       if (entry.kind !== "echo") continue;
       const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
@@ -211,7 +234,14 @@ export function TerminalDisplay({
       id: "heading",
       label: "Heading",
       weight: 1,
-      content: <HeadingPanel heading={lastCardinalHeading} visitedCount={visitedCount} />,
+      content: (
+        <HeadingPanel
+          heading={lastCardinalHeading}
+          available={availableCompassDirections}
+          onDirection={(dir) => onCommand(dir)}
+          visitedCount={visitedCount}
+        />
+      ),
     },
     {
       id: "present",
@@ -301,36 +331,37 @@ export function TerminalDisplay({
         <PanelDeck panels={deckPanels} defaultPanelId="present" />
       </div>
 
-      {/* FUTURE zone — rhetorical verbs, directions */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap justify-center gap-2">
-          {RHETORICAL_VERBS.filter((v) => surface.verbs.has(v.verb)).map((v) => (
-            <KeyCap
-              key={v.verb}
-              label={v.label}
-              variant="verb"
-              emphasis={layout?.rhetorical[emphasisKeyFor(v.verb)] ?? "charged"}
-              onPress={() => onCommand(v.verb)}
-            />
-          ))}
+      {/* FUTURE zone — SCUMM-style verb panel + vertical-traversal keycaps.
+          Horizontal cardinals (NSEW + diagonals) live on the CompassRose
+          inside the HEADING panel, not here. The two vertical directions
+          (Up/Down) sit beside the verb panel because they're not
+          "geographic" enough for the compass. */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-end">
+        <div className="flex-1">
+          <VerbPanel
+            available={surface.verbs}
+            primary={primaryVerbSet(layout)}
+            onVerb={(v) => onCommand(v)}
+          />
         </div>
-        <div className="flex flex-wrap justify-center gap-2">
-          {DIRECTION_KEYS.filter((d) => {
-            const isCardinal =
-              d.dir === "north" || d.dir === "south" || d.dir === "east" || d.dir === "west";
-            if (isCardinal) return surface.cardinals.has(d.dir);
-            return surface.nonCardinals.has(d.dir);
-          }).map((d) => {
-            const dirState = layout?.directions[d.dir];
+        <div className="flex flex-row gap-2 md:flex-col">
+          {(["up", "down"] as const).map((dir) => {
+            const dirState = layout?.directions[dir];
             return (
               <KeyCap
-                key={d.dir}
-                label={d.label}
-                icon={d.icon}
+                key={dir}
+                label={dir === "up" ? "Up" : "Down"}
+                icon={
+                  dir === "up" ? (
+                    <ChevronUp size={18} aria-hidden />
+                  ) : (
+                    <ChevronDown size={18} aria-hidden />
+                  )
+                }
                 variant="direction"
                 disabled={!dirState?.available}
                 traversed={dirState?.alreadyTraversed ?? false}
-                onPress={() => onCommand(d.dir)}
+                onPress={() => onCommand(dir)}
               />
             );
           })}
@@ -340,30 +371,24 @@ export function TerminalDisplay({
   );
 }
 
-/**
- * Map a RHETORICAL_VERBS[].verb (space-and-lowercase) to its emphasis key
- * in computeKeycapLayout's RhetoricalEmphasis shape.
- */
-function emphasisKeyFor(
-  verb: string
-): "look" | "examine" | "question" | "askWhy" | "accept" | "reject" | "traceBack" {
-  switch (verb) {
-    case "ask why":
-      return "askWhy";
-    case "trace back":
-      return "traceBack";
-    default:
-      return verb as "look" | "examine" | "question" | "accept" | "reject";
+/** Reduce computeKeycapLayout's per-verb emphasis into the set of
+ *  verb labels currently marked `primary` (for VerbPanel highlighting). */
+function primaryVerbSet(
+  layout: ReturnType<typeof computeKeycapLayout> | null
+): ReadonlySet<string> {
+  const set = new Set<string>();
+  if (!layout) return set;
+  const map: Array<[string, keyof typeof layout.rhetorical]> = [
+    ["look", "look"],
+    ["examine", "examine"],
+    ["question", "question"],
+    ["ask why", "askWhy"],
+    ["accept", "accept"],
+    ["reject", "reject"],
+    ["trace back", "traceBack"],
+  ];
+  for (const [label, key] of map) {
+    if (layout.rhetorical[key] === "primary") set.add(label);
   }
+  return set;
 }
-
-const DIRECTION_KEYS: ReadonlyArray<{ dir: string; label: string; icon: React.ReactElement }> = [
-  { dir: "north", label: "N", icon: <ArrowUp size={18} aria-hidden /> },
-  { dir: "south", label: "S", icon: <ArrowDown size={18} aria-hidden /> },
-  { dir: "east", label: "E", icon: <ArrowRight size={18} aria-hidden /> },
-  { dir: "west", label: "W", icon: <ArrowLeft size={18} aria-hidden /> },
-  { dir: "up", label: "Up", icon: <ChevronUp size={18} aria-hidden /> },
-  { dir: "down", label: "Down", icon: <ChevronDown size={18} aria-hidden /> },
-  { dir: "back", label: "Back", icon: <RotateCcw size={18} aria-hidden /> },
-  { dir: "forward", label: "Fwd", icon: <MoveDiagonal size={18} aria-hidden /> },
-];

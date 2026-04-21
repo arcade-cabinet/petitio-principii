@@ -1,7 +1,7 @@
 import { selectHint } from "@/features/terminal/hints";
 import type { ArgumentAgent } from "../ai/argument-agent";
 import type { ArgumentMemory } from "../ai/argument-traits";
-import type { ClockSlotId, CommandVerb, Move, ParsedCommand } from "./Command";
+import type { CommandVerb, Move, ParsedCommand, SlotId } from "./Command";
 import type { GameState } from "./GameState";
 import { describeRoom, getHelpText } from "./NarrativeGenerator";
 import { parseCommand } from "./Parser";
@@ -29,13 +29,15 @@ import type { SfxKey } from "./audio-effects";
 
 const MOVEMENT: readonly Direction[] = [
   "north",
-  "south",
+  "northeast",
   "east",
+  "southeast",
+  "south",
+  "southwest",
   "west",
+  "northwest",
   "up",
   "down",
-  "back",
-  "forward",
 ];
 
 export interface WorldBridge {
@@ -81,11 +83,17 @@ export interface AudioSink {
  * Map a clock SlotId to the raw string command it represents.
  * Chord slots get mapped individually; the chord handler assembles them.
  */
-const SLOT_TO_COMMAND: Record<ClockSlotId, string> = {
-  UP: "north",
-  RIGHT: "east",
-  DOWN: "south",
-  LEFT: "west",
+const SLOT_TO_COMMAND: Record<SlotId, string> = {
+  UP: "up",
+  DOWN: "down",
+  NORTH: "north",
+  NORTHEAST: "northeast",
+  EAST: "east",
+  SOUTHEAST: "southeast",
+  SOUTH: "south",
+  SOUTHWEST: "southwest",
+  WEST: "west",
+  NORTHWEST: "northwest",
   LOOK: "look",
   EXAMINE: "examine",
   QUESTION: "question",
@@ -160,7 +168,7 @@ export function applyMove(
  * Canonical chord key — sorted slot ids joined with "+".
  * Ensures UP+ACCEPT and ACCEPT+UP resolve to the same template.
  */
-function chordTemplateKey(a: ClockSlotId, b: ClockSlotId): string {
+function chordTemplateKey(a: SlotId, b: SlotId): string {
   return [a, b].sort().join("+");
 }
 
@@ -196,19 +204,23 @@ const CHORD_TEMPLATES: Record<string, { command: string; label: string }> = {
     command: "accept",
     label: "endorse chain",
   },
-  [chordTemplateKey("UP", "ACCEPT")]: {
+  // direction + ACCEPT = "committed walk" — the player commits as they move.
+  // Defined for the 4 horizontal cardinals (the most pedagogically common
+  // movements). Diagonals + vertical chords are reserved for authored
+  // worlds where they have a specific narrative meaning.
+  [chordTemplateKey("NORTH", "ACCEPT")]: {
     command: "north",
     label: "committed walk north",
   },
-  [chordTemplateKey("DOWN", "ACCEPT")]: {
+  [chordTemplateKey("SOUTH", "ACCEPT")]: {
     command: "south",
     label: "committed walk south",
   },
-  [chordTemplateKey("RIGHT", "ACCEPT")]: {
+  [chordTemplateKey("EAST", "ACCEPT")]: {
     command: "east",
     label: "committed walk east",
   },
-  [chordTemplateKey("LEFT", "ACCEPT")]: {
+  [chordTemplateKey("WEST", "ACCEPT")]: {
     command: "west",
     label: "committed walk west",
   },
@@ -486,12 +498,15 @@ function applyRhetoricalVerb(
 
     // Direction verbs shouldn't reach here; MOVEMENT branch handled them.
     case "north":
-    case "south":
+    case "northeast":
     case "east":
+    case "southeast":
+    case "south":
+    case "southwest":
     case "west":
+    case "northwest":
     case "up":
     case "down":
-    case "back":
       return bump([`You cannot go ${parsed.verb} from here.`]);
 
     default:
