@@ -1,0 +1,16 @@
+{
+  "id": "poe-dupin-root",
+  "slot_hour": 2,
+  "title": "Antebellum Ratiocination — Poe's Dupin Root",
+  "context": {
+    "period": "1841-1844",
+    "milieu": "Parisian and American urban, post-Enlightenment rationalism",
+    "genre": "ratiocinative tale, cryptographic essay"
+  },
+  "sources": [
+    { "ref": "poe-dupin-1841-44", "role": "primary", "weight": 1.0 },
+    { "ref": "poe-gold-bug-1843", "role": "counterweight", "weight": 0.8 }
+  ],
+  "exclude": [],
+  "notes": "Single-author cluster — but Poe's Dupin-tales, Gold-Bug, and Marginalia span genres enough to force synthesis. Synthesis brief will explicitly enumerate Dupin mannerisms to AVOID cosplaying."
+}

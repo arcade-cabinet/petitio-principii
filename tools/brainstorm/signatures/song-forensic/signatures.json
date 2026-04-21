@@ -1,0 +1,536 @@
+[
+  {
+    "cluster_id": "song-forensic",
+    "source_ref": "giles-strange-stories-1880",
+    "sentence_count": 1382,
+    "word_count": 32820,
+    "sentence_length_p10": 3,
+    "sentence_length_p50": 20,
+    "sentence_length_p90": 49,
+    "sentence_length_max": 123,
+    "latinate_ratio": 0.010420475319926873,
+    "type_token_ratio": 0.13117001828153566,
+    "modal_verb_rate": 0.01291895185862279,
+    "sensory_mix": {
+      "visual": 0.504739336492891,
+      "auditory": 0.2037914691943128,
+      "tactile": 0.13270142180094788,
+      "olfactory": 0.002369668246445498,
+      "kinesthetic": 0.15639810426540285
+    },
+    "pov_1st": 0.25420944558521563,
+    "pov_2nd": 0.07515400410677618,
+    "pov_3rd": 0.6706365503080082,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 270
+      },
+      {
+        "bigram": "in the",
+        "count": 155
+      },
+      {
+        "bigram": "and the",
+        "count": 126
+      },
+      {
+        "bigram": "to the",
+        "count": 114
+      },
+      {
+        "bigram": "the old",
+        "count": 91
+      },
+      {
+        "bigram": "he was",
+        "count": 78
+      },
+      {
+        "bigram": "on the",
+        "count": 77
+      },
+      {
+        "bigram": "the princess",
+        "count": 72
+      },
+      {
+        "bigram": "it was",
+        "count": 68
+      },
+      {
+        "bigram": "the prince",
+        "count": 59
+      },
+      {
+        "bigram": "the castle",
+        "count": 57
+      },
+      {
+        "bigram": "that he",
+        "count": 57
+      },
+      {
+        "bigram": "in a",
+        "count": 56
+      },
+      {
+        "bigram": "he had",
+        "count": 54
+      },
+      {
+        "bigram": "at the",
+        "count": 50
+      },
+      {
+        "bigram": "had been",
+        "count": 48
+      },
+      {
+        "bigram": "with a",
+        "count": 45
+      },
+      {
+        "bigram": "the world",
+        "count": 44
+      },
+      {
+        "bigram": "said the",
+        "count": 44
+      },
+      {
+        "bigram": "and a",
+        "count": 42
+      },
+      {
+        "bigram": "and she",
+        "count": 42
+      },
+      {
+        "bigram": "of a",
+        "count": 41
+      },
+      {
+        "bigram": "with the",
+        "count": 40
+      },
+      {
+        "bigram": "that the",
+        "count": 39
+      },
+      {
+        "bigram": "from the",
+        "count": 38
+      },
+      {
+        "bigram": "for the",
+        "count": 38
+      },
+      {
+        "bigram": "it is",
+        "count": 37
+      },
+      {
+        "bigram": "the young",
+        "count": 37
+      },
+      {
+        "bigram": "all the",
+        "count": 36
+      },
+      {
+        "bigram": "she was",
+        "count": 36
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "of the world",
+        "count": 27
+      },
+      {
+        "trigram": "the old king",
+        "count": 25
+      },
+      {
+        "trigram": "east of the",
+        "count": 22
+      },
+      {
+        "trigram": "of the sun",
+        "count": 22
+      },
+      {
+        "trigram": "the sun and",
+        "count": 22
+      },
+      {
+        "trigram": "sun and west",
+        "count": 21
+      },
+      {
+        "trigram": "and west of",
+        "count": 21
+      },
+      {
+        "trigram": "west of the",
+        "count": 21
+      },
+      {
+        "trigram": "poor old beckey",
+        "count": 14
+      },
+      {
+        "trigram": "that he had",
+        "count": 13
+      },
+      {
+        "trigram": "the old woman",
+        "count": 13
+      },
+      {
+        "trigram": "out of the",
+        "count": 12
+      },
+      {
+        "trigram": "of the marlpool",
+        "count": 12
+      },
+      {
+        "trigram": "that he was",
+        "count": 12
+      },
+      {
+        "trigram": "the queen of",
+        "count": 12
+      },
+      {
+        "trigram": "of the castle",
+        "count": 12
+      },
+      {
+        "trigram": "the north wind",
+        "count": 12
+      },
+      {
+        "trigram": "and in the",
+        "count": 11
+      },
+      {
+        "trigram": "the way to",
+        "count": 11
+      },
+      {
+        "trigram": "queen of the",
+        "count": 11
+      },
+      {
+        "trigram": "part of the",
+        "count": 10
+      },
+      {
+        "trigram": "the reckoning house",
+        "count": 10
+      },
+      {
+        "trigram": "and his wife",
+        "count": 10
+      },
+      {
+        "trigram": "welland and his",
+        "count": 10
+      },
+      {
+        "trigram": "the young man",
+        "count": 10
+      },
+      {
+        "trigram": "the prince and",
+        "count": 10
+      },
+      {
+        "trigram": "castle east of",
+        "count": 9
+      },
+      {
+        "trigram": "that it was",
+        "count": 9
+      },
+      {
+        "trigram": "in the garden",
+        "count": 9
+      },
+      {
+        "trigram": "who had been",
+        "count": 9
+      }
+    ]
+  },
+  {
+    "cluster_id": "song-forensic",
+    "source_ref": null,
+    "sentence_count": 1382,
+    "word_count": 32820,
+    "sentence_length_p10": 3,
+    "sentence_length_p50": 20,
+    "sentence_length_p90": 49,
+    "sentence_length_max": 123,
+    "latinate_ratio": 0.010420475319926873,
+    "type_token_ratio": 0.13117001828153566,
+    "modal_verb_rate": 0.01291895185862279,
+    "sensory_mix": {
+      "visual": 0.504739336492891,
+      "auditory": 0.2037914691943128,
+      "tactile": 0.13270142180094788,
+      "olfactory": 0.002369668246445498,
+      "kinesthetic": 0.15639810426540285
+    },
+    "pov_1st": 0.25420944558521563,
+    "pov_2nd": 0.07515400410677618,
+    "pov_3rd": 0.6706365503080082,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 270
+      },
+      {
+        "bigram": "in the",
+        "count": 155
+      },
+      {
+        "bigram": "and the",
+        "count": 126
+      },
+      {
+        "bigram": "to the",
+        "count": 114
+      },
+      {
+        "bigram": "the old",
+        "count": 91
+      },
+      {
+        "bigram": "he was",
+        "count": 78
+      },
+      {
+        "bigram": "on the",
+        "count": 77
+      },
+      {
+        "bigram": "the princess",
+        "count": 72
+      },
+      {
+        "bigram": "it was",
+        "count": 68
+      },
+      {
+        "bigram": "the prince",
+        "count": 59
+      },
+      {
+        "bigram": "the castle",
+        "count": 57
+      },
+      {
+        "bigram": "that he",
+        "count": 57
+      },
+      {
+        "bigram": "in a",
+        "count": 56
+      },
+      {
+        "bigram": "he had",
+        "count": 54
+      },
+      {
+        "bigram": "at the",
+        "count": 50
+      },
+      {
+        "bigram": "had been",
+        "count": 48
+      },
+      {
+        "bigram": "with a",
+        "count": 45
+      },
+      {
+        "bigram": "the world",
+        "count": 44
+      },
+      {
+        "bigram": "said the",
+        "count": 44
+      },
+      {
+        "bigram": "and a",
+        "count": 42
+      },
+      {
+        "bigram": "and she",
+        "count": 42
+      },
+      {
+        "bigram": "of a",
+        "count": 41
+      },
+      {
+        "bigram": "with the",
+        "count": 40
+      },
+      {
+        "bigram": "that the",
+        "count": 39
+      },
+      {
+        "bigram": "from the",
+        "count": 38
+      },
+      {
+        "bigram": "for the",
+        "count": 38
+      },
+      {
+        "bigram": "it is",
+        "count": 37
+      },
+      {
+        "bigram": "the young",
+        "count": 37
+      },
+      {
+        "bigram": "all the",
+        "count": 36
+      },
+      {
+        "bigram": "she was",
+        "count": 36
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "of the world",
+        "count": 27
+      },
+      {
+        "trigram": "the old king",
+        "count": 25
+      },
+      {
+        "trigram": "east of the",
+        "count": 22
+      },
+      {
+        "trigram": "of the sun",
+        "count": 22
+      },
+      {
+        "trigram": "the sun and",
+        "count": 22
+      },
+      {
+        "trigram": "sun and west",
+        "count": 21
+      },
+      {
+        "trigram": "and west of",
+        "count": 21
+      },
+      {
+        "trigram": "west of the",
+        "count": 21
+      },
+      {
+        "trigram": "poor old beckey",
+        "count": 14
+      },
+      {
+        "trigram": "that he had",
+        "count": 13
+      },
+      {
+        "trigram": "the old woman",
+        "count": 13
+      },
+      {
+        "trigram": "out of the",
+        "count": 12
+      },
+      {
+        "trigram": "of the marlpool",
+        "count": 12
+      },
+      {
+        "trigram": "that he was",
+        "count": 12
+      },
+      {
+        "trigram": "the queen of",
+        "count": 12
+      },
+      {
+        "trigram": "of the castle",
+        "count": 12
+      },
+      {
+        "trigram": "the north wind",
+        "count": 12
+      },
+      {
+        "trigram": "and in the",
+        "count": 11
+      },
+      {
+        "trigram": "the way to",
+        "count": 11
+      },
+      {
+        "trigram": "queen of the",
+        "count": 11
+      },
+      {
+        "trigram": "part of the",
+        "count": 10
+      },
+      {
+        "trigram": "the reckoning house",
+        "count": 10
+      },
+      {
+        "trigram": "and his wife",
+        "count": 10
+      },
+      {
+        "trigram": "welland and his",
+        "count": 10
+      },
+      {
+        "trigram": "the young man",
+        "count": 10
+      },
+      {
+        "trigram": "the prince and",
+        "count": 10
+      },
+      {
+        "trigram": "castle east of",
+        "count": 9
+      },
+      {
+        "trigram": "that it was",
+        "count": 9
+      },
+      {
+        "trigram": "in the garden",
+        "count": 9
+      },
+      {
+        "trigram": "who had been",
+        "count": 9
+      }
+    ]
+  }
+]

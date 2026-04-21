@@ -1,0 +1,16 @@
+{
+  "id": "song-forensic",
+  "slot_hour": 3,
+  "title": "Song-era Forensic Reasoning",
+  "context": {
+    "period": "1247 CE (Song dynasty China, text; 1924 translation)",
+    "milieu": "provincial court, circuit judgeship",
+    "genre": "forensic manual, court-case anecdote"
+  },
+  "sources": [
+    { "ref": "song-ci-giles-1924", "role": "primary", "weight": 1.0 },
+    { "ref": "giles-strange-stories-1880", "role": "counterweight", "weight": 0.7 }
+  ],
+  "exclude": [],
+  "notes": "Song Ci's forensic manual anchors the methodical-observational register; Pu Songling's Strange Stories (Giles trans.) provides counter-genre — uncanny tale — to prevent the synthesis from becoming purely technical. Persona is fictional colleague of Song Ci, not Song Ci himself."
+}

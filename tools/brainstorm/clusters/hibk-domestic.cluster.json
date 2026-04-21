@@ -1,0 +1,18 @@
+{
+  "id": "hibk-domestic",
+  "slot_hour": 9,
+  "title": "Had-I-But-Known — American Domestic Mystery (1878-1909)",
+  "context": {
+    "period": "1878-1920",
+    "milieu": "American middle-class domestic",
+    "genre": "mystery novel, ghost story"
+  },
+  "sources": [
+    { "ref": "rinehart-circular-staircase-1908", "role": "primary", "weight": 1.0 },
+    { "ref": "rinehart-man-in-lower-ten-1909", "role": "primary", "weight": 0.9 },
+    { "ref": "green-leavenworth-case-1878", "role": "counterweight", "weight": 0.8 },
+    { "ref": "wharton-ghost-stories", "role": "counterweight", "weight": 0.6 }
+  ],
+  "exclude": [],
+  "notes": "Female-POV American domestic mystery tradition. Rinehart coined 'had-I-but-known'; Green founded American mystery; Wharton's ghost stories provide the uncanny counterweight."
+}

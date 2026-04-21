@@ -1,0 +1,18 @@
+{
+  "id": "sf-bierce-harte",
+  "slot_hour": 11,
+  "title": "San Francisco Civic Register — Bierce / Harte / Twain (1870-1911)",
+  "context": {
+    "period": "1870-1911",
+    "milieu": "San Francisco and gold-country California, press and literary",
+    "genre": "newspaper column, tale, aphorism"
+  },
+  "sources": [
+    { "ref": "bierce-devils-dictionary-1911", "role": "primary", "weight": 1.0 },
+    { "ref": "bierce-in-the-midst-of-life-1898", "role": "primary", "weight": 0.9 },
+    { "ref": "harte-luck-roaring-camp-1870", "role": "counterweight", "weight": 0.8 },
+    { "ref": "twain-roughing-it-1872", "role": "counterweight", "weight": 0.6 }
+  ],
+  "exclude": [],
+  "notes": "Bierce's dry-caustic register anchors; Harte and Twain provide the civic-flavor counter-weight. The detective is a newspaper columnist investigating what passes as accident in the boom-town."
+}

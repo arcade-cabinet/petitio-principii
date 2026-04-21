@@ -1,0 +1,17 @@
+{
+  "id": "paris-third-republic",
+  "slot_hour": 6,
+  "title": "Paris Third Republic — Investigation, Psychology, Public Press",
+  "context": {
+    "period": "1868-1898",
+    "milieu": "Parisian judicial, literary, and journalistic",
+    "genre": "detective novel, psychological tale, public manifesto"
+  },
+  "sources": [
+    { "ref": "gaboriau-monsieur-lecoq-1880", "role": "primary", "weight": 1.0 },
+    { "ref": "maupassant-horla-early-trans", "role": "counterweight", "weight": 0.8 },
+    { "ref": "zola-jaccuse-1898", "role": "counterweight", "weight": 0.6 }
+  ],
+  "exclude": [],
+  "notes": "Gaboriau is detective-fiction origin; Maupassant is uncanny-psychology; Zola is public-accusation. Three stances on investigation in the same city in the same era. Heavy synthesis demand."
+}

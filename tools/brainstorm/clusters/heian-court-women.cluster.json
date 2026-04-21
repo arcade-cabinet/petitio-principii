@@ -1,0 +1,17 @@
+{
+  "id": "heian-court-women",
+  "slot_hour": 1,
+  "title": "Heian Court Women's Prose (c. 1000 CE)",
+  "context": {
+    "period": "980-1060 CE",
+    "milieu": "imperial court, Heian-kyō",
+    "genre": "memoir / diary / novel"
+  },
+  "sources": [
+    { "ref": "pillow-book-waley-1928", "role": "primary", "weight": 1.0 },
+    { "ref": "genji-waley-1925", "role": "primary", "weight": 0.9 },
+    { "ref": "sarashina-omori-doi-1920", "role": "counterweight", "weight": 0.7 }
+  ],
+  "exclude": ["sections with explicit erotic content (author editorial choice for v1)"],
+  "notes": "Three voices, same century, same court-class, distinct temperaments: Pillow Book's list-observational, Genji's epistolary-courtly, Sarashina's inward-dreaming. No single source dominates."
+}

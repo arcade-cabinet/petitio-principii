@@ -1,0 +1,18 @@
+{
+  "id": "yukon-gold-rush",
+  "slot_hour": 8,
+  "title": "Yukon Gold Rush (1898-1909)",
+  "context": {
+    "period": "1898-1909",
+    "milieu": "Klondike claim country; northern placer mining",
+    "genre": "naturalist novel, ballad verse"
+  },
+  "sources": [
+    { "ref": "london-call-of-the-wild-1903", "role": "primary", "weight": 1.0 },
+    { "ref": "london-white-fang-1906", "role": "primary", "weight": 0.9 },
+    { "ref": "london-son-of-the-wolf-1900", "role": "primary", "weight": 0.8 },
+    { "ref": "service-songs-sourdough-1907", "role": "counterweight", "weight": 0.7 }
+  ],
+  "exclude": [],
+  "notes": "London's prose realism + Service's ballad verse frame the same geography in different modes. Synthesis can pull from either pole; brief will emphasize the less-London-cosplay route."
+}

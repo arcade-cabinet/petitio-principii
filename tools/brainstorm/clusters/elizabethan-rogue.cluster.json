@@ -1,0 +1,16 @@
+{
+  "id": "elizabethan-rogue",
+  "slot_hour": 4,
+  "title": "Elizabethan Rogue-Catching",
+  "context": {
+    "period": "1591-1609",
+    "milieu": "London street-life; Elizabethan/Jacobean urban underworld",
+    "genre": "pamphlet, satire"
+  },
+  "sources": [
+    { "ref": "greene-cozenage-1591", "role": "primary", "weight": 1.0 },
+    { "ref": "dekker-gulls-hornbook-1609", "role": "counterweight", "weight": 0.8 }
+  ],
+  "exclude": [],
+  "notes": "Greene's cony-catching taxonomies + Dekker's urban satire. Two pamphleteers, same decade-cluster, different attitudes. Strong early-detective root."
+}

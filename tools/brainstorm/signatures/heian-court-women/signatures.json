@@ -1,0 +1,536 @@
+[
+  {
+    "cluster_id": "heian-court-women",
+    "source_ref": "sarashina-omori-doi-1920",
+    "sentence_count": 2856,
+    "word_count": 71569,
+    "sentence_length_p10": 4,
+    "sentence_length_p50": 19,
+    "sentence_length_p90": 55,
+    "sentence_length_max": 141,
+    "latinate_ratio": 0.026813285081529713,
+    "type_token_ratio": 0.09048610431890902,
+    "modal_verb_rate": 0.017451689977504226,
+    "sensory_mix": {
+      "visual": 0.47534246575342465,
+      "auditory": 0.1958904109589041,
+      "tactile": 0.19315068493150686,
+      "olfactory": 0.0027397260273972603,
+      "kinesthetic": 0.13287671232876713
+    },
+    "pov_1st": 0.28742950700382025,
+    "pov_2nd": 0.14225941422594143,
+    "pov_3rd": 0.5703110787702383,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 834
+      },
+      {
+        "bigram": "in the",
+        "count": 331
+      },
+      {
+        "bigram": "to the",
+        "count": 313
+      },
+      {
+        "bigram": "had been",
+        "count": 167
+      },
+      {
+        "bigram": "from the",
+        "count": 166
+      },
+      {
+        "bigram": "for the",
+        "count": 165
+      },
+      {
+        "bigram": "of his",
+        "count": 165
+      },
+      {
+        "bigram": "on the",
+        "count": 153
+      },
+      {
+        "bigram": "wau nan",
+        "count": 138
+      },
+      {
+        "bigram": "by the",
+        "count": 138
+      },
+      {
+        "bigram": "he had",
+        "count": 138
+      },
+      {
+        "bigram": "nan gee",
+        "count": 133
+      },
+      {
+        "bigram": "and the",
+        "count": 131
+      },
+      {
+        "bigram": "mrs headley",
+        "count": 130
+      },
+      {
+        "bigram": "captain headley",
+        "count": 128
+      },
+      {
+        "bigram": "to be",
+        "count": 123
+      },
+      {
+        "bigram": "at the",
+        "count": 120
+      },
+      {
+        "bigram": "it was",
+        "count": 115
+      },
+      {
+        "bigram": "with the",
+        "count": 113
+      },
+      {
+        "bigram": "the indians",
+        "count": 95
+      },
+      {
+        "bigram": "the fort",
+        "count": 91
+      },
+      {
+        "bigram": "of her",
+        "count": 90
+      },
+      {
+        "bigram": "i have",
+        "count": 89
+      },
+      {
+        "bigram": "to his",
+        "count": 89
+      },
+      {
+        "bigram": "as he",
+        "count": 86
+      },
+      {
+        "bigram": "that the",
+        "count": 85
+      },
+      {
+        "bigram": "in his",
+        "count": 83
+      },
+      {
+        "bigram": "have been",
+        "count": 81
+      },
+      {
+        "bigram": "of their",
+        "count": 80
+      },
+      {
+        "bigram": "with a",
+        "count": 79
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "wau nan gee",
+        "count": 133
+      },
+      {
+        "trigram": "pee to tum",
+        "count": 58
+      },
+      {
+        "trigram": "the commanding officer",
+        "count": 28
+      },
+      {
+        "trigram": "which he had",
+        "count": 27
+      },
+      {
+        "trigram": "of the indians",
+        "count": 25
+      },
+      {
+        "trigram": "the summer house",
+        "count": 22
+      },
+      {
+        "trigram": "of wau nan",
+        "count": 21
+      },
+      {
+        "trigram": "of his wife",
+        "count": 20
+      },
+      {
+        "trigram": "to fort wayne",
+        "count": 19
+      },
+      {
+        "trigram": "there was a",
+        "count": 18
+      },
+      {
+        "trigram": "the first time",
+        "count": 17
+      },
+      {
+        "trigram": "would have been",
+        "count": 17
+      },
+      {
+        "trigram": "who had been",
+        "count": 17
+      },
+      {
+        "trigram": "which had been",
+        "count": 16
+      },
+      {
+        "trigram": "part of the",
+        "count": 16
+      },
+      {
+        "trigram": "he could not",
+        "count": 15
+      },
+      {
+        "trigram": "for the first",
+        "count": 15
+      },
+      {
+        "trigram": "in regard to",
+        "count": 15
+      },
+      {
+        "trigram": "on the subject",
+        "count": 14
+      },
+      {
+        "trigram": "that i have",
+        "count": 14
+      },
+      {
+        "trigram": "there was no",
+        "count": 14
+      },
+      {
+        "trigram": "the fort and",
+        "count": 13
+      },
+      {
+        "trigram": "of the fort",
+        "count": 13
+      },
+      {
+        "trigram": "one of the",
+        "count": 13
+      },
+      {
+        "trigram": "must have been",
+        "count": 13
+      },
+      {
+        "trigram": "he had been",
+        "count": 12
+      },
+      {
+        "trigram": "of the pottowatomies",
+        "count": 12
+      },
+      {
+        "trigram": "was in the",
+        "count": 12
+      },
+      {
+        "trigram": "of his own",
+        "count": 12
+      },
+      {
+        "trigram": "that he had",
+        "count": 12
+      }
+    ]
+  },
+  {
+    "cluster_id": "heian-court-women",
+    "source_ref": null,
+    "sentence_count": 2856,
+    "word_count": 71569,
+    "sentence_length_p10": 4,
+    "sentence_length_p50": 19,
+    "sentence_length_p90": 55,
+    "sentence_length_max": 141,
+    "latinate_ratio": 0.026813285081529713,
+    "type_token_ratio": 0.09048610431890902,
+    "modal_verb_rate": 0.017451689977504226,
+    "sensory_mix": {
+      "visual": 0.47534246575342465,
+      "auditory": 0.1958904109589041,
+      "tactile": 0.19315068493150686,
+      "olfactory": 0.0027397260273972603,
+      "kinesthetic": 0.13287671232876713
+    },
+    "pov_1st": 0.28742950700382025,
+    "pov_2nd": 0.14225941422594143,
+    "pov_3rd": 0.5703110787702383,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 834
+      },
+      {
+        "bigram": "in the",
+        "count": 331
+      },
+      {
+        "bigram": "to the",
+        "count": 313
+      },
+      {
+        "bigram": "had been",
+        "count": 167
+      },
+      {
+        "bigram": "from the",
+        "count": 166
+      },
+      {
+        "bigram": "for the",
+        "count": 165
+      },
+      {
+        "bigram": "of his",
+        "count": 165
+      },
+      {
+        "bigram": "on the",
+        "count": 153
+      },
+      {
+        "bigram": "wau nan",
+        "count": 138
+      },
+      {
+        "bigram": "by the",
+        "count": 138
+      },
+      {
+        "bigram": "he had",
+        "count": 138
+      },
+      {
+        "bigram": "nan gee",
+        "count": 133
+      },
+      {
+        "bigram": "and the",
+        "count": 131
+      },
+      {
+        "bigram": "mrs headley",
+        "count": 130
+      },
+      {
+        "bigram": "captain headley",
+        "count": 128
+      },
+      {
+        "bigram": "to be",
+        "count": 123
+      },
+      {
+        "bigram": "at the",
+        "count": 120
+      },
+      {
+        "bigram": "it was",
+        "count": 115
+      },
+      {
+        "bigram": "with the",
+        "count": 113
+      },
+      {
+        "bigram": "the indians",
+        "count": 95
+      },
+      {
+        "bigram": "the fort",
+        "count": 91
+      },
+      {
+        "bigram": "of her",
+        "count": 90
+      },
+      {
+        "bigram": "i have",
+        "count": 89
+      },
+      {
+        "bigram": "to his",
+        "count": 89
+      },
+      {
+        "bigram": "as he",
+        "count": 86
+      },
+      {
+        "bigram": "that the",
+        "count": 85
+      },
+      {
+        "bigram": "in his",
+        "count": 83
+      },
+      {
+        "bigram": "have been",
+        "count": 81
+      },
+      {
+        "bigram": "of their",
+        "count": 80
+      },
+      {
+        "bigram": "with a",
+        "count": 79
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "wau nan gee",
+        "count": 133
+      },
+      {
+        "trigram": "pee to tum",
+        "count": 58
+      },
+      {
+        "trigram": "the commanding officer",
+        "count": 28
+      },
+      {
+        "trigram": "which he had",
+        "count": 27
+      },
+      {
+        "trigram": "of the indians",
+        "count": 25
+      },
+      {
+        "trigram": "the summer house",
+        "count": 22
+      },
+      {
+        "trigram": "of wau nan",
+        "count": 21
+      },
+      {
+        "trigram": "of his wife",
+        "count": 20
+      },
+      {
+        "trigram": "to fort wayne",
+        "count": 19
+      },
+      {
+        "trigram": "there was a",
+        "count": 18
+      },
+      {
+        "trigram": "the first time",
+        "count": 17
+      },
+      {
+        "trigram": "would have been",
+        "count": 17
+      },
+      {
+        "trigram": "who had been",
+        "count": 17
+      },
+      {
+        "trigram": "which had been",
+        "count": 16
+      },
+      {
+        "trigram": "part of the",
+        "count": 16
+      },
+      {
+        "trigram": "he could not",
+        "count": 15
+      },
+      {
+        "trigram": "for the first",
+        "count": 15
+      },
+      {
+        "trigram": "in regard to",
+        "count": 15
+      },
+      {
+        "trigram": "on the subject",
+        "count": 14
+      },
+      {
+        "trigram": "that i have",
+        "count": 14
+      },
+      {
+        "trigram": "there was no",
+        "count": 14
+      },
+      {
+        "trigram": "the fort and",
+        "count": 13
+      },
+      {
+        "trigram": "of the fort",
+        "count": 13
+      },
+      {
+        "trigram": "one of the",
+        "count": 13
+      },
+      {
+        "trigram": "must have been",
+        "count": 13
+      },
+      {
+        "trigram": "he had been",
+        "count": 12
+      },
+      {
+        "trigram": "of the pottowatomies",
+        "count": 12
+      },
+      {
+        "trigram": "was in the",
+        "count": 12
+      },
+      {
+        "trigram": "of his own",
+        "count": 12
+      },
+      {
+        "trigram": "that he had",
+        "count": 12
+      }
+    ]
+  }
+]

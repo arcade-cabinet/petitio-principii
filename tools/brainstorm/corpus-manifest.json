@@ -1,0 +1,316 @@
+{
+  "$schema": "./corpus-manifest.schema.json",
+  "_doc": "Hand-curated list of public-domain sources available to clusters. Every source must be US-PD at manifest date. Translators' death-years and translation publication years are tracked because translations have their own copyright term. Sources may appear in multiple clusters; a cluster references sources by `ref` string.",
+  "manifest_date": "2026-04-21",
+  "sources": [
+    {
+      "ref": "hammett-red-harvest-1929",
+      "author": "Dashiell Hammett",
+      "work": "Red Harvest",
+      "original_year": 1929,
+      "language": "en",
+      "pd_basis": "US publication 1929, 95 years + 1 day term expired 2025-01-01",
+      "gutenberg_id": null,
+      "source_url": "https://www.fadedpage.com/books/20190628",
+      "notes": "Verify availability from fadedpage.com or equivalent PD host."
+    },
+    {
+      "ref": "hammett-maltese-falcon-1930",
+      "author": "Dashiell Hammett",
+      "work": "The Maltese Falcon",
+      "original_year": 1930,
+      "language": "en",
+      "pd_basis": "US publication 1930, PD in US 2026-01-01",
+      "gutenberg_id": null,
+      "notes": "Confirm 2026 PD entry before fetching."
+    },
+    {
+      "ref": "black-mask-1920-1928",
+      "author": "Various",
+      "work": "Black Mask magazine, issues 1920-1928",
+      "original_year": 1920,
+      "language": "en",
+      "pd_basis": "Periodical publication 1920-1928, all pre-1929 PD in US",
+      "gutenberg_id": null,
+      "notes": "Archive.org holds many scanned issues; need per-issue curation."
+    },
+    {
+      "ref": "pillow-book-waley-1928",
+      "author": "Sei Shōnagon",
+      "work": "The Pillow Book of Sei Shōnagon",
+      "original_year": 1002,
+      "translator": "Arthur Waley",
+      "translation_year": 1928,
+      "translator_death": 1966,
+      "language": "en",
+      "pd_basis": "Translation published 1928 in UK & US; US publication pre-1929 = PD in US",
+      "gutenberg_id": null
+    },
+    {
+      "ref": "genji-waley-1925",
+      "author": "Murasaki Shikibu",
+      "work": "The Tale of Genji (Waley translation, vols. 1-6)",
+      "original_year": 1010,
+      "translator": "Arthur Waley",
+      "translation_year": 1925,
+      "translator_death": 1966,
+      "language": "en",
+      "pd_basis": "First volumes published 1925-1928; pre-1929 PD in US. Later volumes post-1929 copyright tracked separately.",
+      "gutenberg_id": null
+    },
+    {
+      "ref": "sarashina-omori-doi-1920",
+      "author": "Sugawara no Takasue no Musume",
+      "work": "Sarashina Diary (in *Diaries of Court Ladies of Old Japan*)",
+      "original_year": 1060,
+      "translator": "Omori Annie Shepley & Kochi Doi",
+      "translation_year": 1920,
+      "language": "en",
+      "pd_basis": "Publication 1920 in US; PD",
+      "gutenberg_id": 31745
+    },
+    {
+      "ref": "poe-dupin-1841-44",
+      "author": "Edgar Allan Poe",
+      "work": "The Murders in the Rue Morgue; The Mystery of Marie Rogêt; The Purloined Letter",
+      "original_year": 1841,
+      "language": "en",
+      "pd_basis": "Pre-1929 publication; PD in US",
+      "gutenberg_id": 1064,
+      "notes": "PG 1064 is Tales of Mystery and Imagination; contains Dupin trilogy."
+    },
+    {
+      "ref": "poe-gold-bug-1843",
+      "author": "Edgar Allan Poe",
+      "work": "The Gold-Bug",
+      "original_year": 1843,
+      "language": "en",
+      "pd_basis": "Pre-1929 publication; PD in US",
+      "gutenberg_id": 2147
+    },
+    {
+      "ref": "song-ci-giles-1924",
+      "author": "Song Ci",
+      "work": "The Hsi Yuan Lu, or Instructions to Coroners (trans. Giles)",
+      "original_year": 1247,
+      "translator": "Herbert Giles",
+      "translation_year": 1924,
+      "translator_death": 1935,
+      "language": "en",
+      "pd_basis": "Translation published 1924 in UK in the Proceedings of the Royal Society of Medicine; pre-1929 PD in US",
+      "gutenberg_id": null,
+      "notes": "Full text available via archive.org."
+    },
+    {
+      "ref": "giles-strange-stories-1880",
+      "author": "Pu Songling",
+      "work": "Strange Stories from a Chinese Studio",
+      "original_year": 1740,
+      "translator": "Herbert Giles",
+      "translation_year": 1880,
+      "translator_death": 1935,
+      "language": "en",
+      "pd_basis": "1880 publication, PD",
+      "gutenberg_id": 43245
+    },
+    {
+      "ref": "greene-cozenage-1591",
+      "author": "Robert Greene",
+      "work": "A Notable Discovery of Cozenage",
+      "original_year": 1591,
+      "language": "en",
+      "pd_basis": "Pre-1929; PD in US",
+      "gutenberg_id": 42102
+    },
+    {
+      "ref": "dekker-gulls-hornbook-1609",
+      "author": "Thomas Dekker",
+      "work": "The Gulls Hornbook",
+      "original_year": 1609,
+      "language": "en",
+      "pd_basis": "Pre-1929; PD in US",
+      "gutenberg_id": 17849
+    },
+    {
+      "ref": "gaboriau-monsieur-lecoq-1880",
+      "author": "Émile Gaboriau",
+      "work": "Monsieur Lecoq (trans. 1880s)",
+      "original_year": 1868,
+      "translator": "Various (Laurie / Henry Benedict)",
+      "translation_year": 1880,
+      "language": "en",
+      "pd_basis": "1880s translation, PD in US",
+      "gutenberg_id": 9880
+    },
+    {
+      "ref": "maupassant-horla-early-trans",
+      "author": "Guy de Maupassant",
+      "work": "Selected short stories (The Horla; Ball of Fat; etc.)",
+      "original_year": 1887,
+      "translator": "Various (McMaster, Laurie)",
+      "translation_year": 1910,
+      "language": "en",
+      "pd_basis": "Early 20th c. translations pre-1929 PD in US",
+      "gutenberg_id": 3090
+    },
+    {
+      "ref": "zola-jaccuse-1898",
+      "author": "Émile Zola",
+      "work": "J'Accuse! (and selected Dreyfus-era journalism)",
+      "original_year": 1898,
+      "translator": "Various",
+      "translation_year": 1898,
+      "language": "en",
+      "pd_basis": "1898 publication, PD in US",
+      "gutenberg_id": null
+    },
+    {
+      "ref": "london-call-of-the-wild-1903",
+      "author": "Jack London",
+      "work": "The Call of the Wild",
+      "original_year": 1903,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 215
+    },
+    {
+      "ref": "london-white-fang-1906",
+      "author": "Jack London",
+      "work": "White Fang",
+      "original_year": 1906,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 910
+    },
+    {
+      "ref": "london-son-of-the-wolf-1900",
+      "author": "Jack London",
+      "work": "The Son of the Wolf",
+      "original_year": 1900,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 2377
+    },
+    {
+      "ref": "service-songs-sourdough-1907",
+      "author": "Robert W. Service",
+      "work": "Songs of a Sourdough (The Spell of the Yukon)",
+      "original_year": 1907,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 259
+    },
+    {
+      "ref": "service-ballads-cheechako-1909",
+      "author": "Robert W. Service",
+      "work": "Ballads of a Cheechako",
+      "original_year": 1909,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 1051
+    },
+    {
+      "ref": "rinehart-circular-staircase-1908",
+      "author": "Mary Roberts Rinehart",
+      "work": "The Circular Staircase",
+      "original_year": 1908,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 434
+    },
+    {
+      "ref": "rinehart-man-in-lower-ten-1909",
+      "author": "Mary Roberts Rinehart",
+      "work": "The Man in Lower Ten",
+      "original_year": 1909,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 6055
+    },
+    {
+      "ref": "green-leavenworth-case-1878",
+      "author": "Anna Katharine Green",
+      "work": "The Leavenworth Case",
+      "original_year": 1878,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 4047
+    },
+    {
+      "ref": "wharton-ghost-stories",
+      "author": "Edith Wharton",
+      "work": "Selected ghost stories and *The Custom of the Country* etc. (pre-1929 works)",
+      "original_year": 1910,
+      "language": "en",
+      "pd_basis": "Pre-1929 publications PD in US; post-1929 works held separately",
+      "gutenberg_id": null
+    },
+    {
+      "ref": "kipling-kim-1901",
+      "author": "Rudyard Kipling",
+      "work": "Kim",
+      "original_year": 1901,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 2226
+    },
+    {
+      "ref": "tagore-early-trans-1912",
+      "author": "Rabindranath Tagore",
+      "work": "Selected stories & Gitanjali (early translations)",
+      "original_year": 1912,
+      "translator": "Tagore self-translated / W.B. Yeats intro",
+      "translation_year": 1912,
+      "language": "en",
+      "pd_basis": "1912-1916 pre-1929 PD in US",
+      "gutenberg_id": 7164
+    },
+    {
+      "ref": "gandhi-hind-swaraj-1910",
+      "author": "Mohandas K. Gandhi",
+      "work": "Hind Swaraj (Indian Home Rule)",
+      "original_year": 1909,
+      "translator": "Gandhi (self-translated)",
+      "translation_year": 1910,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": null
+    },
+    {
+      "ref": "bierce-devils-dictionary-1911",
+      "author": "Ambrose Bierce",
+      "work": "The Devil's Dictionary",
+      "original_year": 1911,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 972
+    },
+    {
+      "ref": "bierce-in-the-midst-of-life-1898",
+      "author": "Ambrose Bierce",
+      "work": "In the Midst of Life (Tales of Soldiers and Civilians)",
+      "original_year": 1891,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 4366
+    },
+    {
+      "ref": "harte-luck-roaring-camp-1870",
+      "author": "Bret Harte",
+      "work": "The Luck of Roaring Camp and Other Sketches",
+      "original_year": 1870,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 2633
+    },
+    {
+      "ref": "twain-roughing-it-1872",
+      "author": "Mark Twain",
+      "work": "Roughing It",
+      "original_year": 1872,
+      "language": "en",
+      "pd_basis": "PD in US",
+      "gutenberg_id": 3177
+    }
+  ]
+}

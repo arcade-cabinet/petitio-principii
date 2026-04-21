@@ -1,0 +1,1070 @@
+[
+  {
+    "cluster_id": "hibk-domestic",
+    "source_ref": "rinehart-circular-staircase-1908",
+    "sentence_count": 4841,
+    "word_count": 71826,
+    "sentence_length_p10": 4,
+    "sentence_length_p50": 13,
+    "sentence_length_p90": 28,
+    "sentence_length_max": 83,
+    "latinate_ratio": 0.016108373012558127,
+    "type_token_ratio": 0.08017987915239606,
+    "modal_verb_rate": 0.010748197031715534,
+    "sensory_mix": {
+      "visual": 0.48282828282828283,
+      "auditory": 0.24141414141414141,
+      "tactile": 0.1111111111111111,
+      "olfactory": 0.005050505050505051,
+      "kinesthetic": 0.1595959595959596
+    },
+    "pov_1st": 0.5191211236267557,
+    "pov_2nd": 0.08969545264914476,
+    "pov_3rd": 0.3911834237240996,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 456
+      },
+      {
+        "bigram": "in the",
+        "count": 436
+      },
+      {
+        "bigram": "it was",
+        "count": 281
+      },
+      {
+        "bigram": "to the",
+        "count": 276
+      },
+      {
+        "bigram": "and i",
+        "count": 234
+      },
+      {
+        "bigram": "on the",
+        "count": 226
+      },
+      {
+        "bigram": "at the",
+        "count": 209
+      },
+      {
+        "bigram": "had been",
+        "count": 199
+      },
+      {
+        "bigram": "i had",
+        "count": 184
+      },
+      {
+        "bigram": "he said",
+        "count": 175
+      },
+      {
+        "bigram": "the house",
+        "count": 174
+      },
+      {
+        "bigram": "i was",
+        "count": 163
+      },
+      {
+        "bigram": "and the",
+        "count": 157
+      },
+      {
+        "bigram": "i said",
+        "count": 141
+      },
+      {
+        "bigram": "he was",
+        "count": 137
+      },
+      {
+        "bigram": "mr jamieson",
+        "count": 135
+      },
+      {
+        "bigram": "to be",
+        "count": 127
+      },
+      {
+        "bigram": "was a",
+        "count": 127
+      },
+      {
+        "bigram": "there was",
+        "count": 120
+      },
+      {
+        "bigram": "from the",
+        "count": 115
+      },
+      {
+        "bigram": "he had",
+        "count": 113
+      },
+      {
+        "bigram": "in a",
+        "count": 107
+      },
+      {
+        "bigram": "the door",
+        "count": 106
+      },
+      {
+        "bigram": "with the",
+        "count": 94
+      },
+      {
+        "bigram": "i could",
+        "count": 92
+      },
+      {
+        "bigram": "into the",
+        "count": 92
+      },
+      {
+        "bigram": "miss innes",
+        "count": 92
+      },
+      {
+        "bigram": "of a",
+        "count": 91
+      },
+      {
+        "bigram": "she was",
+        "count": 84
+      },
+      {
+        "bigram": "she had",
+        "count": 80
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "the circular staircase",
+        "count": 39
+      },
+      {
+        "trigram": "i don t",
+        "count": 33
+      },
+      {
+        "trigram": "the foot of",
+        "count": 32
+      },
+      {
+        "trigram": "it was a",
+        "count": 30
+      },
+      {
+        "trigram": "there was no",
+        "count": 30
+      },
+      {
+        "trigram": "foot of the",
+        "count": 29
+      },
+      {
+        "trigram": "the house and",
+        "count": 29
+      },
+      {
+        "trigram": "there was a",
+        "count": 29
+      },
+      {
+        "trigram": "the traders bank",
+        "count": 27
+      },
+      {
+        "trigram": "at the foot",
+        "count": 27
+      },
+      {
+        "trigram": "the billiard room",
+        "count": 27
+      },
+      {
+        "trigram": "miss innes he",
+        "count": 25
+      },
+      {
+        "trigram": "back to the",
+        "count": 24
+      },
+      {
+        "trigram": "innes he said",
+        "count": 24
+      },
+      {
+        "trigram": "of the house",
+        "count": 24
+      },
+      {
+        "trigram": "one of the",
+        "count": 24
+      },
+      {
+        "trigram": "i did not",
+        "count": 24
+      },
+      {
+        "trigram": "the card room",
+        "count": 23
+      },
+      {
+        "trigram": "the trunk room",
+        "count": 23
+      },
+      {
+        "trigram": "to the house",
+        "count": 23
+      },
+      {
+        "trigram": "in the house",
+        "count": 22
+      },
+      {
+        "trigram": "and i had",
+        "count": 22
+      },
+      {
+        "trigram": "it was the",
+        "count": 20
+      },
+      {
+        "trigram": "he had been",
+        "count": 20
+      },
+      {
+        "trigram": "the east wing",
+        "count": 19
+      },
+      {
+        "trigram": "i could hear",
+        "count": 19
+      },
+      {
+        "trigram": "the greenwood club",
+        "count": 17
+      },
+      {
+        "trigram": "it was not",
+        "count": 17
+      },
+      {
+        "trigram": "the old man",
+        "count": 17
+      },
+      {
+        "trigram": "i had a",
+        "count": 17
+      }
+    ]
+  },
+  {
+    "cluster_id": "hibk-domestic",
+    "source_ref": "rinehart-man-in-lower-ten-1909",
+    "sentence_count": 3251,
+    "word_count": 36704,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 9,
+    "sentence_length_p90": 24,
+    "sentence_length_max": 57,
+    "latinate_ratio": 0.0053400174367916305,
+    "type_token_ratio": 0.07841107236268527,
+    "modal_verb_rate": 0.015311682650392329,
+    "sensory_mix": {
+      "visual": 0.608433734939759,
+      "auditory": 0.15863453815261044,
+      "tactile": 0.1706827309236948,
+      "olfactory": 0.004016064257028112,
+      "kinesthetic": 0.05823293172690763
+    },
+    "pov_1st": 0.3925075936550793,
+    "pov_2nd": 0.18393520080998987,
+    "pov_3rd": 0.4235572055349308,
+    "signature_bigrams": [
+      {
+        "bigram": "in the",
+        "count": 169
+      },
+      {
+        "bigram": "of the",
+        "count": 161
+      },
+      {
+        "bigram": "on the",
+        "count": 137
+      },
+      {
+        "bigram": "snow lodge",
+        "count": 128
+      },
+      {
+        "bigram": "mr carford",
+        "count": 102
+      },
+      {
+        "bigram": "it was",
+        "count": 102
+      },
+      {
+        "bigram": "and the",
+        "count": 100
+      },
+      {
+        "bigram": "to the",
+        "count": 87
+      },
+      {
+        "bigram": "the ice",
+        "count": 72
+      },
+      {
+        "bigram": "going to",
+        "count": 70
+      },
+      {
+        "bigram": "bert and",
+        "count": 65
+      },
+      {
+        "bigram": "mrs bobbsey",
+        "count": 64
+      },
+      {
+        "bigram": "in a",
+        "count": 59
+      },
+      {
+        "bigram": "mr bobbsey",
+        "count": 59
+      },
+      {
+        "bigram": "with a",
+        "count": 58
+      },
+      {
+        "bigram": "was a",
+        "count": 58
+      },
+      {
+        "bigram": "at the",
+        "count": 57
+      },
+      {
+        "bigram": "i don't",
+        "count": 55
+      },
+      {
+        "bigram": "to be",
+        "count": 53
+      },
+      {
+        "bigram": "ice boat",
+        "count": 53
+      },
+      {
+        "bigram": "had been",
+        "count": 52
+      },
+      {
+        "bigram": "did not",
+        "count": 50
+      },
+      {
+        "bigram": "and i",
+        "count": 49
+      },
+      {
+        "bigram": "i guess",
+        "count": 49
+      },
+      {
+        "bigram": "for a",
+        "count": 48
+      },
+      {
+        "bigram": "to snow",
+        "count": 48
+      },
+      {
+        "bigram": "and then",
+        "count": 47
+      },
+      {
+        "bigram": "he was",
+        "count": 47
+      },
+      {
+        "bigram": "said mr",
+        "count": 46
+      },
+      {
+        "bigram": "flossie and",
+        "count": 45
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "to snow lodge",
+        "count": 46
+      },
+      {
+        "trigram": "the ice boat",
+        "count": 46
+      },
+      {
+        "trigram": "flossie and freddie",
+        "count": 40
+      },
+      {
+        "trigram": "on the ice",
+        "count": 27
+      },
+      {
+        "trigram": "said mr bobbsey",
+        "count": 24
+      },
+      {
+        "trigram": "said mrs bobbsey",
+        "count": 23
+      },
+      {
+        "trigram": "the bobbsey twins",
+        "count": 22
+      },
+      {
+        "trigram": "in the woods",
+        "count": 22
+      },
+      {
+        "trigram": "at snow lodge",
+        "count": 21
+      },
+      {
+        "trigram": "bert and nan",
+        "count": 19
+      },
+      {
+        "trigram": "i'm going to",
+        "count": 19
+      },
+      {
+        "trigram": "it was a",
+        "count": 16
+      },
+      {
+        "trigram": "there was a",
+        "count": 16
+      },
+      {
+        "trigram": "go to snow",
+        "count": 16
+      },
+      {
+        "trigram": "bert and harry",
+        "count": 16
+      },
+      {
+        "trigram": "out of the",
+        "count": 15
+      },
+      {
+        "trigram": "boys and girls",
+        "count": 15
+      },
+      {
+        "trigram": "said mr carford",
+        "count": 14
+      },
+      {
+        "trigram": "nan and bert",
+        "count": 13
+      },
+      {
+        "trigram": "it would be",
+        "count": 13
+      },
+      {
+        "trigram": "i don't know",
+        "count": 13
+      },
+      {
+        "trigram": "and the others",
+        "count": 13
+      },
+      {
+        "trigram": "the ice bird",
+        "count": 13
+      },
+      {
+        "trigram": "and freddie were",
+        "count": 12
+      },
+      {
+        "trigram": "a good time",
+        "count": 12
+      },
+      {
+        "trigram": "part of the",
+        "count": 12
+      },
+      {
+        "trigram": "bert and the",
+        "count": 12
+      },
+      {
+        "trigram": "a little later",
+        "count": 11
+      },
+      {
+        "trigram": "with a laugh",
+        "count": 11
+      },
+      {
+        "trigram": "the aged man",
+        "count": 11
+      }
+    ]
+  },
+  {
+    "cluster_id": "hibk-domestic",
+    "source_ref": "green-leavenworth-case-1878",
+    "sentence_count": 6721,
+    "word_count": 112568,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 12,
+    "sentence_length_p90": 37,
+    "sentence_length_max": 215,
+    "latinate_ratio": 0.023185985359960203,
+    "type_token_ratio": 0.0638725037310781,
+    "modal_verb_rate": 0.016168005116907115,
+    "sensory_mix": {
+      "visual": 0.5465980560320183,
+      "auditory": 0.2166952544311035,
+      "tactile": 0.11320754716981132,
+      "olfactory": 0.002858776443682104,
+      "kinesthetic": 0.12064036592338478
+    },
+    "pov_1st": 0.4944775526420342,
+    "pov_2nd": 0.14493444576877235,
+    "pov_3rd": 0.36058800158919346,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 623
+      },
+      {
+        "bigram": "in the",
+        "count": 476
+      },
+      {
+        "bigram": "to the",
+        "count": 300
+      },
+      {
+        "bigram": "it was",
+        "count": 283
+      },
+      {
+        "bigram": "at the",
+        "count": 253
+      },
+      {
+        "bigram": "to be",
+        "count": 247
+      },
+      {
+        "bigram": "i had",
+        "count": 223
+      },
+      {
+        "bigram": "mr gryce",
+        "count": 205
+      },
+      {
+        "bigram": "i was",
+        "count": 201
+      },
+      {
+        "bigram": "on the",
+        "count": 199
+      },
+      {
+        "bigram": "i have",
+        "count": 198
+      },
+      {
+        "bigram": "in a",
+        "count": 182
+      },
+      {
+        "bigram": "of a",
+        "count": 177
+      },
+      {
+        "bigram": "with a",
+        "count": 167
+      },
+      {
+        "bigram": "i could",
+        "count": 159
+      },
+      {
+        "bigram": "it is",
+        "count": 158
+      },
+      {
+        "bigram": "i am",
+        "count": 157
+      },
+      {
+        "bigram": "from the",
+        "count": 152
+      },
+      {
+        "bigram": "for the",
+        "count": 150
+      },
+      {
+        "bigram": "did not",
+        "count": 146
+      },
+      {
+        "bigram": "in my",
+        "count": 146
+      },
+      {
+        "bigram": "of her",
+        "count": 142
+      },
+      {
+        "bigram": "mr leavenworth",
+        "count": 139
+      },
+      {
+        "bigram": "and i",
+        "count": 138
+      },
+      {
+        "bigram": "with the",
+        "count": 134
+      },
+      {
+        "bigram": "as i",
+        "count": 132
+      },
+      {
+        "bigram": "the room",
+        "count": 130
+      },
+      {
+        "bigram": "that i",
+        "count": 125
+      },
+      {
+        "bigram": "in her",
+        "count": 123
+      },
+      {
+        "bigram": "she was",
+        "count": 121
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "i did not",
+        "count": 61
+      },
+      {
+        "trigram": "i could not",
+        "count": 59
+      },
+      {
+        "trigram": "i don t",
+        "count": 58
+      },
+      {
+        "trigram": "mr leavenworth s",
+        "count": 54
+      },
+      {
+        "trigram": "i do not",
+        "count": 50
+      },
+      {
+        "trigram": "in regard to",
+        "count": 48
+      },
+      {
+        "trigram": "of mr leavenworth",
+        "count": 46
+      },
+      {
+        "trigram": "in the house",
+        "count": 39
+      },
+      {
+        "trigram": "don t know",
+        "count": 36
+      },
+      {
+        "trigram": "it was a",
+        "count": 33
+      },
+      {
+        "trigram": "she did not",
+        "count": 32
+      },
+      {
+        "trigram": "it was the",
+        "count": 30
+      },
+      {
+        "trigram": "for a moment",
+        "count": 29
+      },
+      {
+        "trigram": "for me to",
+        "count": 27
+      },
+      {
+        "trigram": "at the time",
+        "count": 26
+      },
+      {
+        "trigram": "as well as",
+        "count": 25
+      },
+      {
+        "trigram": "mr gryce s",
+        "count": 25
+      },
+      {
+        "trigram": "if i had",
+        "count": 25
+      },
+      {
+        "trigram": "in the room",
+        "count": 24
+      },
+      {
+        "trigram": "what do you",
+        "count": 24
+      },
+      {
+        "trigram": "i am not",
+        "count": 23
+      },
+      {
+        "trigram": "that i had",
+        "count": 23
+      },
+      {
+        "trigram": "was in the",
+        "count": 23
+      },
+      {
+        "trigram": "it would be",
+        "count": 22
+      },
+      {
+        "trigram": "out of the",
+        "count": 21
+      },
+      {
+        "trigram": "i was in",
+        "count": 21
+      },
+      {
+        "trigram": "i cannot say",
+        "count": 21
+      },
+      {
+        "trigram": "of the murder",
+        "count": 21
+      },
+      {
+        "trigram": "her uncle s",
+        "count": 20
+      },
+      {
+        "trigram": "that it was",
+        "count": 20
+      }
+    ]
+  },
+  {
+    "cluster_id": "hibk-domestic",
+    "source_ref": null,
+    "sentence_count": 14813,
+    "word_count": 221098,
+    "sentence_length_p10": 3,
+    "sentence_length_p50": 12,
+    "sentence_length_p90": 30,
+    "sentence_length_max": 215,
+    "latinate_ratio": 0.017924178418619797,
+    "type_token_ratio": 0.047178174384209716,
+    "modal_verb_rate": 0.01426516748229292,
+    "sensory_mix": {
+      "visual": 0.5366079703429101,
+      "auditory": 0.2153228297806611,
+      "tactile": 0.12140871177015755,
+      "olfactory": 0.0037071362372567192,
+      "kinesthetic": 0.12295335186901452
+    },
+    "pov_1st": 0.4889836844188399,
+    "pov_2nd": 0.13254760543559524,
+    "pov_3rd": 0.3784687101455649,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 1240
+      },
+      {
+        "bigram": "in the",
+        "count": 1081
+      },
+      {
+        "bigram": "it was",
+        "count": 666
+      },
+      {
+        "bigram": "to the",
+        "count": 663
+      },
+      {
+        "bigram": "on the",
+        "count": 562
+      },
+      {
+        "bigram": "at the",
+        "count": 519
+      },
+      {
+        "bigram": "to be",
+        "count": 427
+      },
+      {
+        "bigram": "i had",
+        "count": 425
+      },
+      {
+        "bigram": "and i",
+        "count": 421
+      },
+      {
+        "bigram": "i was",
+        "count": 398
+      },
+      {
+        "bigram": "and the",
+        "count": 369
+      },
+      {
+        "bigram": "had been",
+        "count": 361
+      },
+      {
+        "bigram": "in a",
+        "count": 348
+      },
+      {
+        "bigram": "the house",
+        "count": 311
+      },
+      {
+        "bigram": "from the",
+        "count": 304
+      },
+      {
+        "bigram": "with a",
+        "count": 302
+      },
+      {
+        "bigram": "i have",
+        "count": 288
+      },
+      {
+        "bigram": "of a",
+        "count": 288
+      },
+      {
+        "bigram": "he was",
+        "count": 267
+      },
+      {
+        "bigram": "i could",
+        "count": 264
+      },
+      {
+        "bigram": "for the",
+        "count": 262
+      },
+      {
+        "bigram": "did not",
+        "count": 262
+      },
+      {
+        "bigram": "with the",
+        "count": 261
+      },
+      {
+        "bigram": "i am",
+        "count": 261
+      },
+      {
+        "bigram": "was a",
+        "count": 259
+      },
+      {
+        "bigram": "it is",
+        "count": 237
+      },
+      {
+        "bigram": "he said",
+        "count": 221
+      },
+      {
+        "bigram": "into the",
+        "count": 221
+      },
+      {
+        "bigram": "as i",
+        "count": 219
+      },
+      {
+        "bigram": "she was",
+        "count": 210
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "i don t",
+        "count": 91
+      },
+      {
+        "trigram": "i did not",
+        "count": 90
+      },
+      {
+        "trigram": "it was a",
+        "count": 79
+      },
+      {
+        "trigram": "i could not",
+        "count": 74
+      },
+      {
+        "trigram": "i do not",
+        "count": 63
+      },
+      {
+        "trigram": "in the house",
+        "count": 62
+      },
+      {
+        "trigram": "mr leavenworth s",
+        "count": 54
+      },
+      {
+        "trigram": "it was the",
+        "count": 53
+      },
+      {
+        "trigram": "don t know",
+        "count": 53
+      },
+      {
+        "trigram": "out of the",
+        "count": 52
+      },
+      {
+        "trigram": "one of the",
+        "count": 51
+      },
+      {
+        "trigram": "there was a",
+        "count": 50
+      },
+      {
+        "trigram": "there was no",
+        "count": 50
+      },
+      {
+        "trigram": "for a moment",
+        "count": 49
+      },
+      {
+        "trigram": "in regard to",
+        "count": 49
+      },
+      {
+        "trigram": "to snow lodge",
+        "count": 46
+      },
+      {
+        "trigram": "the ice boat",
+        "count": 46
+      },
+      {
+        "trigram": "of mr leavenworth",
+        "count": 46
+      },
+      {
+        "trigram": "of the house",
+        "count": 44
+      },
+      {
+        "trigram": "the house and",
+        "count": 44
+      },
+      {
+        "trigram": "it would be",
+        "count": 43
+      },
+      {
+        "trigram": "she did not",
+        "count": 42
+      },
+      {
+        "trigram": "that it was",
+        "count": 40
+      },
+      {
+        "trigram": "flossie and freddie",
+        "count": 40
+      },
+      {
+        "trigram": "the circular staircase",
+        "count": 39
+      },
+      {
+        "trigram": "the foot of",
+        "count": 39
+      },
+      {
+        "trigram": "it was not",
+        "count": 39
+      },
+      {
+        "trigram": "at the time",
+        "count": 38
+      },
+      {
+        "trigram": "i am not",
+        "count": 37
+      },
+      {
+        "trigram": "foot of the",
+        "count": 36
+      }
+    ]
+  }
+]

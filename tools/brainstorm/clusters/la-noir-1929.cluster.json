@@ -1,0 +1,17 @@
+{
+  "id": "la-noir-1929",
+  "slot_hour": 0,
+  "title": "Hard-boiled Los Angeles / San Francisco noir, 1929-1930",
+  "context": {
+    "period": "1929-1930",
+    "milieu": "hard-boiled private investigation; early West-coast noir",
+    "genre": "detective novel / pulp periodical"
+  },
+  "sources": [
+    { "ref": "hammett-red-harvest-1929", "role": "primary", "weight": 1.0 },
+    { "ref": "hammett-maltese-falcon-1930", "role": "primary", "weight": 1.0 },
+    { "ref": "black-mask-1920-1928", "role": "counterweight", "weight": 0.6 }
+  ],
+  "exclude": [],
+  "notes": "Hammett anchors the voice; Black Mask anthology pieces supply the pulp-periodical counterweight so synthesis doesn't mimic Hammett specifically. This is the beta cluster — first persona authored against it is the Midnight detective."
+}

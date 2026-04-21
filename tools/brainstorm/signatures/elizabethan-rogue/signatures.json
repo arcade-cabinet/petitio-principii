@@ -1,0 +1,803 @@
+[
+  {
+    "cluster_id": "elizabethan-rogue",
+    "source_ref": "greene-cozenage-1591",
+    "sentence_count": 3725,
+    "word_count": 47574,
+    "sentence_length_p10": 3,
+    "sentence_length_p50": 11,
+    "sentence_length_p90": 25,
+    "sentence_length_max": 58,
+    "latinate_ratio": 0.01563879429940724,
+    "type_token_ratio": 0.1315003993778114,
+    "modal_verb_rate": 0.009101610123176526,
+    "sensory_mix": {
+      "visual": 0.4597156398104265,
+      "auditory": 0.24170616113744076,
+      "tactile": 0.1484992101105845,
+      "olfactory": 0.007898894154818325,
+      "kinesthetic": 0.14218009478672985
+    },
+    "pov_1st": 0.2752063150340868,
+    "pov_2nd": 0.10620739146035163,
+    "pov_3rd": 0.6185862935055615,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 474
+      },
+      {
+        "bigram": "in the",
+        "count": 207
+      },
+      {
+        "bigram": "on the",
+        "count": 134
+      },
+      {
+        "bigram": "it was",
+        "count": 134
+      },
+      {
+        "bigram": "to the",
+        "count": 131
+      },
+      {
+        "bigram": "the major",
+        "count": 120
+      },
+      {
+        "bigram": "in a",
+        "count": 113
+      },
+      {
+        "bigram": "at the",
+        "count": 103
+      },
+      {
+        "bigram": "and the",
+        "count": 94
+      },
+      {
+        "bigram": "with a",
+        "count": 94
+      },
+      {
+        "bigram": "had been",
+        "count": 88
+      },
+      {
+        "bigram": "he had",
+        "count": 88
+      },
+      {
+        "bigram": "he was",
+        "count": 84
+      },
+      {
+        "bigram": "the boy",
+        "count": 76
+      },
+      {
+        "bigram": "from the",
+        "count": 74
+      },
+      {
+        "bigram": "of a",
+        "count": 69
+      },
+      {
+        "bigram": "by the",
+        "count": 68
+      },
+      {
+        "bigram": "as he",
+        "count": 65
+      },
+      {
+        "bigram": "was a",
+        "count": 63
+      },
+      {
+        "bigram": "for the",
+        "count": 61
+      },
+      {
+        "bigram": "said the",
+        "count": 57
+      },
+      {
+        "bigram": "through the",
+        "count": 52
+      },
+      {
+        "bigram": "they were",
+        "count": 52
+      },
+      {
+        "bigram": "out of",
+        "count": 51
+      },
+      {
+        "bigram": "into the",
+        "count": 51
+      },
+      {
+        "bigram": "the two",
+        "count": 51
+      },
+      {
+        "bigram": "to be",
+        "count": 50
+      },
+      {
+        "bigram": "that the",
+        "count": 50
+      },
+      {
+        "bigram": "as the",
+        "count": 49
+      },
+      {
+        "bigram": "of his",
+        "count": 48
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 27
+      },
+      {
+        "trigram": "the boy scouts",
+        "count": 26
+      },
+      {
+        "trigram": "said the major",
+        "count": 26
+      },
+      {
+        "trigram": "the next instant",
+        "count": 23
+      },
+      {
+        "trigram": "it was a",
+        "count": 23
+      },
+      {
+        "trigram": "hunt and his",
+        "count": 22
+      },
+      {
+        "trigram": "all at once",
+        "count": 18
+      },
+      {
+        "trigram": "out of the",
+        "count": 17
+      },
+      {
+        "trigram": "in a flash",
+        "count": 16
+      },
+      {
+        "trigram": "for an instant",
+        "count": 15
+      },
+      {
+        "trigram": "of the hut",
+        "count": 14
+      },
+      {
+        "trigram": "there was a",
+        "count": 13
+      },
+      {
+        "trigram": "at the same",
+        "count": 13
+      },
+      {
+        "trigram": "of the lake",
+        "count": 13
+      },
+      {
+        "trigram": "the same instant",
+        "count": 12
+      },
+      {
+        "trigram": "the fat boy",
+        "count": 12
+      },
+      {
+        "trigram": "publishers new york",
+        "count": 12
+      },
+      {
+        "trigram": "end of the",
+        "count": 11
+      },
+      {
+        "trigram": "it had been",
+        "count": 11
+      },
+      {
+        "trigram": "of the eagle",
+        "count": 10
+      },
+      {
+        "trigram": "the eagle patrol",
+        "count": 10
+      },
+      {
+        "trigram": "seemed to be",
+        "count": 10
+      },
+      {
+        "trigram": "the two boys",
+        "count": 10
+      },
+      {
+        "trigram": "the boy scout",
+        "count": 10
+      },
+      {
+        "trigram": "the rest of",
+        "count": 10
+      },
+      {
+        "trigram": "said the professor",
+        "count": 10
+      },
+      {
+        "trigram": "upon receipt of",
+        "count": 10
+      },
+      {
+        "trigram": "of the boy",
+        "count": 9
+      },
+      {
+        "trigram": "hurst company publishers",
+        "count": 9
+      },
+      {
+        "trigram": "that he was",
+        "count": 9
+      }
+    ]
+  },
+  {
+    "cluster_id": "elizabethan-rogue",
+    "source_ref": "dekker-gulls-hornbook-1609",
+    "sentence_count": 1303,
+    "word_count": 17849,
+    "sentence_length_p10": 1,
+    "sentence_length_p50": 9,
+    "sentence_length_p90": 31,
+    "sentence_length_max": 105,
+    "latinate_ratio": 0.004594094907277719,
+    "type_token_ratio": 0.29194912880273405,
+    "modal_verb_rate": 0,
+    "sensory_mix": {
+      "visual": 1,
+      "auditory": 0,
+      "tactile": 0,
+      "olfactory": 0,
+      "kinesthetic": 0
+    },
+    "pov_1st": 1,
+    "pov_2nd": 0,
+    "pov_3rd": 0,
+    "signature_bigrams": [
+      {
+        "bigram": "il visconte",
+        "count": 92
+      },
+      {
+        "bigram": "la contessa",
+        "count": 65
+      },
+      {
+        "bigram": "di karolystria",
+        "count": 40
+      },
+      {
+        "bigram": "il conte",
+        "count": 37
+      },
+      {
+        "bigram": "di un",
+        "count": 36
+      },
+      {
+        "bigram": "e di",
+        "count": 28
+      },
+      {
+        "bigram": "don fulgenzio",
+        "count": 25
+      },
+      {
+        "bigram": "di una",
+        "count": 22
+      },
+      {
+        "bigram": "il commissario",
+        "count": 22
+      },
+      {
+        "bigram": "contessa di",
+        "count": 21
+      },
+      {
+        "bigram": "che il",
+        "count": 21
+      },
+      {
+        "bigram": "che io",
+        "count": 20
+      },
+      {
+        "bigram": "e il",
+        "count": 20
+      },
+      {
+        "bigram": "disse il",
+        "count": 19
+      },
+      {
+        "bigram": "ci che",
+        "count": 17
+      },
+      {
+        "bigram": "il mio",
+        "count": 17
+      },
+      {
+        "bigram": "che la",
+        "count": 17
+      },
+      {
+        "bigram": "esclam il",
+        "count": 17
+      },
+      {
+        "bigram": "conte bradamano",
+        "count": 16
+      },
+      {
+        "bigram": "io vi",
+        "count": 16
+      },
+      {
+        "bigram": "che si",
+        "count": 15
+      },
+      {
+        "bigram": "in un",
+        "count": 15
+      },
+      {
+        "bigram": "i suoi",
+        "count": 15
+      },
+      {
+        "bigram": "il parroco",
+        "count": 15
+      },
+      {
+        "bigram": "il vescovo",
+        "count": 15
+      },
+      {
+        "bigram": "anna maria",
+        "count": 14
+      },
+      {
+        "bigram": "che mi",
+        "count": 14
+      },
+      {
+        "bigram": "non vi",
+        "count": 14
+      },
+      {
+        "bigram": "si era",
+        "count": 14
+      },
+      {
+        "bigram": "rispose il",
+        "count": 14
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "contessa di karolystria",
+        "count": 21
+      },
+      {
+        "trigram": "il conte bradamano",
+        "count": 13
+      },
+      {
+        "trigram": "contessa anna maria",
+        "count": 10
+      },
+      {
+        "trigram": "anna maria di",
+        "count": 10
+      },
+      {
+        "trigram": "maria di karolystria",
+        "count": 10
+      },
+      {
+        "trigram": "esclam il visconte",
+        "count": 10
+      },
+      {
+        "trigram": "disse il visconte",
+        "count": 9
+      },
+      {
+        "trigram": "la contessa di",
+        "count": 8
+      },
+      {
+        "trigram": "la contessa anna",
+        "count": 7
+      },
+      {
+        "trigram": "conte bradamano di",
+        "count": 7
+      },
+      {
+        "trigram": "bradamano di karolystria",
+        "count": 7
+      },
+      {
+        "trigram": "in presenza di",
+        "count": 6
+      },
+      {
+        "trigram": "della maga rossa",
+        "count": 6
+      },
+      {
+        "trigram": "e il visconte",
+        "count": 6
+      },
+      {
+        "trigram": "la signora contessa",
+        "count": 6
+      },
+      {
+        "trigram": "cinque milioni di",
+        "count": 6
+      },
+      {
+        "trigram": "milioni di ducati",
+        "count": 6
+      },
+      {
+        "trigram": "foresta di bathelmatt",
+        "count": 5
+      },
+      {
+        "trigram": "al momento in",
+        "count": 5
+      },
+      {
+        "trigram": "momento in cui",
+        "count": 5
+      },
+      {
+        "trigram": "rispose il commissario",
+        "count": 5
+      },
+      {
+        "trigram": "signora contessa di",
+        "count": 5
+      },
+      {
+        "trigram": "all'albergo del pappagallo",
+        "count": 5
+      },
+      {
+        "trigram": "nella mia lunga",
+        "count": 5
+      },
+      {
+        "trigram": "mia lunga carriera",
+        "count": 5
+      },
+      {
+        "trigram": "lunga carriera ecclesiastica",
+        "count": 5
+      },
+      {
+        "trigram": "giorno in cui",
+        "count": 4
+      },
+      {
+        "trigram": "il visconte si",
+        "count": 4
+      },
+      {
+        "trigram": "il visconte con",
+        "count": 4
+      },
+      {
+        "trigram": "in meno di",
+        "count": 4
+      }
+    ]
+  },
+  {
+    "cluster_id": "elizabethan-rogue",
+    "source_ref": null,
+    "sentence_count": 5028,
+    "word_count": 65423,
+    "sentence_length_p10": 2,
+    "sentence_length_p50": 11,
+    "sentence_length_p90": 26,
+    "sentence_length_max": 105,
+    "latinate_ratio": 0.012625529248123749,
+    "type_token_ratio": 0.17385323204377665,
+    "modal_verb_rate": 0.006618467511425645,
+    "sensory_mix": {
+      "visual": 0.4605678233438486,
+      "auditory": 0.24132492113564669,
+      "tactile": 0.14826498422712933,
+      "olfactory": 0.007886435331230283,
+      "kinesthetic": 0.14195583596214512
+    },
+    "pov_1st": 0.30987359070720877,
+    "pov_2nd": 0.10112743423300308,
+    "pov_3rd": 0.5889989750597882,
+    "signature_bigrams": [
+      {
+        "bigram": "of the",
+        "count": 474
+      },
+      {
+        "bigram": "in the",
+        "count": 207
+      },
+      {
+        "bigram": "on the",
+        "count": 134
+      },
+      {
+        "bigram": "it was",
+        "count": 134
+      },
+      {
+        "bigram": "to the",
+        "count": 131
+      },
+      {
+        "bigram": "the major",
+        "count": 120
+      },
+      {
+        "bigram": "in a",
+        "count": 113
+      },
+      {
+        "bigram": "at the",
+        "count": 103
+      },
+      {
+        "bigram": "and the",
+        "count": 95
+      },
+      {
+        "bigram": "with a",
+        "count": 94
+      },
+      {
+        "bigram": "il visconte",
+        "count": 92
+      },
+      {
+        "bigram": "had been",
+        "count": 88
+      },
+      {
+        "bigram": "he had",
+        "count": 88
+      },
+      {
+        "bigram": "he was",
+        "count": 84
+      },
+      {
+        "bigram": "the boy",
+        "count": 76
+      },
+      {
+        "bigram": "from the",
+        "count": 74
+      },
+      {
+        "bigram": "of a",
+        "count": 69
+      },
+      {
+        "bigram": "by the",
+        "count": 68
+      },
+      {
+        "bigram": "as he",
+        "count": 65
+      },
+      {
+        "bigram": "la contessa",
+        "count": 65
+      },
+      {
+        "bigram": "was a",
+        "count": 63
+      },
+      {
+        "bigram": "for the",
+        "count": 61
+      },
+      {
+        "bigram": "said the",
+        "count": 57
+      },
+      {
+        "bigram": "through the",
+        "count": 52
+      },
+      {
+        "bigram": "they were",
+        "count": 52
+      },
+      {
+        "bigram": "out of",
+        "count": 51
+      },
+      {
+        "bigram": "into the",
+        "count": 51
+      },
+      {
+        "bigram": "the two",
+        "count": 51
+      },
+      {
+        "bigram": "to be",
+        "count": 50
+      },
+      {
+        "bigram": "that the",
+        "count": 50
+      }
+    ],
+    "signature_trigrams": [
+      {
+        "trigram": "one of the",
+        "count": 27
+      },
+      {
+        "trigram": "the boy scouts",
+        "count": 26
+      },
+      {
+        "trigram": "said the major",
+        "count": 26
+      },
+      {
+        "trigram": "the next instant",
+        "count": 23
+      },
+      {
+        "trigram": "it was a",
+        "count": 23
+      },
+      {
+        "trigram": "hunt and his",
+        "count": 22
+      },
+      {
+        "trigram": "contessa di karolystria",
+        "count": 21
+      },
+      {
+        "trigram": "all at once",
+        "count": 18
+      },
+      {
+        "trigram": "out of the",
+        "count": 17
+      },
+      {
+        "trigram": "in a flash",
+        "count": 16
+      },
+      {
+        "trigram": "for an instant",
+        "count": 15
+      },
+      {
+        "trigram": "of the hut",
+        "count": 14
+      },
+      {
+        "trigram": "there was a",
+        "count": 13
+      },
+      {
+        "trigram": "at the same",
+        "count": 13
+      },
+      {
+        "trigram": "of the lake",
+        "count": 13
+      },
+      {
+        "trigram": "il conte bradamano",
+        "count": 13
+      },
+      {
+        "trigram": "the same instant",
+        "count": 12
+      },
+      {
+        "trigram": "the fat boy",
+        "count": 12
+      },
+      {
+        "trigram": "publishers new york",
+        "count": 12
+      },
+      {
+        "trigram": "end of the",
+        "count": 11
+      },
+      {
+        "trigram": "it had been",
+        "count": 11
+      },
+      {
+        "trigram": "of the eagle",
+        "count": 10
+      },
+      {
+        "trigram": "the eagle patrol",
+        "count": 10
+      },
+      {
+        "trigram": "seemed to be",
+        "count": 10
+      },
+      {
+        "trigram": "the two boys",
+        "count": 10
+      },
+      {
+        "trigram": "the boy scout",
+        "count": 10
+      },
+      {
+        "trigram": "the rest of",
+        "count": 10
+      },
+      {
+        "trigram": "said the professor",
+        "count": 10
+      },
+      {
+        "trigram": "upon receipt of",
+        "count": 10
+      },
+      {
+        "trigram": "contessa anna maria",
+        "count": 10
+      }
+    ]
+  }
+]
