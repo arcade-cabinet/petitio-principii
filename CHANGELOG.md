@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/arcade-cabinet/petitio-principii/compare/v1.0.0...v1.1.0) (2026-04-21)
+
+
+### Features
+
+* **pivot:** brainstorm pipeline foundation — fetch, normalize, ([#25](https://github.com/arcade-cabinet/petitio-principii/issues/25)) ([f026264](https://github.com/arcade-cabinet/petitio-principii/commit/f026264e7e6a4f15333e317d384ea77f0f48e048))
+* **pivot:** brainstorm pipeline stages 5+7 — embed (Ollama) + check (sqlite-vec), plus full PR [#24](https://github.com/arcade-cabinet/petitio-principii/issues/24) feedback sweep ([#27](https://github.com/arcade-cabinet/petitio-principii/issues/27)) ([caabeac](https://github.com/arcade-cabinet/petitio-principii/commit/caabeacb9d2b3d5956b61876a4fde67a20860da8))
+
 ## 1.0.0 (2026-04-21)
 
 
