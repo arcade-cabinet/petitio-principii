@@ -13,6 +13,7 @@ import {
 import { createSeededRandom } from "@/engine";
 import { ArgumentAgent } from "@/engine/ai/argument-agent";
 import { sfxForRhetoricalType } from "@/lib/audio-manifest";
+import * as mobile from "@/lib/mobile";
 import { readTranscript } from "@/world";
 import { useCallback, useRef, useState } from "react";
 import { useAudio } from "./use-audio";
@@ -92,6 +93,8 @@ export function useGame(): GameHandle {
     async (seed: number) => {
       audio.stopBgm();
       seedRef.current = seed;
+      // Hide the status bar entering the game (immersive mode). No-op on web.
+      void mobile.statusBarHide();
 
       // One Yuka argument agent per game, seeded so choice-between-variants
       // is deterministic for (seed, player-acts).
@@ -137,6 +140,8 @@ export function useGame(): GameHandle {
   const requestNewGame = useCallback(() => {
     audio.stopBgm();
     audio.playSfx("ui.back");
+    // Restore status bar when returning to the landing screen. No-op on web.
+    void mobile.statusBarShow();
     world.discard();
     agentRef.current = null;
     setState(createInitialGameState());
@@ -146,6 +151,10 @@ export function useGame(): GameHandle {
     (raw: string) => {
       if (!raw.trim()) return;
       audio.playSfx("ui.press");
+      // Fire haptics for ACCEPT / REJECT on native. No-op on web.
+      const verb = raw.trim().toLowerCase();
+      if (verb === "accept") void mobile.hapticSuccess();
+      else if (verb === "reject") void mobile.hapticWarning();
       setState((prev) => {
         const bridge = makeBridge();
         if (!bridge) return prev;

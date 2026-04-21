@@ -3,6 +3,7 @@ import { CrystalField } from "@/components/ui/crystal-field";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { useGame } from "@/hooks/use-game";
 import { initTelemetry, trackCircleClosed } from "@/lib/telemetry";
+import { registerBackHandler } from "@/lib/mobile";
 import { isCircleClosed } from "@/world";
 import { Suspense, lazy, useEffect, useMemo, useRef } from "react";
 
@@ -59,6 +60,10 @@ function TerminalLoadingPill() {
  *
  * T81: Opt-in analytics via Plausible — consent banner on first launch.
  * T93: When the circle closes, a ShareCard overlay appears.
+ *
+ * Android back-button behaviour (T75):
+ *   - In-game: fires requestNewGame (returns to landing / "new game?").
+ *   - On landing: default OS behaviour (suspend/background).
  */
 export function App() {
   const game = useGame();
@@ -88,6 +93,15 @@ export function App() {
       circleTrackedRef.current = false;
     }
   }, [circleClosed, game.state.started, game.state.seed, game.state.turnCount]);
+
+  // Register the Android hardware back-button handler.
+  // When the game is active, back → requestNewGame (return to landing).
+  // When on the landing screen, pass null so the OS default applies
+  // (suspend / background the app).
+  useEffect(() => {
+    const cleanup = registerBackHandler(game.state.started ? game.requestNewGame : null);
+    return cleanup;
+  }, [game.state.started, game.requestNewGame]);
 
   return (
     <div className="relative h-[100svh] w-screen overflow-hidden">
