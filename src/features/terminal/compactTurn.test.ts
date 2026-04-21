@@ -117,7 +117,18 @@ describe("compactTurn", () => {
   });
 
   it("recognises every movement verb", () => {
-    const verbs = ["north", "south", "east", "west", "up", "down", "back", "forward"];
+    const verbs = [
+      "north",
+      "northeast",
+      "east",
+      "southeast",
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "up",
+      "down",
+    ];
     for (const v of verbs) {
       const t = makeTurn([
         entry({ kind: "echo", text: `> ${v}` }),

@@ -23,7 +23,7 @@
  * terminal. Reduced-motion users get a 0.6s opacity fade only.
  */
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Duration in milliseconds of the melt-away transition. Exported so the
@@ -118,51 +118,31 @@ export function HeroClock({
 }: HeroClockProps) {
   const reducedMotion = useReducedMotion();
 
-  // Real-time tick: the hands sync to the actual current time (locale time
-  // — same time the user's wrist watch shows), so the clock reads as a
-  // real object in the room rather than a frozen prop. While idle on the
-  // landing, a random rate-multiplier drift speeds the apparent flow up
-  // and slows it down ([0.3×, 3.0×], resampled at 1–6s intervals) — the
-  // memory-palace clock losing structural integrity the longer the
-  // player hesitates. The DISPLAYED time always represents real time at
-  // the *baseline* rate; only the perceived sweep speed warps. When
-  // melting starts, we freeze the sweep so the dissolve animation owns
-  // the frame.
+  // Real-time tick: the hands sync to the actual current wall-clock time
+  // (the same time the user's wrist watch shows), so the clock reads as
+  // a real object in the room rather than a frozen prop. We poll
+  // requestAnimationFrame and read fresh `Date.now()` each frame —
+  // displayed time is ALWAYS real time, no drift. When melting starts,
+  // we freeze the sweep so the dissolve animation owns the frame.
+  //
+  // (The earlier draft tried a "random rate multiplier" idle-drift
+  // effect by integrating dt × rate into an accumulator. Multiple bot
+  // reviewers correctly flagged that this drifted the displayed face
+  // away from real time, contradicting the comment. Cut it: the drift
+  // would only have been perceptible on a second hand we don't render,
+  // and on minute/hour scales it simply broke the "real time" promise.)
   const [now, setNow] = useState<Date>(() => new Date());
-  const rateRef = useRef<number>(1.0);
-  const baseTimeRef = useRef<number>(Date.now());
-  const accumulatedRef = useRef<number>(0);
 
   useEffect(() => {
     if (melting || reducedMotion) {
       // Freeze the hands during melt; reduced-motion users get a static
-      // current-time face (no drift, no sweep visible).
+      // current-time face (no sweep visible).
       if (reducedMotion && !melting) setNow(new Date());
       return;
     }
     let raf = 0;
-    let lastT = performance.now();
-    let lastSample = performance.now();
-    let nextSampleIn = 1000 + Math.random() * 5000;
-
-    const loop = (t: number) => {
-      const dt = t - lastT;
-      lastT = t;
-      // Apply current rate multiplier to elapsed real time.
-      accumulatedRef.current += dt * rateRef.current;
-      const display = new Date(baseTimeRef.current + accumulatedRef.current);
-      setNow(display);
-
-      // Resample rate at random intervals.
-      if (t - lastSample >= nextSampleIn) {
-        // Smooth easing toward the new rate over ~400ms via a transient
-        // intermediate target — but for simplicity we just snap; the
-        // visual smoothness comes from the underlying time integration
-        // (rate change shifts dDate/dt which is felt as acceleration).
-        rateRef.current = 0.3 + Math.random() * 2.7;
-        lastSample = t;
-        nextSampleIn = 1000 + Math.random() * 5000;
-      }
+    const loop = () => {
+      setNow(new Date());
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);

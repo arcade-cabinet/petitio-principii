@@ -46,7 +46,7 @@ const TUTORIAL_DISTINCT_VERB_THRESHOLD = 3;
 const TUTORIAL_TURN_THRESHOLD = 8;
 
 const CARDINAL_DIRECTIONS = new Set(["north", "south", "east", "west"]);
-const NON_CARDINAL_DIRECTIONS = new Set(["up", "down", "back", "forward"]);
+const NON_CARDINAL_DIRECTIONS = new Set(["up", "down"]);
 
 export interface KeycapSurface {
   /** Verbs the UI should render, including "look". */

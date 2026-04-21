@@ -28,13 +28,15 @@ function neutralLayout(): KeycapLayout {
     },
     directions: {
       north: { available: true, alreadyTraversed: false },
-      south: { available: false, alreadyTraversed: false },
+      northeast: { available: false, alreadyTraversed: false },
       east: { available: false, alreadyTraversed: false },
+      southeast: { available: false, alreadyTraversed: false },
+      south: { available: false, alreadyTraversed: false },
+      southwest: { available: false, alreadyTraversed: false },
       west: { available: false, alreadyTraversed: false },
+      northwest: { available: false, alreadyTraversed: false },
       up: { available: false, alreadyTraversed: false },
       down: { available: false, alreadyTraversed: false },
-      back: { available: false, alreadyTraversed: false },
-      forward: { available: false, alreadyTraversed: false },
     },
   };
 }

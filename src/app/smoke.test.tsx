@@ -164,6 +164,10 @@ describe("App end-to-end smoke", () => {
       }
     }
 
+    // Capture present-zone state BEFORE the click so the change-detection
+    // assertion below has something meaningful to compare against.
+    const beforeAccept = screen.getByTestId("present-zone").textContent ?? "";
+
     // ACCEPT in circle/meta closes the argument. (VerbPanel aria-label is
     // "Accept — concede the point", so match by leading word.)
     await user.click(screen.getByRole("button", { name: /^Accept\b/i }));
@@ -172,7 +176,6 @@ describe("App end-to-end smoke", () => {
     // re-render. Three-way OR because the PRNG seed determines whether the
     // 12-hop trace lands in the circle. Even when it doesn't, ACCEPT must
     // produce SOME observable state change (present-zone re-render).
-    const beforeAccept = screen.getByTestId("present-zone").textContent ?? "";
     await waitFor(
       () => {
         const closingEdge = document.querySelector('[data-testid="argument-map-closing-edge"]');

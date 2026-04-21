@@ -64,13 +64,15 @@ export function sfxForVerb(verb: string): SfxKey | null {
       return "rhetoric.trace";
     // Directional movement collapses to a single room-enter
     case "north":
-    case "south":
+    case "northeast":
     case "east":
+    case "southeast":
+    case "south":
+    case "southwest":
     case "west":
+    case "northwest":
     case "up":
     case "down":
-    case "back":
-    case "forward":
       return "room.enter";
     default:
       return null;
