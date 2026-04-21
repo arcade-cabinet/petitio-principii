@@ -6,6 +6,19 @@
 @import "@fontsource/dm-mono/400.css";
 @import "@fontsource/dm-mono/500.css";
 
+/* T85 — OpenDyslexic via CDN (loaded only when the dyslexia toggle is on).
+   The @font-face rule lives here so the family name is always defined even
+   before the font file has been fetched; the browser only downloads it when
+   the family is actually referenced. */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.woff2") format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /**
  * Petitio Principii — design tokens.
  *
@@ -48,6 +61,75 @@
   --animate-drift: drift 20s ease-in-out infinite;
   --animate-pulse-violet: pulse-violet 3s ease-in-out infinite;
   --animate-dot-orbit: dot-orbit 8s linear infinite;
+}
+
+/* ── T85/T86 runtime appearance vars ───────────────────────────────────────
+ * These are set on <html> by useAppearance. Components refer to them via
+ * CSS custom properties, giving us a single DOM-root toggle point.
+ *
+ * --pp-font-body      : overrides the display font when dyslexia mode is on.
+ *                       Default is empty string → inherits --font-display.
+ * --pp-font-scale     : multiplier applied to font-size on body.
+ *                       0.875 | 1 | 1.2 for small / medium / large.
+ */
+:root {
+  --pp-font-body: "";
+  --pp-font-scale: 1;
+}
+
+html {
+  font-size: calc(100% * var(--pp-font-scale, 1));
+}
+
+/* When dyslexia mode is active, body text uses OpenDyslexic.
+   The incantation (Yesteryear / --font-incantation) is intentionally excluded. */
+html[data-dyslexia="true"] body,
+html[data-dyslexia="true"] #root {
+  font-family: "OpenDyslexic", sans-serif;
+}
+
+/* ── T84 high-contrast mode ─────────────────────────────────────────────────
+ * When the OS reports "more contrast" preference:
+ *   • Kill all glow / blur effects
+ *   • Push colours to WCAG AAA levels (≥ 7:1 against #000000 background)
+ *   • Ensure interactive element outlines are always visible
+ */
+@media (prefers-contrast: more) {
+  :root {
+    /* Raise text colours to near-white for AAA on black */
+    --color-silver: #ffffff;
+    --color-highlight: #ffffff;
+    --color-dim: #dddddd;
+    --color-muted: #bbbbbb;
+    --color-violet: #b8a0ff;
+    --color-violet-bright: #d0c0ff;
+    --color-pink: #ffc0f8;
+
+    /* Erase all glow */
+    --shadow-glow-silver: none;
+    --shadow-glow-silver-soft: none;
+    --shadow-glow-violet: none;
+    --shadow-glow-pink: none;
+  }
+
+  /* Remove box-shadows used for glow throughout the UI */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure interactive elements have visible focus outlines */
+  :focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+  }
+
+  /* Panel borders must be clearly visible */
+  [class*="border-"] {
+    border-color: #888888 !important;
+  }
 }
 
 @keyframes drift {

@@ -1,6 +1,8 @@
+import { AppearanceControls } from "@/components/ui/appearance-controls";
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { generatePhrase, generateSeed } from "@/engine";
-import { useMemo, useState } from "react";
+import { useAppearance } from "@/hooks/use-appearance";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * NewGameIncantation — the landing display.
@@ -12,24 +14,90 @@ import { useMemo, useState } from "react";
  * Three actions: BEGIN (press the incantation into the argument),
  * REGENERATE (another phrase), CUSTOM SEED (specify the reproducible
  * argument-journey you want to play).
+ *
+ * T91: If `?seed=XXXX` is present in the URL on landing, that seed is loaded
+ * immediately. The "Share" button copies
+ * `window.location.origin + base + "?seed=" + currentSeed` to the clipboard.
+ *
+ * T92: Each day a date-derived seed surfaces as "Argument of the Day". The
+ * seed is derived from `hash(YYYY-MM-DD)` so every device on the same UTC
+ * date plays the same argument.
  */
+
+/** Derive a deterministic u32 seed from a UTC date string "YYYY-MM-DD". */
+function dateSeed(dateStr: string): number {
+  // FNV-1a 32-bit
+  let h = 0x811c9dc5;
+  for (let i = 0; i < dateStr.length; i++) {
+    h ^= dateStr.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** Return today's UTC date as "YYYY-MM-DD". */
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** Parse ?seed= from the current URL; returns null if absent/invalid. */
+function seedFromURL(): number | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("seed");
+    if (!raw) return null;
+    const n = Number.parseInt(raw, 10);
+    if (Number.isNaN(n) || n < 0 || n > 0xffffffff) return null;
+    return n;
+  } catch {
+    return null;
+  }
+}
+
+/** Build the shareable URL for a given seed. */
+function buildShareURL(seed: number): string {
+  const url = new URL(window.location.href);
+  url.searchParams.set("seed", String(seed));
+  // Strip any hash fragment so the shared link lands on landing
+  url.hash = "";
+  return url.toString();
+}
+
 export interface NewGameIncantationProps {
   onBegin: (seed: number) => void | Promise<void>;
 }
 
 export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
-  const [seed, setSeed] = useState<number>(() => generateSeed());
+  const appearance = useAppearance();
+  const urlSeed = useMemo(() => seedFromURL(), []);
+  const todaySeedValue = useMemo(() => dateSeed(todayUTC()), []);
+
+  const [seed, setSeed] = useState<number>(() => urlSeed ?? todaySeedValue);
+  /** true when the currently-shown seed is today's date-derived seed */
+  const [isArgumentOfDay, setIsArgumentOfDay] = useState<boolean>(
+    () => urlSeed === null || urlSeed === todaySeedValue,
+  );
   const [customOpen, setCustomOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [customError, setCustomError] = useState("");
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">("idle");
 
   const phrase = useMemo(() => generatePhrase(seed), [seed]);
 
+  // Keep the URL bar in sync with the current seed so the page is always shareable.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("seed", String(seed));
+    window.history.replaceState(null, "", url.toString());
+  }, [seed]);
+
   const handleRegenerate = () => {
     setSeed(generateSeed());
+    setIsArgumentOfDay(false);
     setCustomInput("");
     setCustomError("");
     setCustomOpen(false);
+    setShareStatus("idle");
   };
 
   const handleCustomSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -41,8 +109,22 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
     }
     setCustomError("");
     setSeed(parsed);
+    setIsArgumentOfDay(parsed === todaySeedValue);
     setCustomOpen(false);
     setCustomInput("");
+    setShareStatus("idle");
+  };
+
+  const handleShare = async () => {
+    const shareURL = buildShareURL(seed);
+    try {
+      await navigator.clipboard.writeText(shareURL);
+      setShareStatus("copied");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    } catch {
+      setShareStatus("error");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    }
   };
 
   return (
@@ -63,8 +145,23 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
           a text adventure through a self-justifying argument
         </p>
 
+        {/* T92 — Argument of the Day banner */}
+        {isArgumentOfDay && (
+          <div
+            className="mt-5 rounded-[4px] border border-[var(--color-panel-edge)] bg-[var(--color-ink)]/60 px-4 py-2"
+            aria-live="polite"
+          >
+            <p className="font-[family-name:var(--font-display)] text-[0.88rem] tracking-[0.16em] text-[var(--color-violet-bright)] uppercase">
+              Today&rsquo;s Argument &mdash; {todayUTC()}
+            </p>
+            <p className="mt-0.5 font-[family-name:var(--font-display)] text-[0.78rem] tracking-[0.1em] text-[var(--color-muted)]">
+              Everyone playing today shares this seed.
+            </p>
+          </div>
+        )}
+
         {/* Incantation — the seeded phrase, drawn in Yesteryear */}
-        <div className="mt-10 flex flex-col items-center gap-2">
+        <div className="mt-8 flex flex-col items-center gap-2">
           <div
             className="font-[family-name:var(--font-incantation)] text-[clamp(1.8rem,5vw,2.4rem)] leading-tight text-[var(--color-silver)]"
             style={{ textShadow: "0 0 6px rgba(192,192,255,0.45)" }}
@@ -124,6 +221,27 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               Custom Seed
             </button>
           </div>
+
+          {/* T91 — Share button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            aria-label="Copy shareable link to this seed"
+            className={`
+              min-h-[40px] rounded-[5px]
+              border border-transparent
+              bg-transparent
+              font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.16em] uppercase
+              transition-colors duration-150
+              ${shareStatus === "copied" ? "text-[var(--color-silver)]" : "text-[var(--color-muted)] hover:text-[var(--color-dim)]"}
+            `}
+          >
+            {shareStatus === "copied"
+              ? "Link copied!"
+              : shareStatus === "error"
+                ? "Copy failed — try again"
+                : "Share this seed"}
+          </button>
         </div>
 
         {customOpen && (
@@ -164,6 +282,9 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
             {customError}
           </p>
         )}
+
+        {/* T85/T86 appearance settings */}
+        <AppearanceControls appearance={appearance} />
       </GlowingPanel>
     </div>
   );

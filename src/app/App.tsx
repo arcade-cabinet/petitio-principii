@@ -1,7 +1,10 @@
+import { ShareCard } from "@/components/ui/share-card";
 import { CrystalField } from "@/components/ui/crystal-field";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { TerminalDisplay } from "@/features/terminal/TerminalDisplay";
 import { useGame } from "@/hooks/use-game";
+import { isCircleClosed } from "@/world";
+import { useMemo } from "react";
 
 /**
  * App shell. Three layers, back to front:
@@ -14,21 +17,57 @@ import { useGame } from "@/hooks/use-game";
  * projection of an argument. Each panel is a soft pointer-tracked glow
  * card sitting directly on the nebula backdrop. The player presses
  * keys; nobody types. See docs/LORE.md.
+ *
+ * T93: When the circle closes, a ShareCard overlay appears so the player
+ * can share their result as a canvas-rendered image.
  */
 export function App() {
   const game = useGame();
+
+  // T93 — compute circle-closed for the share overlay.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: transcript drives re-read
+  const circleClosed = useMemo(() => {
+    const w = game.world.getWorld();
+    return w ? isCircleClosed(w) : false;
+  }, [game.world, game.state.transcript.length]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: transcript drives re-read
+  const visited = useMemo(
+    () => game.world.readVisitHistory(),
+    [game.world, game.state.transcript.length, game.state.currentRoomId],
+  );
 
   return (
     <div className="relative h-[100svh] w-screen overflow-hidden">
       <CrystalField />
       {game.state.started ? (
-        <TerminalDisplay
-          state={game.state}
-          world={game.world}
-          onCommand={game.submitCommand}
-          onNewGame={game.requestNewGame}
-          onHintDismiss={game.dismissHint}
-        />
+        <>
+          <TerminalDisplay
+            state={game.state}
+            world={game.world}
+            onCommand={game.submitCommand}
+            onNewGame={game.requestNewGame}
+            onHintDismiss={game.dismissHint}
+          />
+          {/* T93 — share card overlay, shown only after circle closes */}
+          {circleClosed && (
+            <div
+              className="absolute inset-0 z-50 flex items-end justify-center pb-8 px-4 pointer-events-none"
+              aria-live="polite"
+            >
+              <div className="pointer-events-auto w-full max-w-lg">
+                <ShareCard
+                  visited={visited}
+                  currentRoomId={game.state.currentRoomId}
+                  circleClosed={circleClosed}
+                  seed={game.state.seed}
+                  phrase={game.state.phrase}
+                  turnCount={game.state.turnCount}
+                />
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <NewGameIncantation onBegin={game.startGame} />
       )}
