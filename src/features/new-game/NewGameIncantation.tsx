@@ -88,7 +88,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
   const [seed, setSeed] = useState<number>(() => urlSeed ?? todaySeedValue);
   /** true when the currently-shown seed is today's date-derived seed */
   const [isArgumentOfDay, setIsArgumentOfDay] = useState<boolean>(
-    () => urlSeed === null || urlSeed === todaySeedValue,
+    () => urlSeed === null || urlSeed === todaySeedValue
   );
   const [customOpen, setCustomOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
@@ -300,9 +300,8 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
         <AppearanceControls appearance={appearance} />
 
         {/* T82/T83 language switcher */}
-        <div
-          className="mt-3 flex items-center justify-center gap-2"
-          role="group"
+        <fieldset
+          className="mt-3 flex items-center justify-center gap-2 border-0 m-0 p-0"
           aria-label="Language"
         >
           {SUPPORTED_LANGUAGES.map((lang) => (
@@ -326,7 +325,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               {LANG_LABELS[lang]}
             </button>
           ))}
-        </div>
+        </fieldset>
       </GlowingPanel>
     </div>
   );

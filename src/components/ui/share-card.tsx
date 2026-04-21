@@ -53,7 +53,7 @@ function drawCard(
   circleClosed: boolean,
   seed: number,
   phrase: string,
-  turnCount: number,
+  turnCount: number
 ): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -66,7 +66,14 @@ function drawCard(
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
   // Subtle radial gradient for depth
-  const grad = ctx.createRadialGradient(CARD_W / 2, CARD_H / 2, 0, CARD_W / 2, CARD_H / 2, CARD_W * 0.7);
+  const grad = ctx.createRadialGradient(
+    CARD_W / 2,
+    CARD_H / 2,
+    0,
+    CARD_W / 2,
+    CARD_H / 2,
+    CARD_W * 0.7
+  );
   grad.addColorStop(0, C_PANEL);
   grad.addColorStop(1, C_INK);
   ctx.fillStyle = grad;
@@ -146,7 +153,11 @@ function drawCard(
   ctx.textAlign = "center";
   ctx.fillStyle = C_DIM;
   ctx.font = "22px monospace";
-  ctx.fillText(`SEED ${seed}   ·   ${turnCount} turn${turnCount === 1 ? "" : "s"}`, CARD_W / 2, 430);
+  ctx.fillText(
+    `SEED ${seed}   ·   ${turnCount} turn${turnCount === 1 ? "" : "s"}`,
+    CARD_W / 2,
+    430
+  );
 
   // ── share URL ────────────────────────────────────────────────────────────
   const shareURL = `${window.location.origin}${window.location.pathname}?seed=${seed}`;
@@ -254,7 +265,7 @@ export function ShareCard({
   return (
     <div className="mt-4 flex flex-col items-center gap-3">
       {/* Hidden canvas used for image generation */}
-      <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
+      <canvas ref={canvasRef} className="hidden" aria-hidden="true" tabIndex={-1} />
 
       {/* Preview thumbnail */}
       {dataURL && (

@@ -9,13 +9,25 @@
  *
  * T82: labels go through i18next so they render in the active locale.
  */
-import { type AppearanceHandle, type TextSize } from "@/hooks/use-appearance";
+import type { AppearanceHandle, TextSize } from "@/hooks/use-appearance";
 import { useTranslation } from "react-i18next";
 
 const TEXT_SIZES: { labelKey: string; ariaKey: string; value: TextSize }[] = [
-  { labelKey: "settings.text_size_small", ariaKey: "settings.text_size_small_aria", value: "small" },
-  { labelKey: "settings.text_size_medium", ariaKey: "settings.text_size_medium_aria", value: "medium" },
-  { labelKey: "settings.text_size_large", ariaKey: "settings.text_size_large_aria", value: "large" },
+  {
+    labelKey: "settings.text_size_small",
+    ariaKey: "settings.text_size_small_aria",
+    value: "small",
+  },
+  {
+    labelKey: "settings.text_size_medium",
+    ariaKey: "settings.text_size_medium_aria",
+    value: "medium",
+  },
+  {
+    labelKey: "settings.text_size_large",
+    ariaKey: "settings.text_size_large_aria",
+    value: "large",
+  },
 ];
 
 interface AppearanceControlsProps {
@@ -57,9 +69,8 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
       </button>
 
       {/* T86 — Text size stepper */}
-      <div
-        className="flex items-center gap-1"
-        role="group"
+      <fieldset
+        className="flex items-center gap-1 border-0 m-0 p-0"
         aria-label={t("settings.text_size_label")}
       >
         {TEXT_SIZES.map(({ labelKey, ariaKey, value }) => (
@@ -84,7 +95,7 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
             {t(labelKey)}
           </button>
         ))}
-      </div>
+      </fieldset>
     </div>
   );
 }

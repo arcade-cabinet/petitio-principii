@@ -159,3 +159,6 @@ docs/playtest/*.mp4
 src/**/*.d.ts
 app/**/*.d.ts
 !src/types/**/*.d.ts
+
+# Claude Code git worktrees (other agents — not part of this project's source)
+.claude/worktrees/

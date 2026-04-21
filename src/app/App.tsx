@@ -1,6 +1,6 @@
 import { ConsentBanner } from "@/components/ui/consent-banner";
-import { ShareCard } from "@/components/ui/share-card";
 import { CrystalField } from "@/components/ui/crystal-field";
+import { ShareCard } from "@/components/ui/share-card";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { TerminalDisplay } from "@/features/terminal/TerminalDisplay";
 import { useGame } from "@/hooks/use-game";
@@ -39,7 +39,7 @@ export function App() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: transcript drives re-read
   const visited = useMemo(
     () => game.world.readVisitHistory(),
-    [game.world, game.state.transcript.length, game.state.currentRoomId],
+    [game.world, game.state.transcript.length, game.state.currentRoomId]
   );
 
   // T81 — fire circle_closed telemetry event once when the circle closes.
@@ -58,37 +58,40 @@ export function App() {
   return (
     <div className="relative h-[100svh] w-screen overflow-hidden">
       <CrystalField />
-      {game.state.started ? (
-        <>
-          <TerminalDisplay
-            state={game.state}
-            world={game.world}
-            onCommand={game.submitCommand}
-            onNewGame={game.requestNewGame}
-            onHintDismiss={game.dismissHint}
-          />
-          {/* T93 — share card overlay, shown only after circle closes */}
-          {circleClosed && (
-            <div
-              className="absolute inset-0 z-50 flex items-end justify-center pb-8 px-4 pointer-events-none"
-              aria-live="polite"
-            >
-              <div className="pointer-events-auto w-full max-w-lg">
-                <ShareCard
-                  visited={visited}
-                  currentRoomId={game.state.currentRoomId}
-                  circleClosed={circleClosed}
-                  seed={game.state.seed}
-                  phrase={game.state.phrase}
-                  turnCount={game.state.turnCount}
-                />
+      {/* T71: <main> landmark so screen readers can navigate the primary content area */}
+      <main className="absolute inset-0" aria-label={game.state.started ? "Game" : "Landing"}>
+        {game.state.started ? (
+          <>
+            <TerminalDisplay
+              state={game.state}
+              world={game.world}
+              onCommand={game.submitCommand}
+              onNewGame={game.requestNewGame}
+              onHintDismiss={game.dismissHint}
+            />
+            {/* T93 — share card overlay, shown only after circle closes */}
+            {circleClosed && (
+              <div
+                className="absolute inset-0 z-50 flex items-end justify-center pb-8 px-4 pointer-events-none"
+                aria-live="polite"
+              >
+                <div className="pointer-events-auto w-full max-w-lg">
+                  <ShareCard
+                    visited={visited}
+                    currentRoomId={game.state.currentRoomId}
+                    circleClosed={circleClosed}
+                    seed={game.state.seed}
+                    phrase={game.state.phrase}
+                    turnCount={game.state.turnCount}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <NewGameIncantation onBegin={game.startGame} />
-      )}
+            )}
+          </>
+        ) : (
+          <NewGameIncantation onBegin={game.startGame} />
+        )}
+      </main>
 
       {/* T81 — analytics consent banner (first launch only, defaults OFF) */}
       <ConsentBanner />

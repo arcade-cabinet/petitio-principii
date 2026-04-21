@@ -53,6 +53,7 @@ export function ConsentBanner() {
   };
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: banner role="dialog" on div is intentional; aside would misrepresent a consent prompt
     <div
       role="dialog"
       aria-modal="false"
@@ -69,10 +70,9 @@ export function ConsentBanner() {
       `}
     >
       <p className="font-[family-name:var(--font-display)] text-[0.9rem] leading-[1.5] tracking-[0.06em] text-[var(--color-dim)]">
-        We use{" "}
-        <span className="text-[var(--color-silver)]">privacy-first analytics</span>
-        {" "}(no cookies, no tracking) to understand which arguments get closed.
-        Opt in to help improve the game.
+        We use <span className="text-[var(--color-silver)]">privacy-first analytics</span> (no
+        cookies, no tracking) to understand which arguments get closed. Opt in to help improve the
+        game.
       </p>
       <div className="flex gap-2">
         <button

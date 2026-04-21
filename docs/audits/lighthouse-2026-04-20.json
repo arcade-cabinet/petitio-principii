@@ -1,0 +1,11 @@
+{
+  "url": "https://arcade-cabinet.github.io/petitio-principii/",
+  "date": "2026-04-20",
+  "device": "desktop",
+  "scores": {
+    "accessibility": 96,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "full_report": "report.json"
+}

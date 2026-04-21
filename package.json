@@ -20,6 +20,7 @@
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
     "@biomejs/biome": "^1.9.4",
     "@capacitor/cli": "^8.3.1",
     "@tailwindcss/vite": "^4.2.2",

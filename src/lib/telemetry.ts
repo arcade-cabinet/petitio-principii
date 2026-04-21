@@ -21,10 +21,12 @@
  */
 
 const CONSENT_KEY = "pp.analytics";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PLAUSIBLE_HOST = (typeof (import.meta as any).env?.VITE_PLAUSIBLE_HOST === "string"
-  ? (import.meta as any).env.VITE_PLAUSIBLE_HOST
-  : undefined) ?? "https://plausible.io";
+const PLAUSIBLE_HOST =
+  // biome-ignore lint/suspicious/noExplicitAny: Vite augments ImportMeta but the type is environment-specific
+  (typeof (import.meta as any).env?.VITE_PLAUSIBLE_HOST === "string"
+    ? // biome-ignore lint/suspicious/noExplicitAny: same as above
+      (import.meta as any).env.VITE_PLAUSIBLE_HOST
+    : undefined) ?? "https://plausible.io";
 
 let scriptInjected = false;
 let consentGranted = false;
@@ -73,14 +75,11 @@ export function setConsent(granted: boolean): void {
 }
 
 /** Track a custom Plausible event. No-ops when consent not granted. */
-export function trackEvent(
-  name: string,
-  props?: Record<string, string | number | boolean>,
-): void {
+export function trackEvent(name: string, props?: Record<string, string | number | boolean>): void {
   if (!consentGranted) return;
 
   // Plausible exposes window.plausible once the script is loaded.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: Plausible is injected at runtime and not typed
   const plausible = (window as any).plausible;
   if (typeof plausible === "function") {
     plausible(name, props ? { props } : undefined);

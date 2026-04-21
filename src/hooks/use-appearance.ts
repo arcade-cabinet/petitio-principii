@@ -52,10 +52,7 @@ function applyDyslexia(enabled: boolean) {
 }
 
 function applyTextSize(size: TextSize) {
-  document.documentElement.style.setProperty(
-    "--pp-font-scale",
-    String(TEXT_SIZE_SCALE[size]),
-  );
+  document.documentElement.style.setProperty("--pp-font-scale", String(TEXT_SIZE_SCALE[size]));
   try {
     localStorage.setItem(STORAGE_KEY_TEXT_SIZE, size);
   } catch {
