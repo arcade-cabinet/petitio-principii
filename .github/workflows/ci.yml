@@ -2,6 +2,16 @@ name: CI
 
 on:
   pull_request:
+  # `pull_request` is intentionally suppressed by GitHub for PRs opened by
+  # github-actions[bot] (loop-prevention). release-please opens PRs as that
+  # bot, so its release PRs would otherwise never run CI and would stay
+  # UNSTABLE forever. `pull_request_target` fires for bot-opened PRs; we
+  # explicitly check out the PR head SHA below so the proposed changes are
+  # validated, not the base branch. Safe because release-please always opens
+  # from a branch in this repo (never an external fork).
+  pull_request_target:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -17,6 +27,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # Validate the PR head SHA, not the base — required because
+          # `pull_request_target` defaults to checking out the base ref.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@71c92474e7e4f5bca283fb17ef80fba9cdb2b4b1 # v6.0.2
@@ -43,6 +57,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup JDK 21 (Temurin)
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
