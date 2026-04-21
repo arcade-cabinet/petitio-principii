@@ -4,8 +4,9 @@
  * Given a path to a SCENE file (or any markdown/text containing
  * authored prose paragraphs), embed each paragraph and knn-search
  * the cluster's vector space. Flag paragraphs whose nearest-source-
- * neighbor is too close (cosine distance < 0.18 = cosine similarity
- * > 0.82 = author paraphrasing a source).
+ * neighbor is too close: cosine distance ≤ 0.36 (⇔ cosine similarity
+ * ≥ 0.82 under sim = 1 - dist/2) is FAIL; 0.36 < dist ≤ 0.50 is WARN;
+ * anything farther is CLEAN.
  *
  * CLI:
  *   pnpm brainstorm check <scene-file> [--cluster <id>]
@@ -103,7 +104,7 @@ export async function checkFile(scenePath: string, clusterId: string): Promise<C
   for (let i = 0; i < paragraphs.length; i++) {
     const para = paragraphs[i];
     const vec = embeddings[i];
-    const row = knn.get(Buffer.from(vec.buffer), clusterId) as
+    const row = knn.get(Buffer.from(vec.buffer, vec.byteOffset, vec.byteLength), clusterId) as
       | { source_ref: string; text: string; d: number }
       | undefined;
     let verdict: Verdict;

@@ -57,13 +57,14 @@ tokenizer + parser.
   whitespace is stripped (same rules as Python textwrap.dedent).
 - **Block**: `{ ... }`. Opens after a keyword + optional id.
 - **List**: `[ elem, elem, ... ]`. Comma-separated. Trailing comma
-  permitted. Elements are *strings*, *references*, *tags*, or
-  *predicate-atoms* depending on context. The element type is fixed
-  per keyword; the parser does not accept mixed-type lists.
+  permitted. Elements are *strings*, *references*, *tags*, *numbers*,
+  or *predicate-atoms* depending on context. The element type is
+  fixed per keyword; the parser does not accept mixed-type lists.
   Examples:
     - string list: `phrases-in-prose [ "Evelyn", "her", "the woman" ]`
     - reference list: `from [ clue:receiver-warm, clue:perfume-faint ]`
     - predicate-atom list: `all: [ clue:receiver-warm, fact:she-was-alone ]`
+    - number list: `intervals [ 0, 3, 7, 10 ]`
 - **Keyword**: reserved words (see §3). Keywords are lowercase.
 
 Operators:
@@ -270,10 +271,7 @@ Combines clues/facts/claim-states into a new fact.
 
 ```
 connect she-was-alone {
-  from {
-    clue:receiver-warm,
-    clue:perfume-faint
-  }
+  from [ clue:receiver-warm, clue:perfume-faint ]
   yields fact:she-was-alone
   prose <<<
     Together: warm phone, fading jasmine. She was alone, and recent.

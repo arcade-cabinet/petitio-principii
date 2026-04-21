@@ -23,7 +23,30 @@ import { AUTHORING_DB, EMBEDDINGS_CACHE, SENTENCES_DIR } from "./paths";
 import type { EmbeddingsCache } from "./types";
 
 const DEFAULT_MODEL = process.env.BRAINSTORM_EMBED_MODEL ?? "mxbai-embed-large";
-const AUTHORING_MODEL_DIM = 1024; // mxbai-embed-large
+
+/**
+ * Supported embedding models and their vector dimensions. The
+ * authoring.db schema is keyed to the dimension, so swapping models
+ * is not free: the vec0 virtual table hard-codes `float[DIM]`. To add
+ * a new model, extend this map AND update the schema / migrate
+ * authoring.db.
+ */
+const MODEL_DIMS: Record<string, number> = {
+  "mxbai-embed-large": 1024,
+  "nomic-embed-text": 768,
+};
+
+function dimForModel(model: string): number {
+  const dim = MODEL_DIMS[model];
+  if (!dim) {
+    throw new Error(
+      `unknown embedding model '${model}'. Add it to MODEL_DIMS in tools/brainstorm/embed.ts (and run the schema migration) before using it.`
+    );
+  }
+  return dim;
+}
+
+const AUTHORING_MODEL_DIM = dimForModel(DEFAULT_MODEL);
 const CACHE_REQUIRED = process.env.CI === "true";
 
 function slugify(s: string): string {
@@ -116,6 +139,23 @@ interface IndexRow {
   embedding: Float32Array;
 }
 
+async function scanForCacheMisses(
+  clusters: ReadonlyArray<import("./types").ClusterManifest>,
+  cache: EmbeddingsCache
+): Promise<number> {
+  let misses = 0;
+  for (const cluster of clusters) {
+    for (const src of cluster.sources) {
+      const sentences = await readSentencesForRef(src.ref);
+      for (const rec of sentences) {
+        const key = cacheKey(rec.text, DEFAULT_MODEL);
+        if (!cache[key]) misses++;
+      }
+    }
+  }
+  return misses;
+}
+
 export async function embedAll(): Promise<void> {
   await ensureDir(path.dirname(AUTHORING_DB));
   const clusters = await readClusterManifests();
@@ -128,9 +168,16 @@ export async function embedAll(): Promise<void> {
     );
   }
   if (!ollamaUp && CACHE_REQUIRED) {
-    console.error(
-      "  CI mode: Ollama not reachable and cache-only mode cannot fill misses. Run `pnpm brainstorm embed` locally first, then commit the updated `tools/brainstorm/embeddings-cache.json`."
-    );
+    // CI mode contract: we accept cache hits only, but the moment we
+    // encounter a miss we hard-fail. Rather than warn-then-silently-
+    // skip (which lets CI pass with an incomplete index), pre-scan
+    // and throw up front.
+    const cacheOnly = await scanForCacheMisses(clusters, cache);
+    if (cacheOnly > 0) {
+      throw new Error(
+        `  CI mode: Ollama not reachable and ${cacheOnly} cache misses would be skipped. Run \`pnpm brainstorm embed\` locally first, then commit the updated \`tools/brainstorm/embeddings-cache.json\`.`
+      );
+    }
   }
 
   const db = openAuthoringDb();
@@ -147,7 +194,15 @@ export async function embedAll(): Promise<void> {
       // binding layer tags it as a float. Wrap in BigInt to force the
       // integer binding path.
       const rowid = BigInt(info.lastInsertRowid as number | bigint);
-      insertVec.run(rowid, Buffer.from(row.embedding.buffer));
+      // Bind with explicit offset/length to guarantee the driver writes
+      // exactly `dim * 4` bytes. Buffer.from(typedArray.buffer) alone
+      // ignores byteOffset/byteLength and can slurp adjacent bytes when
+      // the Float32Array is a view into a shared pool (as our
+      // decodeF32() returns).
+      insertVec.run(
+        rowid,
+        Buffer.from(row.embedding.buffer, row.embedding.byteOffset, row.embedding.byteLength)
+      );
     }
   });
 

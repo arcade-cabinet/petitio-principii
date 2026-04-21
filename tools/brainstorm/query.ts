@@ -17,6 +17,11 @@ export async function queryCli(argv: string[]): Promise<number> {
     return 1;
   }
   const clusterId = argv[clusterIdx + 1];
+  if (!clusterId || clusterId.startsWith("--") || !clusterId.trim()) {
+    console.error("usage: pnpm brainstorm query --cluster <id> <query-text...>");
+    console.error("error: --cluster requires a non-empty cluster id");
+    return 1;
+  }
   const queryText = argv
     .slice(0, clusterIdx)
     .concat(argv.slice(clusterIdx + 2))
@@ -44,7 +49,10 @@ export async function queryCli(argv: string[]): Promise<number> {
     LIMIT 10
   `
   );
-  const rows = knn.all(Buffer.from(vec.buffer), clusterId) as Array<{
+  const rows = knn.all(
+    Buffer.from(vec.buffer, vec.byteOffset, vec.byteLength),
+    clusterId
+  ) as Array<{
     source_ref: string;
     text: string;
     d: number;

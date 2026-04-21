@@ -365,13 +365,11 @@ Both gates are mandatory.
       during authoring.
 - [ ] `pnpm brainstorm check scene/cases/<case>.scene` passes with
       zero failures. Warnings are acknowledged in the PR description.
-- [ ] `pnpm build-game-db` (from `tools/build-game-db/`, introduced
-      alongside the SCENE parser in the pivot implementation)
-      succeeds without linter warnings, or warnings are explicitly
-      waived in the PR description. **Planned script**: authored
-      alongside the engine-seam PR; see
-      `docs/design/pivot/03-SCENE-LANGUAGE.md` §7 for the parser
-      entry point.
+**Mandatory gates (enforced in CI from today):**
+
+- [ ] `pnpm brainstorm check scene/cases/<case>.scene --cluster <id>`
+      passes with zero FAIL results. WARN results are acknowledged
+      in the PR description.
 - [ ] The case has ≥ 6 verdicts, spread across at least 3 distinct
       `moral` tags and at least 3 distinct `atmos` tags.
 - [ ] Every claim is used in at least one verdict's `requires`
@@ -383,13 +381,18 @@ Both gates are mandatory.
 - [ ] Retort pool has at least 40 entries.
 - [ ] Blind-read test has been performed with at least one human
       who has not read the cluster's source material.
-- [ ] Maestro smoke flow `walk-<case-id>.yaml` exists and passes
-      against the built APK on a booted emulator. **Path**:
-      `.maestro/flows/walk-<case-id>.yaml`. Required once Maestro
-      flows land for the pivot (see `scripts/maestro-smoke.sh`
-      scaffolding in the prior QA branch); currently there are no
-      walk-* flows in-tree, so this gate is marked NOT-YET-ENFORCED
-      until the midnight case's flow lands.
+
+**Planned gates (enforced once the supporting tool lands):**
+
+- [ ] *(planned)* `pnpm build-game-db` succeeds without linter warnings.
+      **Tool status**: not yet implemented; authored alongside the
+      engine-seam PR. See `docs/design/pivot/03-SCENE-LANGUAGE.md` §7
+      for the parser entry point. Until `tools/build-game-db/` lands,
+      this check is informational only.
+- [ ] *(planned)* Maestro smoke flow at `.maestro/flows/walk-<case-id>.yaml`
+      passes against the built APK on a booted emulator. **Flow
+      status**: no `walk-*` flows exist in-tree yet; enforcement
+      begins once the midnight case's flow is authored.
 
 ---
 

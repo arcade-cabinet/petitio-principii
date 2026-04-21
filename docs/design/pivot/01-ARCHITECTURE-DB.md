@@ -13,8 +13,9 @@ domain: technical
 > contains the schema + empty shells for the other 11 hours so the
 > landing can render them as locked). Gains progress and settings as
 > the player plays. Follows the established arcade-cabinet pattern
-> (grailguard, marmalade-drops): `sql.js` on web (OPFS-backed),
-> `capacitor-sqlite` on native.
+> (grailguard, marmalade-drops): `wa-sqlite` on web (OPFS-backed,
+> chosen over `sql.js` because sqlite-vec requires extension loading
+> — see §3), `capacitor-sqlite` on native.
 
 ---
 
@@ -116,9 +117,10 @@ platform.
 
 ### 3.2 First-paint concern
 
-`sql.js` is ~600 KB + `sqlite-vec` ~80 KB. The landing page's current
-first-paint budget is 180 KB gzipped (2.25 KB headroom post-pivot
-stash). **Solution: lazy-load the db after landing renders.**
+`wa-sqlite` is ~600 KB + `sqlite-vec` ~80 KB. The landing page's
+current first-paint budget is 180 KB gzipped (2.25 KB headroom
+post-pivot stash). **Solution: lazy-load the db after landing
+renders.**
 
 - The landing page doesn't need the db. It needs 12 case-card
   metadata (hour, title, persona name, era, one-line, lock state).
@@ -127,15 +129,15 @@ stash). **Solution: lazy-load the db after landing renders.**
 - The db (+ sqlite-vec + the seed) loads only when the player
   commits to entering a case (taps a case card). Loading happens
   during the case-card → terminal transition animation, which is
-  ~1.5s on the current design — plenty for sql.js init + db fetch
-  from service-worker cache.
+  ~1.5s on the current design — plenty for wa-sqlite init + db
+  fetch from service-worker cache.
 
 ### 3.3 Lazy load wiring
 
 ```
 landing-cards.json               ← 4KB static, always
 public/game.db                   ← 30-50MB, fetched on first case-entry
-src/lib/db.ts                    ← dynamic import('sql.js') on first call
+src/lib/db.ts                    ← dynamic import('wa-sqlite') on first call
 ```
 
 Cached by the service worker; subsequent loads are instant.
@@ -565,7 +567,7 @@ be diffed/merged with CRDT tools. Out of scope for launch.
 
 ## 10. Testing
 
-- **Unit**: db-bound logic gets an in-memory `sql.js` fixture seeded
+- **Unit**: db-bound logic gets an in-memory `wa-sqlite` fixture seeded
   from a tiny golden `tests/fixtures/tiny-case.db`.
 - **Integration**: full build → spin up a test db → drive the
   reducer through a scripted tap trail → assert transcripts.

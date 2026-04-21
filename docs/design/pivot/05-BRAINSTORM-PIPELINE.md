@@ -417,14 +417,13 @@ under `authoring/`:
    not to certify safety. Any flagged sentence is written to
    `tools/brainstorm/flagged/<cluster-id>.jsonl` for audit.
 4. The **author's review** is the certifying step. A brief is
-   `status: generated` until a human marks it `status: reviewed`
-   in the frontmatter. Downstream stages (embed, check, persona
-   authoring) refuse `status: generated` briefs.
-
-This is a soft gate enforced by culture + the check-in script
-`tools/brainstorm/check-brief-reviewed.ts` (part of the pre-commit
-hook). It is not a technical guarantee; the technical infrastructure
-exists to support the human review, not to replace it.
+   `status: generated` by the pipeline. A human author manually
+   marks it `status: reviewed` in the frontmatter after reading it
+   end-to-end. **This is currently a manual-culture gate, not a
+   technical one.** A future `tools/brainstorm/check-brief-reviewed.ts`
+   pre-commit hook is planned to enforce the status field, but that
+   script does not yet exist — until it lands, honor the gate
+   yourself; the audit trail is in git history + the feedback log.
 
 ---
 
