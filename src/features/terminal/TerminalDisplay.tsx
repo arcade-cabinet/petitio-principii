@@ -1,3 +1,4 @@
+import { type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
 import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
@@ -121,6 +122,20 @@ export function TerminalDisplay({
     return set;
   }, [state.transcript]);
 
+  // Last cardinal heading the player committed to — drives the compass
+  // rose's rotation in the PRESENT underlay. Purely derived from the
+  // transcript; null until the player moves.
+  const lastCardinalHeading = useMemo<CompassHeading>(() => {
+    const CARDINALS = new Set(["north", "south", "east", "west"]);
+    for (let i = state.transcript.length - 1; i >= 0; i--) {
+      const entry = state.transcript[i];
+      if (entry.kind !== "echo") continue;
+      const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
+      if (CARDINALS.has(raw)) return raw as CompassHeading;
+    }
+    return null;
+  }, [state.transcript]);
+
   // Exits already traversed from this room (via movement-verb echoes in
   // the current room). Used to draw the faint trail-glow on direction
   // keycaps — the UX half of the argument map's geometry.
@@ -181,7 +196,24 @@ export function TerminalDisplay({
   return (
     <div className="relative z-10 flex h-full w-full flex-col gap-4 p-4 md:p-6">
       {/* Display surface */}
-      <GlowingPanel tone="active" className="flex-1 min-h-0 flex flex-col">
+      <GlowingPanel tone="active" className="relative flex-1 min-h-0 flex flex-col">
+        {/* Compass rose — anchored to the GlowingPanel, not the scrolling
+            present-zone, so it always sits at the panel's visual bottom
+            regardless of content length. Responsive: hidden below md
+            where prose fills the panel. pointer-events-none so taps
+            pass through; heading is diegetic (the needle reacts to the
+            cardinal the player just committed to). */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-4 left-4 z-0 hidden md:block select-none"
+          style={{
+            width: "clamp(180px, 22vw, 240px)",
+            opacity: 0.25,
+            mixBlendMode: "plus-lighter",
+          }}
+        >
+          <CompassRose heading={lastCardinalHeading} size="100%" />
+        </div>
         {/* Header */}
         <div className="flex items-baseline justify-between px-6 pt-4 pb-2 border-b border-[var(--color-panel-edge)]/60">
           <span className="font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.22em] text-[var(--color-dim)] uppercase">
@@ -256,9 +288,9 @@ export function TerminalDisplay({
           </>
         )}
 
-        {/* PRESENT zone — current room title + description + latest response */}
+        {/* PRESENT zone — current room title + description + latest response. */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
+          className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
           aria-live="polite"
           aria-atomic="true"
           data-testid="present-zone"
@@ -275,7 +307,7 @@ export function TerminalDisplay({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
+                className="relative z-10 pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
                 style={{
                   textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
                 }}
@@ -294,6 +326,7 @@ export function TerminalDisplay({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
               className={`
+                relative z-10
                 font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
                 leading-[1.55] text-[var(--color-silver)]
               `}
