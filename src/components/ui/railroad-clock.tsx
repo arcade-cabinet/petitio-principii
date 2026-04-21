@@ -5,22 +5,33 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *
  * A mechanical railroad-watch face rendered in SVG (viewBox 500×500).
  *
- * Geometry (post visual rework):
- *   - Recessed bezel with case-edge silver stroke at r=240, dial radial
- *     gradient from #1a0526 → #050108, inset feDropShadow.
- *   - 60-tick minute ring on the rim. Majors: silver stroke-width 3.
- *     Minors: violet stroke-width 1.5.
- *   - Outer ring (r=210): 12 hour positions. 4 interactive direction slots
- *     (UP/RIGHT/DOWN/LEFT) + 8 decorative silver dots (r=6).
- *   - Separator ring at r=180 (silver) divides direction band from actions.
- *   - Inner ring (r=140): 7 rhetorical-action slots at 51.4° stride.
- *   - Spade hand: silver fill, wide lobes mid-shaft, narrow stem at pivot,
- *     drop-shadow filter. No breguet counterweight.
+ * Geometry (v3 — fixes DOWN slot overflow, numeral clipping, action ring snap):
+ *   - Watch case: r=248 (bezel), silver edge stroke at r=240, dial r=236.
+ *   - Minute-tick ring: inner r=218 (major) / r=222 (minor), outer r=230.
+ *     Majors: silver stroke-width 3. Minors: violet stroke-width 1.5.
+ *   - Hour numerals: concentric band at r=215, 9px VT323 (inside the minute
+ *     ticks, above direction slots — no more clipping).
+ *   - Outer ring (r=180): 12 positions. 4 interactive direction slots
+ *     (UP/RIGHT/DOWN/LEFT) at the quarters + 8 small silver hour dots
+ *     at 1/2/4/5/7/8/10/11. Direction slots r=28 → extent 152-208
+ *     (inside numeral band at 215).
+ *   - Silver separator ring at r=150 divides direction band from action band.
+ *   - Inner ring (r=115): 7 rhetorical-action slots SNAPPED TO CLOCK
+ *     POSITIONS — 6 at 60° intervals + TRACE_BACK at 330° (semantically
+ *     "going back" on the clock). Slot r=26 → extent 89-141.
+ *   - Centre hub at r=75, silver pivot cap r=10.
+ *   - Spade hand at len=175 (tip at r=175, well inside separator at 150,
+ *     reaches action band without overshooting direction band).
  *
  * Inputs (T98):
  *   - Single tap: `{ kind: 'tap', slot }` on pointer-up (same slot).
  *   - Chord: if a second pointer-down lands on a different slot within
  *     CHORD_WINDOW_MS, fires `{ kind: 'chord', slots: [a, b] }` instead.
+ *
+ * Feedback (v3 fix #4): during the chord window, the first-pressed slot
+ * glows pink (#ec4899) to signal "chord pending — tap another slot to
+ * combine." Pink clears when the window expires (tap fires) or a second
+ * slot is pressed (chord fires).
  *
  * A11y: each interactive slot has `aria-label` and `role="button"`.
  * Keyboard Enter/Space on focused slot fires a tap.
@@ -45,16 +56,16 @@ const DIRECTION_SLOTS = [
 
 export type DirectionSlotId = "UP" | "RIGHT" | "DOWN" | "LEFT";
 
-// Inner ring: 7 rhetorical actions at 51.4° stride.
-const ACTION_STEP = 360 / 7; // ≈ 51.428°
+// Inner ring: 7 rhetorical actions SNAPPED to clock-hour positions.
+// 6 actions at 60° intervals + TRACE_BACK at 330° (semantically "backward").
 const ACTION_SLOTS = [
-  { id: "LOOK", label: "Look", angle: 0 },
-  { id: "EXAMINE", label: "Examine", angle: ACTION_STEP },
-  { id: "QUESTION", label: "Question", angle: ACTION_STEP * 2 },
-  { id: "ASK_WHY", label: "Ask\nWhy", angle: ACTION_STEP * 3 },
-  { id: "ACCEPT", label: "Accept", angle: ACTION_STEP * 4 },
-  { id: "REJECT", label: "Reject", angle: ACTION_STEP * 5 },
-  { id: "TRACE_BACK", label: "Trace\nBack", angle: ACTION_STEP * 6 },
+  { id: "LOOK", label: "Look", angle: 0 }, // 12
+  { id: "EXAMINE", label: "Examine", angle: 60 }, // 2
+  { id: "QUESTION", label: "Question", angle: 120 }, // 4
+  { id: "ACCEPT", label: "Accept", angle: 180 }, // 6
+  { id: "ASK_WHY", label: "Ask\nWhy", angle: 240 }, // 8
+  { id: "REJECT", label: "Reject", angle: 300 }, // 10
+  { id: "TRACE_BACK", label: "Trace\nBack", angle: 330 }, // 11 — "backward"
 ] as const;
 
 export type ActionSlotId =
@@ -92,29 +103,18 @@ function clockToXY(angle: number, radius: number): { x: number; y: number } {
 
 /**
  * Build the SVG path for a spade-style clock hand.
- *
- * Modeled on the HTML reference: tip at top, wide lobes mid-shaft,
- * narrow neck near the pivot.  Designed to be placed at origin (0,0)
- * with the tip extending to (0, -len).  No counterweight.
- *
- * Example with len=200, width=12:
- *   tip at (0, -200), max lobe width ±6 at y ≈ -100, neck ±2.4 at y ≈ -50.
+ * Tip at (0, -len), wide lobes mid-shaft, narrow neck near pivot.
+ * No counterweight.
  */
 function spadePath(len: number, width: number): string {
   const hw = width / 2;
-  // Reference curve from the user-provided HTML spec, scaled to len.
-  // Original (len=200): M 0 0 L 0 -100 C 0 -120 -8 -130 -8 -150
-  //   C -8 -165 2 -180 0 -200 C -2 -180 12 -165 12 -150 C 12 -130 4 -120 4 -100 L 4 0 Z
-  // We parameterise against len so callers can scale.
-  const neckY = -len * 0.25; // where stem meets body (~-50 when len=200)
-  const lobeY = -len * 0.5; // widest point (~-100 when len=200)
-  const shoulderY = -len * 0.75; // upper shoulders (~-150)
-  const stemHW = hw * 0.4; // stem half-width near pivot
-  const neckHW = hw * 0.6; // neck half-width
-  const lobeHW = hw * 1.0; // widest lobe
+  const neckY = -len * 0.25;
+  const lobeY = -len * 0.5;
+  const shoulderY = -len * 0.75;
+  const stemHW = hw * 0.4;
+  const neckHW = hw * 0.6;
+  const lobeHW = hw * 1.0;
 
-  // Build path: start at pivot on right side, go up to tip via left, back down via right.
-  // shoulderY parameterises the cubic bezier control tangent near the tip.
   return [
     `M ${-stemHW} 0`,
     `L ${-stemHW} ${neckY}`,
@@ -127,25 +127,29 @@ function spadePath(len: number, width: number): string {
 
 // ─── Slot rendering ──────────────────────────────────────────────────────────
 
-// Post-rework sizing (T103 visual): bigger slot rings, bigger labels.
-const OUTER_R = 210; // direction slot ring radius
-const SEP_R = 180; // separator between direction band and action band
-const INNER_R = 140; // action slot ring radius
-const SLOT_RING_R = 30; // visible ring radius (was 22)
-const DIR_RING_R = 34; // direction slots slightly larger
-const SLOT_HIT_R = 38;
+// v3 layout: tighter radii keep everything inside the case with clearance.
+const OUTER_R = 180; // direction-slot centre ring
+const NUMERAL_R = 215; // hour-numeral band (inside minute ticks)
+const SEP_R = 150; // silver separator between direction and action bands
+const INNER_R = 115; // action-slot centre ring
+const SLOT_RING_R = 26; // action-slot visible radius
+const DIR_RING_R = 28; // direction-slot visible radius (only marginally larger)
+const SLOT_HIT_R = 34; // hit-test radius
 const LABEL_FONT_SIZE = 11;
 
 const COL_ENABLED = "#7c3aed"; // violet
 const COL_DISABLED = "#2a2140"; // dim violet (still reads as a slot)
 const COL_ACTIVE_FILL = "#a855f7"; // bright violet
 const COL_ACTIVE_RIM = "#ffffff";
+const COL_CHORD_PENDING_FILL = "#ec4899"; // pink — chord listening
+const COL_CHORD_PENDING_RIM = "#fdf2f8";
 
 interface SlotCircleProps {
   cx: number;
   cy: number;
   isEnabled: boolean;
   isActive: boolean;
+  isChordPending: boolean;
   id: SlotId;
   label: string;
   ring: "outer" | "inner";
@@ -159,6 +163,7 @@ function SlotCircle({
   cy,
   isEnabled,
   isActive,
+  isChordPending,
   id,
   label,
   ring,
@@ -166,10 +171,22 @@ function SlotCircle({
   onPointerDown,
   onPointerUp,
 }: SlotCircleProps) {
-  const fill = isActive ? COL_ACTIVE_FILL : isEnabled ? COL_ENABLED : COL_DISABLED;
-  const stroke = isActive ? COL_ACTIVE_RIM : isEnabled ? "#c4b5fd" : "#554676";
-  const strokeWidth = isActive ? 3 : 2;
-  const labelFill = isActive ? "#fff" : isEnabled ? "#ede9fe" : "#7c72a0";
+  const fill = isChordPending
+    ? COL_CHORD_PENDING_FILL
+    : isActive
+      ? COL_ACTIVE_FILL
+      : isEnabled
+        ? COL_ENABLED
+        : COL_DISABLED;
+  const stroke = isChordPending
+    ? COL_CHORD_PENDING_RIM
+    : isActive
+      ? COL_ACTIVE_RIM
+      : isEnabled
+        ? "#c4b5fd"
+        : "#554676";
+  const strokeWidth = isChordPending ? 3 : isActive ? 3 : 2;
+  const labelFill = isChordPending || isActive ? "#fff" : isEnabled ? "#ede9fe" : "#7c72a0";
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -187,15 +204,25 @@ function SlotCircle({
   const lineHeight = LABEL_FONT_SIZE * 1.05;
   const firstLineDY = lines.length === 1 ? 0 : -lineHeight * 0.45;
 
+  // Glow style: pink is stronger than violet-active to read as distinct feedback.
+  const glowStyle: React.CSSProperties | undefined = isChordPending
+    ? { filter: "drop-shadow(0 0 10px rgba(236,72,153,0.95))" }
+    : isActive
+      ? { filter: "drop-shadow(0 0 8px rgba(168,85,247,0.9))" }
+      : isEnabled
+        ? { filter: "drop-shadow(0 0 4px rgba(124,58,237,0.5))" }
+        : undefined;
+
   return (
     // biome-ignore lint/a11y/useSemanticElements: SVG does not support <button>; role="button" on <g> is the correct ARIA pattern for SVG interactive elements.
     <g
       role="button"
-      aria-label={label.replace("\n", " ")}
+      aria-label={label.replaceAll("\n", " ")}
       aria-disabled={!isEnabled}
       tabIndex={0}
       data-slot-id={id}
       data-ring={ring}
+      data-chord-pending={isChordPending ? "true" : undefined}
       style={{ cursor: isEnabled ? "pointer" : "default" }}
       onPointerDown={(e) => {
         if (!isEnabled) return;
@@ -218,14 +245,8 @@ function SlotCircle({
         fill={fill}
         stroke={stroke}
         strokeWidth={strokeWidth}
-        opacity={isEnabled || isActive ? 0.95 : 0.75}
-        style={
-          isActive
-            ? { filter: "drop-shadow(0 0 8px rgba(168,85,247,0.9))" }
-            : isEnabled
-              ? { filter: "drop-shadow(0 0 4px rgba(124,58,237,0.5))" }
-              : undefined
-        }
+        opacity={isEnabled || isActive || isChordPending ? 0.95 : 0.75}
+        style={glowStyle}
       />
       {/* Label — presentational; pointerEvents:none so parent <g> gets events. */}
       <text
@@ -261,6 +282,10 @@ export function RailroadClock({
 }: RailroadClockProps) {
   const [handAngle, setHandAngle] = useState(0);
 
+  // v3 fix #4: track which slot is currently "waiting for a chord partner"
+  // so we can render it in pink during the chord window.
+  const [pendingChordSlot, setPendingChordSlot] = useState<SlotId | null>(null);
+
   useEffect(() => {
     if (!lastSlot) return;
     const dir = DIRECTION_SLOTS.find((d) => d.id === lastSlot);
@@ -290,17 +315,21 @@ export function RailroadClock({
       pressMap.current.set(pointerId, slotId);
 
       if (!firstPress.current) {
+        // First press — open chord window, light this slot pink.
         chordFired.current = false;
         firstPress.current = { pointerId, slotId };
+        setPendingChordSlot(slotId);
         clearChordTimer();
         chordTimer.current = setTimeout(() => {
           chordTimer.current = null;
         }, CHORD_WINDOW_MS);
       } else {
+        // Second press while chord window open — fire chord if distinct.
         const other = firstPress.current;
         if (other.slotId !== slotId) {
           clearChordTimer();
           chordFired.current = true;
+          setPendingChordSlot(null); // window closing — return first slot to normal
           setHandAngle((_prev) => {
             const dir = DIRECTION_SLOTS.find((d) => d.id === slotId);
             if (dir) return dir.angle;
@@ -327,6 +356,7 @@ export function RailroadClock({
         clearChordTimer();
         firstPress.current = null;
         chordFired.current = false;
+        setPendingChordSlot(null); // tap fires — clear the pink indicator
         setHandAngle((_prev) => {
           const dir = DIRECTION_SLOTS.find((d) => d.id === slotId);
           if (dir) return dir.angle;
@@ -338,6 +368,7 @@ export function RailroadClock({
       } else if (firstPress.current?.pointerId === pointerId) {
         firstPress.current = null;
         chordFired.current = false;
+        setPendingChordSlot(null);
       }
     },
     [clearChordTimer, onCommit]
@@ -382,13 +413,6 @@ export function RailroadClock({
           <stop offset="100%" stopColor="#050108" />
         </radialGradient>
 
-        {/* Bezel recessed shadow — makes dial feel inset into the case */}
-        <filter id="rc-bezel-inset" x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
-          <feOffset dx="0" dy="4" result="offset" />
-          <feComposite in="SourceGraphic" in2="offset" operator="over" />
-        </filter>
-
         {/* Silver glow filter for major ticks and hub */}
         <filter id="rc-silver-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur1" />
@@ -427,7 +451,7 @@ export function RailroadClock({
           const angle = i * 6;
           const isMajor = i % 5 === 0;
           const outerP = clockToXY(angle, 230);
-          const innerP = clockToXY(angle, isMajor ? 215 : 222);
+          const innerP = clockToXY(angle, isMajor ? 218 : 222);
           return (
             <line
               key={`tick-${angle}`}
@@ -441,6 +465,31 @@ export function RailroadClock({
               opacity={isMajor ? 1 : 0.8}
               filter={isMajor ? "url(#rc-silver-glow)" : undefined}
             />
+          );
+        })}
+      </g>
+
+      {/* ── 12 hour numerals on their own band at r=215 ── */}
+      <g>
+        {Array.from({ length: 12 }).map((_, i) => {
+          const angle = i * 30;
+          const pos = clockToXY(angle, NUMERAL_R);
+          return (
+            <text
+              key={`numeral-${angle}`}
+              x={pos.x}
+              y={pos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#9ca0b5"
+              fontSize={9}
+              fontFamily="'VT323', monospace"
+              letterSpacing="0.08em"
+              opacity={0.85}
+              style={{ userSelect: "none" }}
+            >
+              {i === 0 ? 12 : i}
+            </text>
           );
         })}
       </g>
@@ -460,14 +509,14 @@ export function RailroadClock({
       <circle
         cx={CX}
         cy={CY}
-        r={90}
+        r={75}
         fill="#0a0513"
         stroke="url(#rc-silver)"
         strokeWidth={1}
         opacity={0.7}
       />
 
-      {/* ── 12 hour markers: 8 decorative silver dots + 4 direction slots ── */}
+      {/* ── 8 decorative silver hour dots at 1/2/4/5/7/8/10/11 ── */}
       <g>
         {Array.from({ length: 12 }).map((_, i) => {
           const angle = i * 30;
@@ -475,32 +524,16 @@ export function RailroadClock({
           if (isDirection) return null; // rendered as interactive slot below
           const pos = clockToXY(angle, OUTER_R);
           return (
-            <g key={`hour-marker-${angle}`}>
-              {/* Silver filled hour dot */}
-              <circle
-                cx={pos.x}
-                cy={pos.y}
-                r={6}
-                fill="url(#rc-silver)"
-                stroke="#2a2535"
-                strokeWidth={0.5}
-                opacity={0.95}
-              />
-              {/* Hour numeral below the dot */}
-              <text
-                x={pos.x}
-                y={pos.y + 18}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="#9ca0b5"
-                fontSize={10}
-                fontFamily="'VT323', monospace"
-                letterSpacing="0.08em"
-                style={{ userSelect: "none" }}
-              >
-                {i === 0 ? 12 : i}
-              </text>
-            </g>
+            <circle
+              key={`hour-dot-${angle}`}
+              cx={pos.x}
+              cy={pos.y}
+              r={5}
+              fill="url(#rc-silver)"
+              stroke="#2a2535"
+              strokeWidth={0.5}
+              opacity={0.95}
+            />
           );
         })}
       </g>
@@ -510,6 +543,7 @@ export function RailroadClock({
         const pos = clockToXY(slot.angle, OUTER_R);
         const isEnabled = availableDirections.has(slot.id);
         const isActive = lastSlot === slot.id;
+        const isChordPending = pendingChordSlot === slot.id;
         return (
           <SlotCircle
             key={slot.id}
@@ -517,6 +551,7 @@ export function RailroadClock({
             cy={pos.y}
             isEnabled={isEnabled}
             isActive={isActive}
+            isChordPending={isChordPending}
             id={slot.id}
             label={slot.label}
             ring="outer"
@@ -532,6 +567,7 @@ export function RailroadClock({
         const pos = clockToXY(slot.angle, INNER_R);
         const isEnabled = availableActions.has(slot.id);
         const isActive = lastSlot === slot.id;
+        const isChordPending = pendingChordSlot === slot.id;
         return (
           <SlotCircle
             key={slot.id}
@@ -539,6 +575,7 @@ export function RailroadClock({
             cy={pos.y}
             isEnabled={isEnabled}
             isActive={isActive}
+            isChordPending={isChordPending}
             id={slot.id}
             label={slot.label}
             ring="inner"
@@ -560,7 +597,7 @@ export function RailroadClock({
       >
         <g transform={`translate(${CX}, ${CY})`}>
           <path
-            d={spadePath(200, 14)}
+            d={spadePath(175, 12)}
             fill="url(#rc-silver)"
             stroke="#2a2535"
             strokeWidth={0.6}
@@ -576,14 +613,14 @@ export function RailroadClock({
         <circle cx={CX} cy={CY} r={1.5} fill="#c4b5fd" />
       </g>
 
-      {/* ── Brand label at 6 o'clock ── */}
+      {/* ── Brand label — moved further toward centre to clear DOWN slot ── */}
       <text
         x={CX}
-        y={CY + 62}
+        y={CY + 40}
         textAnchor="middle"
         dominantBaseline="middle"
         fill="#4c4575"
-        fontSize={9}
+        fontSize={8}
         fontFamily="'VT323', monospace"
         letterSpacing="0.35em"
         style={{ userSelect: "none" }}
