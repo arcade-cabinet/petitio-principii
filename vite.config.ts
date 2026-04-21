@@ -42,9 +42,6 @@ export default defineConfig({
       "@testing-library/user-event",
       "@testing-library/jest-dom",
       "motion/react",
-      "i18next",
-      "i18next-resources-to-backend",
-      "react-i18next",
     ],
   },
   build: {
