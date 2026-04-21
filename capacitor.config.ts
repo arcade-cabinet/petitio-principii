@@ -26,8 +26,6 @@ const config: CapacitorConfig = {
     SplashScreen: {
       // Ink background with violet accent tint — matches landing chrome (T74).
       backgroundColor: "#05010a",
-      // Tint the activity indicator violet so the splash feels branded.
-      spinnerColor: "#7c3aed",
       launchShowDuration: 2000,
       showSpinner: false,
     },

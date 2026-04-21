@@ -99,8 +99,8 @@ export async function hapticWarning(): Promise<void> {
 export async function statusBarHide(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   try {
-    const { StatusBar } = await import("@capacitor/status-bar");
-    await StatusBar.hide({ animation: "FADE" } as Parameters<typeof StatusBar.hide>[0]);
+    const { StatusBar, StatusBarAnimation } = await import("@capacitor/status-bar");
+    await StatusBar.hide({ animation: StatusBarAnimation.Fade });
   } catch (err) {
     console.warn("[mobile] statusBarHide failed", err);
   }
@@ -113,8 +113,8 @@ export async function statusBarHide(): Promise<void> {
 export async function statusBarShow(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   try {
-    const { StatusBar } = await import("@capacitor/status-bar");
-    await StatusBar.show({ animation: "FADE" } as Parameters<typeof StatusBar.show>[0]);
+    const { StatusBar, StatusBarAnimation } = await import("@capacitor/status-bar");
+    await StatusBar.show({ animation: StatusBarAnimation.Fade });
   } catch (err) {
     console.warn("[mobile] statusBarShow failed", err);
   }
@@ -142,31 +142,37 @@ export type BackHandler = () => void;
  * Safe to call on web — returns a no-op cleanup.
  */
 export function registerBackHandler(onInGame: BackHandler | null): () => void {
-  if (!Capacitor.isNativePlatform()) return () => {};
+  // When there is no in-game handler, skip registering the listener entirely.
+  // Attaching a Capacitor back listener overrides the default Android back
+  // behaviour, so registering with a null handler would prevent the OS from
+  // backgrounding the app on the landing screen.
+  if (!Capacitor.isNativePlatform() || !onInGame) return () => {};
 
-  let cleanup: (() => void) | null = null;
+  let disposed = false;
+  let handle: { remove: () => Promise<void> } | null = null;
 
   void (async () => {
     try {
       const { App } = await import("@capacitor/app");
-      const handle = await App.addListener("backButton", ({ canGoBack }) => {
-        if (onInGame) {
-          // Override: we're in-game, hand off to the UI.
-          onInGame();
-        } else if (!canGoBack) {
-          // Landing screen with no WebView history — suspend via OS default.
-          void App.exitApp();
-        }
+      const listener = await App.addListener("backButton", () => {
+        // onInGame is captured at registration time; it's non-null by the
+        // guard above.
+        onInGame();
       });
-      cleanup = () => {
-        void handle.remove();
-      };
+      if (disposed) {
+        // Cleanup was called before the Promise resolved — remove immediately.
+        void listener.remove();
+        return;
+      }
+      handle = listener;
     } catch (err) {
       console.warn("[mobile] registerBackHandler failed", err);
     }
   })();
 
   return () => {
-    cleanup?.();
+    disposed = true;
+    void handle?.remove();
+    handle = null;
   };
 }

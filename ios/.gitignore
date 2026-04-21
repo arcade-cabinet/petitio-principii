@@ -1,9 +1,10 @@
-App/build
-App/Pods
-App/output
-App/App/public
-DerivedData
-xcuserdata
+App/build/
+App/Pods/
+App/output/
+App/App/public/
+DerivedData/
+xcuserdata/
+.DS_Store
 
 # Cordova plugins for Capacitor
 capacitor-cordova-ios-plugins

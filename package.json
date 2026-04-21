@@ -17,9 +17,9 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
-    "cap-sync": "npx cap sync",
-    "cap-sync:android": "npx cap sync android",
-    "cap-sync:ios": "npx cap sync ios",
+    "cap-sync": "pnpm exec cap sync",
+    "cap-sync:android": "pnpm exec cap sync android",
+    "cap-sync:ios": "pnpm exec cap sync ios",
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {

@@ -2,8 +2,8 @@ import { ConsentBanner } from "@/components/ui/consent-banner";
 import { CrystalField } from "@/components/ui/crystal-field";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { useGame } from "@/hooks/use-game";
-import { initTelemetry, trackCircleClosed } from "@/lib/telemetry";
 import { registerBackHandler } from "@/lib/mobile";
+import { initTelemetry, trackCircleClosed } from "@/lib/telemetry";
 import { isCircleClosed } from "@/world";
 import { Suspense, lazy, useEffect, useMemo, useRef } from "react";
 
