@@ -159,6 +159,7 @@ interface SlotCircleProps {
   radius: number;
   onPointerDown: (id: SlotId, pointerId: number) => void;
   onPointerUp: (id: SlotId, pointerId: number) => void;
+  onPointerCancel: (id: SlotId, pointerId: number) => void;
 }
 
 function SlotCircle({
@@ -173,6 +174,7 @@ function SlotCircle({
   radius,
   onPointerDown,
   onPointerUp,
+  onPointerCancel,
 }: SlotCircleProps) {
   const fill = isChordPending
     ? COL_CHORD_PENDING_FILL
@@ -222,7 +224,7 @@ function SlotCircle({
       role="button"
       aria-label={label.replaceAll("\n", " ")}
       aria-disabled={!isEnabled}
-      tabIndex={0}
+      tabIndex={isEnabled ? 0 : -1}
       data-slot-id={id}
       data-ring={ring}
       data-chord-pending={isChordPending ? "true" : undefined}
@@ -235,6 +237,12 @@ function SlotCircle({
       onPointerUp={(e) => {
         if (!isEnabled) return;
         onPointerUp(id, e.pointerId);
+      }}
+      onPointerCancel={(e) => {
+        onPointerCancel(id, e.pointerId);
+      }}
+      onLostPointerCapture={(e) => {
+        onPointerCancel(id, e.pointerId);
       }}
       onKeyDown={handleKeyDown}
     >
@@ -301,10 +309,21 @@ export function RailroadClock({
   }, [lastSlot]);
 
   // ── Chord detection ──────────────────────────────────────────────────
-  const pressMap = useRef<Map<number, SlotId>>(new Map());
+  //
+  // pressMap removed — it was tracked but never read; chord state is
+  // entirely captured by firstPress/chordFired/chordTimer.
   const chordTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstPress = useRef<{ pointerId: number; slotId: SlotId } | null>(null);
   const chordFired = useRef(false);
+
+  const clearChordState = useCallback(() => {
+    if (chordTimer.current) {
+      clearTimeout(chordTimer.current);
+      chordTimer.current = null;
+    }
+    firstPress.current = null;
+    chordFired.current = false;
+  }, []);
 
   const clearChordTimer = useCallback(() => {
     if (chordTimer.current) {
@@ -315,8 +334,6 @@ export function RailroadClock({
 
   const handlePointerDown = useCallback(
     (slotId: SlotId, pointerId: number) => {
-      pressMap.current.set(pointerId, slotId);
-
       if (!firstPress.current) {
         // First press — open chord window, light this slot pink.
         chordFired.current = false;
@@ -324,14 +341,21 @@ export function RailroadClock({
         setPendingChordSlot(slotId);
         clearChordTimer();
         chordTimer.current = setTimeout(() => {
+          // Window expired: reset to single-tap mode so a late second press
+          // is NOT treated as a chord. The pink glow stays until pointer-up
+          // fires the tap (consistent with documented behavior).
           chordTimer.current = null;
+          firstPress.current = null;
+          chordFired.current = false;
+          setPendingChordSlot(null);
         }, CHORD_WINDOW_MS);
       } else {
-        // Second press while chord window open — fire chord if distinct.
+        // Second press — only fire chord if window is still open (timer still running).
         const other = firstPress.current;
-        if (other.slotId !== slotId) {
+        if (other.slotId !== slotId && chordTimer.current !== null) {
           clearChordTimer();
           chordFired.current = true;
+          firstPress.current = null;
           setPendingChordSlot(null); // window closing — return first slot to normal
           setHandAngle((_prev) => {
             const dir = DIRECTION_SLOTS.find((d) => d.id === slotId);
@@ -349,8 +373,6 @@ export function RailroadClock({
 
   const handlePointerUp = useCallback(
     (slotId: SlotId, pointerId: number) => {
-      pressMap.current.delete(pointerId);
-
       if (
         firstPress.current?.pointerId === pointerId &&
         firstPress.current?.slotId === slotId &&
@@ -369,6 +391,7 @@ export function RailroadClock({
         });
         onCommit({ kind: "tap", slot: slotId });
       } else if (firstPress.current?.pointerId === pointerId) {
+        clearChordTimer();
         firstPress.current = null;
         chordFired.current = false;
         setPendingChordSlot(null);
@@ -377,9 +400,18 @@ export function RailroadClock({
     [clearChordTimer, onCommit]
   );
 
+  /** Cancel / lost-capture: reset all chord state so next interaction is clean. */
+  const handlePointerCancel = useCallback(
+    (_slotId: SlotId, _pointerId: number) => {
+      clearChordState();
+      setPendingChordSlot(null);
+    },
+    [clearChordState]
+  );
+
   useEffect(() => {
-    return () => clearChordTimer();
-  }, [clearChordTimer]);
+    return () => clearChordState();
+  }, [clearChordState]);
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
@@ -562,6 +594,7 @@ export function RailroadClock({
             radius={DIR_RING_R}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
           />
         );
       })}
@@ -586,6 +619,7 @@ export function RailroadClock({
             radius={SLOT_RING_R}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
           />
         );
       })}

@@ -26,8 +26,6 @@ import { compactTurns } from "./compactTurn";
 export interface TerminalDisplayProps {
   state: GameState;
   world: WorldHandle;
-  /** @deprecated Clock tap/chord input via onMove supersedes raw command strings. Kept for test compat. */
-  onCommand?: (raw: string) => void;
   onMove: (move: Move) => void;
   onNewGame: () => void;
   onHintDismiss: () => void;
@@ -56,21 +54,16 @@ const VERB_TO_SLOT: Record<string, ActionSlotId> = {
   "trace back": "TRACE_BACK",
 };
 
-/** Map a clock SlotId back to the command string it triggers. */
-const SLOT_TO_COMMAND: Record<SlotId, string> = {
-  UP: "north",
-  RIGHT: "east",
-  DOWN: "south",
-  LEFT: "west",
-  LOOK: "look",
-  EXAMINE: "examine",
-  QUESTION: "question",
-  ASK_WHY: "ask why",
-  ACCEPT: "accept",
-  REJECT: "reject",
-  TRACE_BACK: "trace back",
-};
-void SLOT_TO_COMMAND; // referenced in onMove dispatch below
+// ── All rhetorical action slots — always available (no contextual hiding) ────
+const ALL_AVAILABLE_ACTIONS = new Set<string>([
+  "LOOK",
+  "EXAMINE",
+  "QUESTION",
+  "ASK_WHY",
+  "ACCEPT",
+  "REJECT",
+  "TRACE_BACK",
+]);
 
 // ── groupByTurn ──────────────────────────────────────────────────────────────
 
@@ -115,12 +108,9 @@ export function TerminalDisplay({
     return set;
   }, [currentRoom]);
 
-  // Derive available action slots — all rhetorical actions are always
-  // available (all slots visible + enabled), matching the "no contextual
-  // hiding" design of T97/T102.
-  const availableActions = useMemo<Set<string>>(() => {
-    return new Set(["LOOK", "EXAMINE", "QUESTION", "ASK_WHY", "ACCEPT", "REJECT", "TRACE_BACK"]);
-  }, []);
+  // All rhetorical action slots are always available — no contextual hiding
+  // (T97/T102 design). Module-level constant avoids creating a new Set each render.
+  const availableActions = ALL_AVAILABLE_ACTIONS;
 
   // Last committed slot — drives the spade hand.
   const lastSlot = useMemo<SlotId | null>(() => {

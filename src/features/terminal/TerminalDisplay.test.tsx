@@ -122,7 +122,6 @@ function renderDisplay(state: GameState, world = mockWorld(), onMove: (m: Move) 
     <TerminalDisplay
       state={state}
       world={world}
-      onCommand={vi.fn()}
       onMove={onMove}
       onNewGame={vi.fn()}
       onHintDismiss={vi.fn()}
