@@ -30,13 +30,26 @@ export type RhetoricalVerb =
   | "reject"
   | "trace back";
 
-const PEDAGOGY: ReadonlyArray<{ verb: RhetoricalVerb; key: keyof KeycapLayout["rhetorical"] }> = [
-  { verb: "examine", key: "examine" },
-  { verb: "question", key: "question" },
-  { verb: "ask why", key: "askWhy" },
-  { verb: "accept", key: "accept" },
-  { verb: "reject", key: "reject" },
-  { verb: "trace back", key: "traceBack" },
+/**
+ * Each pedagogy entry pairs the **display label** (what the UI renders)
+ * with the **canonical parsed verb** (what `parseCommand(raw).verb`
+ * returns). They diverge for multi-word commands: "ask why" parses to
+ * "ask"; "trace back" parses to "trace". The `usedVerbs` set tracked by
+ * TerminalDisplay holds parsed verbs, so we MUST look up by `parsedVerb`
+ * — the previous `usedVerbs.has(label as CommandVerb)` cast was a silent
+ * miss for those two labels and never expanded the contextual surface.
+ */
+const PEDAGOGY: ReadonlyArray<{
+  verb: RhetoricalVerb;
+  parsedVerb: CommandVerb;
+  key: keyof KeycapLayout["rhetorical"];
+}> = [
+  { verb: "examine", parsedVerb: "examine", key: "examine" },
+  { verb: "question", parsedVerb: "question", key: "question" },
+  { verb: "ask why", parsedVerb: "ask", key: "askWhy" },
+  { verb: "accept", parsedVerb: "accept", key: "accept" },
+  { verb: "reject", parsedVerb: "reject", key: "reject" },
+  { verb: "trace back", parsedVerb: "trace", key: "traceBack" },
 ];
 
 /** Tutorial ends once the player has used at least this many non-LOOK verbs. */
@@ -91,7 +104,7 @@ export function computeKeycapSurface(ctx: KeycapSurfaceContext): KeycapSurface {
   // Every verb the player has already used stays visible.
   const nonLookUsed: string[] = [];
   for (const v of PEDAGOGY) {
-    if (usedVerbs.has(v.verb as CommandVerb)) {
+    if (usedVerbs.has(v.parsedVerb)) {
       verbs.add(v.verb);
       nonLookUsed.push(v.verb);
     }
@@ -115,7 +128,7 @@ export function computeKeycapSurface(ctx: KeycapSurfaceContext): KeycapSurface {
   }
 
   for (const v of PEDAGOGY) {
-    if (!usedVerbs.has(v.verb as CommandVerb)) {
+    if (!usedVerbs.has(v.parsedVerb)) {
       verbs.add(v.verb);
       break;
     }
@@ -128,15 +141,15 @@ function pickTutorialVerb(
   usedVerbs: ReadonlySet<CommandVerb>
 ): string | null {
   for (const v of PEDAGOGY) {
-    if (usedVerbs.has(v.verb as CommandVerb)) continue;
+    if (usedVerbs.has(v.parsedVerb)) continue;
     if (layout.rhetorical[v.key] === "primary") return v.verb;
   }
   for (const v of PEDAGOGY) {
-    if (usedVerbs.has(v.verb as CommandVerb)) continue;
+    if (usedVerbs.has(v.parsedVerb)) continue;
     if (layout.rhetorical[v.key] === "charged") return v.verb;
   }
   for (const v of PEDAGOGY) {
-    if (!usedVerbs.has(v.verb as CommandVerb)) return v.verb;
+    if (!usedVerbs.has(v.parsedVerb)) return v.verb;
   }
   return null;
 }

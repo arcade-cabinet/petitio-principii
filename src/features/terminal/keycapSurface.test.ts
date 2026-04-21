@@ -89,6 +89,27 @@ describe("computeKeycapSurface", () => {
     }
   });
 
+  // Regression: parseCommand normalizes "ask why" → "ask" and "trace back" → "trace",
+  // so usedVerbs always contains the parsed (canonical) form. Earlier code looked up
+  // membership by the display label ("ask why" / "trace back") via an unsafe
+  // `as CommandVerb` cast — those two verbs never registered as used and the
+  // contextual surface stayed stuck in tutorial mode.
+  it("recognizes parsed verbs ('ask', 'trace') as the used form for 'ask why' / 'trace back'", () => {
+    const r = room();
+    const rooms = new Map<string, Room>([["r", r]]);
+    const used: Set<CommandVerb> = new Set(["examine", "ask", "trace"]);
+    const s = computeKeycapSurface({
+      rooms,
+      currentRoom: r,
+      turnCount: 4,
+      usedVerbs: used,
+      layout: neutralLayout(),
+    });
+    expect(s.verbs.has("ask why")).toBe(true);
+    expect(s.verbs.has("trace back")).toBe(true);
+    expect(s.verbs.has("examine")).toBe(true);
+  });
+
   it("opens the full set once turnCount reaches the turn threshold", () => {
     const r = room();
     const rooms = new Map<string, Room>([["r", r]]);
