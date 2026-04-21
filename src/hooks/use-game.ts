@@ -1,7 +1,9 @@
 import {
   type GameState,
+  type Move,
   type WorldBridge,
   applyCommand,
+  applyMove,
   createInitialGameState,
   describeRoom,
   dismissActiveHint,
@@ -30,6 +32,8 @@ export interface GameHandle {
   world: WorldHandle;
   startGame: (seed: number) => Promise<void>;
   submitCommand: (raw: string) => void;
+  /** Submit a clock Move (tap or chord) directly from the RailroadClock. */
+  submitMove: (move: Move) => void;
   requestNewGame: () => void;
   /** Clear the active onboarding hint without consuming a turn. */
   dismissHint: () => void;
@@ -152,6 +156,19 @@ export function useGame(): GameHandle {
     [audio, makeBridge, project]
   );
 
+  const submitMove = useCallback(
+    (move: Move) => {
+      audio.playSfx("ui.press");
+      setState((prev) => {
+        const bridge = makeBridge();
+        if (!bridge) return prev;
+        const next = applyMove(prev, move, bridge, audio);
+        return project(next);
+      });
+    },
+    [audio, makeBridge, project]
+  );
+
   const dismissHint = useCallback(() => {
     setState((prev) => dismissActiveHint(prev));
   }, []);
@@ -161,6 +178,7 @@ export function useGame(): GameHandle {
     world,
     startGame,
     submitCommand,
+    submitMove,
     requestNewGame,
     dismissHint,
     toggleMute: audio.toggleMute,

@@ -1,7 +1,7 @@
 import { selectHint } from "@/features/terminal/hints";
 import type { ArgumentAgent } from "../ai/argument-agent";
 import type { ArgumentMemory } from "../ai/argument-traits";
-import type { CommandVerb, ParsedCommand } from "./Command";
+import type { ClockSlotId, CommandVerb, Move, ParsedCommand } from "./Command";
 import type { GameState } from "./GameState";
 import { describeRoom, getHelpText } from "./NarrativeGenerator";
 import { parseCommand } from "./Parser";
@@ -75,6 +75,162 @@ export interface WorldBridge {
 
 export interface AudioSink {
   playSfx: (key: SfxKey) => void;
+}
+
+/**
+ * Map a clock SlotId to the raw string command it represents.
+ * Chord slots get mapped individually; the chord handler assembles them.
+ */
+const SLOT_TO_COMMAND: Record<ClockSlotId, string> = {
+  UP: "north",
+  RIGHT: "east",
+  DOWN: "south",
+  LEFT: "west",
+  LOOK: "look",
+  EXAMINE: "examine",
+  QUESTION: "question",
+  ASK_WHY: "ask why",
+  ACCEPT: "accept",
+  REJECT: "reject",
+  TRACE_BACK: "trace back",
+};
+
+/**
+ * Apply a clock Move (tap or chord) to the state.
+ *
+ * Tap: maps to a single raw command via SLOT_TO_COMMAND.
+ * Chord: checks for a known chord template via resolveChord; if none matches,
+ *        runs both slots sequentially (first then second) with a connective
+ *        narration phrase separating them.
+ *
+ * Chords are a first-class verb, not two sequential commands — the beginTurn
+ * call happens exactly once, so the entire chord belongs to one turn.
+ */
+export function applyMove(
+  state: GameState,
+  move: Move,
+  world: WorldBridge,
+  audio: AudioSink
+): GameState {
+  if (move.kind === "tap") {
+    return applyCommand(state, SLOT_TO_COMMAND[move.slot], world, audio);
+  }
+
+  // Chord — try to resolve a template.
+  const chordKey = chordTemplateKey(move.slots[0], move.slots[1]);
+  const template = CHORD_TEMPLATES[chordKey];
+
+  if (template) {
+    // Known chord — run as a single named command.
+    return applyCommand(state, template.command, world, audio);
+  }
+
+  // Unknown chord — apply both effects in sequence within ONE turn.
+  // We begin the turn once and emit both effects plus a connective phrase.
+  world.beginTurn();
+  const currentRoom = state.rooms.get(state.currentRoomId);
+  const rawA = SLOT_TO_COMMAND[move.slots[0]];
+  const rawB = SLOT_TO_COMMAND[move.slots[1]];
+  world.appendLine("echo", `> ${rawA} + ${rawB}`);
+
+  if (!state.started || !currentRoom) {
+    world.appendLine("narration", "The argument has not yet begun.");
+    return state;
+  }
+
+  // Run both verbs' logic directly, accumulating state.
+  // We call applyRhetoricalOrMovement for each, skipping beginTurn (already done).
+  const parsedA = parseCommand(rawA);
+  const parsedB = parseCommand(rawB);
+
+  let nextState = applyVerbInternal(state, parsedA, rawA, currentRoom, world, audio);
+  const roomForB = nextState.rooms.get(nextState.currentRoomId);
+  if (roomForB) {
+    world.appendLine("narration", "— and then —");
+    nextState = applyVerbInternal(nextState, parsedB, rawB, roomForB, world, audio);
+  }
+
+  return {
+    ...nextState,
+    activeHint: maybeSelectHint(nextState, parsedB.verb, world),
+  };
+}
+
+/**
+ * Canonical chord key — sorted slot ids joined with "+".
+ * Ensures UP+ACCEPT and ACCEPT+UP resolve to the same template.
+ */
+function chordTemplateKey(a: ClockSlotId, b: ClockSlotId): string {
+  return [a, b].sort().join("+");
+}
+
+/**
+ * Known chord templates. Each maps a canonical slot pair to a single
+ * named command string that the engine already handles.
+ *
+ * Populated from T100; for T99 we seed the table with the most
+ * analytically fundamental pairs so chord routing is exercised.
+ */
+const CHORD_TEMPLATES: Record<string, { command: string; label: string }> = {
+  [chordTemplateKey("EXAMINE", "QUESTION")]: {
+    command: "examine",
+    label: "scrutinize",
+  },
+  [chordTemplateKey("ACCEPT", "REJECT")]: {
+    command: "question",
+    label: "provisional",
+  },
+  [chordTemplateKey("QUESTION", "ASK_WHY")]: {
+    command: "ask why",
+    label: "deep interrogation",
+  },
+  [chordTemplateKey("REJECT", "TRACE_BACK")]: {
+    command: "trace back",
+    label: "disavow",
+  },
+  [chordTemplateKey("LOOK", "EXAMINE")]: {
+    command: "look",
+    label: "survey",
+  },
+  [chordTemplateKey("ACCEPT", "TRACE_BACK")]: {
+    command: "accept",
+    label: "endorse chain",
+  },
+  [chordTemplateKey("UP", "ACCEPT")]: {
+    command: "north",
+    label: "committed walk north",
+  },
+  [chordTemplateKey("DOWN", "ACCEPT")]: {
+    command: "south",
+    label: "committed walk south",
+  },
+  [chordTemplateKey("RIGHT", "ACCEPT")]: {
+    command: "east",
+    label: "committed walk east",
+  },
+  [chordTemplateKey("LEFT", "ACCEPT")]: {
+    command: "west",
+    label: "committed walk west",
+  },
+};
+
+/**
+ * Internal helper — apply a parsed command to state WITHOUT calling
+ * beginTurn (used by applyMove's chord path, which already called it).
+ * Returns only the new state; hint selection is handled by the caller.
+ */
+function applyVerbInternal(
+  state: GameState,
+  parsed: ParsedCommand,
+  raw: string,
+  currentRoom: Room,
+  world: WorldBridge,
+  audio: AudioSink
+): GameState {
+  if (MOVEMENT.includes(parsed.verb as Direction)) {
+    return applyMovement(state, parsed, currentRoom, world, audio);
+  }
+  return applyRhetoricalVerb(state, parsed, raw, currentRoom, world, audio);
 }
 
 /**

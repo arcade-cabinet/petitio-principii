@@ -1,6 +1,6 @@
 export { generateArgumentGraph, type ArgumentGraph } from "./core/ArgumentGraph";
 export type { SfxKey } from "./core/audio-effects";
-export type { CommandVerb, ParsedCommand } from "./core/Command";
+export type { ClockSlotId, CommandVerb, Move, ParsedCommand } from "./core/Command";
 export {
   type ActiveHint,
   createInitialGameState,
@@ -20,6 +20,7 @@ export { parseCommand } from "./core/Parser";
 export type { Passage } from "./core/Passage";
 export {
   applyCommand,
+  applyMove,
   type AudioSink as EngineAudioSink,
   type WorldBridge,
 } from "./core/reducer";
