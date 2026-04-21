@@ -1,5 +1,5 @@
+import { BezelPanel } from "@/components/ui/bezel-panel";
 import { type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
-import { GlowingPanel } from "@/components/ui/glowing-panel";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
@@ -196,8 +196,12 @@ export function TerminalDisplay({
   return (
     <div className="relative z-10 flex h-full w-full flex-col gap-4 p-4 md:p-6">
       {/* Display surface */}
-      <GlowingPanel tone="active" className="relative flex-1 min-h-0 flex flex-col">
-        {/* Compass rose — anchored to the GlowingPanel, not the scrolling
+      <BezelPanel
+        className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
+        rivets="corners-mid-all"
+        rivetSize={12}
+      >
+        {/* Compass rose — anchored to the BezelPanel, not the scrolling
             present-zone, so it always sits at the panel's visual bottom
             regardless of content length. Responsive: hidden below md
             where prose fills the panel. pointer-events-none so taps
@@ -367,7 +371,7 @@ export function TerminalDisplay({
           {/* Active onboarding hint — fades in/out via Motion One. T63. */}
           <HintLine hint={state.activeHint} onDismiss={onHintDismiss} />
         </div>
-      </GlowingPanel>
+      </BezelPanel>
 
       {/* FUTURE zone — rhetorical verbs, directions */}
       <div className="flex flex-col gap-3">
