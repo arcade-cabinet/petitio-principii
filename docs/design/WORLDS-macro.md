@@ -7,12 +7,12 @@ domain: creative
 
 # Worlds — Macro Design
 
-> Two arguments are going to be braided into one walk. This document defines
+> Two arguments will be braided into one walk. This document defines
 > what each argument *is* — its place, its voice, its temperament, its
 > ending — before any room is drawn or any connection is wired. Later layers
 > (meso, micro) are only as good as this one.
 
-The game already has a conceit (`docs/LORE.md`): the player is a mind
+The game already has a conceit ([LORE.md](../LORE.md)): the player is a mind
 re-entering an argument it once made. What has been missing is a **place**
 for that argument to live — somewhere the mind can walk. T109 answers the
 question by providing two such places, hand-authored, each a complete
@@ -176,7 +176,7 @@ for authoring.
 
 - **Second person, always.** The mind narrates to itself.
 - **No NPCs with names.** Voices are always *your own voice in another
-  register* (see `VOICE.md`). The Librarian and the Court are both
+  register* (see [VOICE.md](../VOICE.md)). The Librarian and the Court are both
   *forms of you*, but not the *same* form — see §2 and §3.2 / §3.3 for
   the past-singular / future-plural asymmetry that must be audible in
   the prose.
@@ -199,20 +199,28 @@ for authoring.
 | Syntax | Short declaratives. Comma splices rare. Full stops early. |
 | Register | Quiet, scholarly, intimate. A hand on your sleeve. |
 | Tense | Present, but slipping into the pluperfect for authority: *You had read this before.* |
-| Pronouns | Strongly *I / my / your / our* — possessive, private. |
+| Pronouns | Singular possessives — *I / my / your*. Plural possessives allowed only in intimate-possessive constructions (*our ledger*, *our hand*, *our margin*) where "our" means *you-and-your-past-self*. Never *we* as subject. Never *we find*, *we agree*. |
 | Verbs | Of handling: *turn, lift, stamp, shelve, read, underline, leave-open.* |
 | Sound imagery | Small, enclosed. *Paper creases. A candle gutters. Your sleeve catches a page.* |
 | Temperature words | *Warm, close, stale, amber, underlined, foxed, damp.* |
-| Forbidden | Ceremony nouns (*tribunal, court, bench, gallery, panel*). Plural authority (*we, the court*). Fanfare verbs (*proclaim, decree, ratify*). Glass imagery. Height imagery. |
+| Forbidden | Ceremony nouns (*tribunal, court, bench, gallery, panel*). **Plural-subject authority** (*we find*, *we rule*, *the court finds*) — that is World B's register. Fanfare verbs (*proclaim, decree, ratify*). Glass imagery. Height imagery. |
 | Signature move | A margin note, in your hand, corrects the page you are reading. |
 | Signature image | *Old paper. Candle. A hand you recognize as your own.* |
 
 Example cadence (diagnostic — not for any specific room):
 
-> You step down into a low alcove. A ledger is open on the reading
-> stand, your handwriting in the left column, a gentler version of your
-> handwriting in the right. The right-column argues the left into
-> stillness. You read both, and agree with the second, and move on.
+> You step down into a low alcove. The ledger is already open on our
+> reading stand. You had turned to this page before. Your handwriting
+> is in the left column; a gentler handwriting, also yours, is in the
+> right. You had underlined the left the first time. The right answers
+> the left in stillness. You read both, and agree with the second, and
+> leave the page open for the next descent.
+
+This example demonstrates the rules: **pluperfect authority** (*you
+had turned*, *you had underlined*), **intimate-possessive "our"**
+(*our reading stand* — the you-and-your-past-self of §2, not a plural
+subject), **verbs of handling** (*turned, underlined, leave open*),
+and **no plural-subject authority** (no *we find*, no *the court*).
 
 ### 3.3 World B — The Celestial Court
 
@@ -232,9 +240,19 @@ Example cadence (diagnostic — not for any specific room):
 Example cadence:
 
 > You rise into a pale atrium whose ceiling is lost in geometry. A
-> finding has been read, though by whom is unclear, and the finding is
-> that the premise you brought with you was always a finding. The
+> finding has been entered, and — though it will not have been read
+> aloud by anyone you can point to — we find it so; we have found
+> it so; we will have found it so before you reach the gallery. The
 > assembled do not disagree. You cross the floor.
+
+This example demonstrates the rules: **future-perfect authority**
+(*it will have been read*, *we will have found it so*), **first-
+person-plural subject** (*we find*, *we have found*, *we will have
+found*), **third-person-ceremonial** (*the assembled*), and
+**periodic syntax** (the middle sentence is a single deliberate period
+holding three tenses of ratification). The plural is the §2 future-
+plural-self; it is you, having ratified yourself often enough that
+your own voice is a quorum.
 
 ### 3.4 The blind-read test
 
@@ -301,9 +319,7 @@ Diagnostic examples of hinge-sentence shapes (not commitments — these
 are authoring cues):
 
 > The premise is the same premise it was.
-
 > Seven columns. Seven entrances. Nothing more is needed here.
-
 > Something has been agreed to in this room.
 
 These are grammatical in both the Librarian's hush and the Court's
@@ -333,8 +349,25 @@ swung. That swing is the braid.
 
 ## 4. Thematic pairing — what the braid is doing
 
-A seed draws a ~30-room walk that weaves between A and B at connection
-nodes. Three things must be true of every braid for the pairing to work:
+Two room counts appear throughout this document and they are not the
+same number:
+
+- **~40 authored rooms per world** — the hand-crafted content pool
+  each world commits to. The entire authored inventory of A, or of B,
+  that meso enumerates and micro writes.
+- **~30-room woven walk per seed** — what the player actually
+  traverses in a single braided playthrough. The PRNG walks through a
+  subset of the combined pool, crossing between A and B at connection-
+  nodes. Not every authored room is visited in any given seed; that is
+  what makes replay meaningful.
+
+So: ~40 + ~40 authored in total, ~30 traversed per playthrough.
+Wherever this doc says "~40" it means the pool; wherever it says
+"~30" it means the walk.
+
+A seed therefore draws a ~30-room walk that weaves between A and B at
+connection nodes. Three things must be true of every braid for the
+pairing to work:
 
 1. **The same argument is being made in both dictions.** Whichever
    rooms the seed visits, the player is always walking *one* argument,
@@ -464,8 +497,10 @@ is a **meso-layer decision**. The choice has structural consequences
 belongs in the density-curve layer, not the identity layer.
 
 Meso owes: (a) a count of closing chambers per world, (b) a mapping
-from path-pattern to closing variant, (c) a reachability guarantee
-that every seed reaches *some* closing chamber.
+from path-pattern to closing variant, (c) a density curve and
+connection-node placement delivering **≥ 99% natural reachability** of
+*some* closing chamber per §5.4 (the remaining ≤ 1% is handled by the
+engine fallback).
 
 ### 5.4 The game's rule about endings
 
@@ -478,10 +513,26 @@ moment the walk is named.
 
 The only **false ending** is a seeded walk that reaches a cap on turns
 without ever entering a closing chamber — the *indefinite loop*
-failure mode (Act III without closure). The meso layer must ensure
-every seed has a ≥ 95% chance of reaching *some* closing chamber
-(across both worlds and across all variants per world) within the
-turn budget. Budgeting happens there.
+failure mode (Act III without closure). 1 in 20 seeds hitting this
+mode would ship broken games, so the bar is high:
+
+1. **Natural reachability ≥ 99%.** Meso-layer density curves and
+   connection-node placement must ensure that, without any engine
+   intervention, at least 99 of every 100 seeds reach a closing
+   chamber organically within the turn budget.
+2. **Hard fallback guarantees 100%.** The remaining ≤ 1% is caught by
+   a deterministic engine fallback: if the player hits the turn cap
+   without having entered a closing chamber, the *next* `TRACE BACK`
+   (or the next movement if no TRACE BACK is issued within three
+   turns) is routed to a closing chamber in whichever world the
+   player currently occupies. This fallback is itself seeded — the
+   same seed always picks the same fallback closing — so
+   determinism is preserved.
+
+Net effect: **every seed closes.** The ≥ 99% natural bar keeps the
+fallback invisible in the common case; the fallback ensures zero
+false endings in the pathological case. The engine requirement is
+flagged in §6.
 
 ---
 
@@ -498,13 +549,15 @@ These are deliberate deferrals, by layer:
   roughly how many rooms each claims.
 - Where the gnomes (T108) range and which of them are A-resident,
   B-resident, or A/B-bridging.
-- The pacing density curve across the ~40 rooms of each world.
+- The pacing density curve across the ~40 authored rooms of each world
+  (the pool; the per-seed walk is ~30, per §4).
 - **Closing-chamber count and variation strategy per world** (per §5.3)
   — number of closing chambers per world, the mapping from path-
   pattern to closing variant, and the authoring approach (distinct
   chambers per pattern vs. conditional prose inside fewer chambers).
-- How we guarantee reachability of *some* closing chamber inside the
-  turn budget.
+- **≥ 99% natural reachability** of *some* closing chamber within the
+  turn budget (per §5.4). The remaining ≤ 1% is handled by the engine
+  fallback; meso owns the natural-reachability bar.
 
 **Micro (`WORLDS-micro.md`).**
 - Individual room titles, bodies, verb-responses, and exits.
@@ -519,22 +572,39 @@ These are deliberate deferrals, by layer:
 - The Zod schema sketch that will validate authored rooms at build
   time, including the connection-node and closing-chamber variants.
 
-**Engine (weaver + reducer).** Surfaced here so downstream agents aren't
-surprised:
-- The weaver must produce and retain a **seeded path-list** — the
-  ordered list of rooms visited in this braid — and make it available
-  to the grammar when a closing chamber is rendered (per §5.1 obligation
-  1). Today the transcript carries this implicitly; the closing chamber
-  needs it explicitly as a structured input.
-- The weaver (or the reducer) must compute a **dominant-verb path-
-  pattern classifier** over the walk (Acceptor / Rejector / Questioner
-  / Tracer, per §5.1) and expose it as a grammar input to the closing
-  chamber, so the correct closing variant can be selected per §5.3.
-- The weaver must track the **last connection-node crossed** so the
-  closing can re-surface that node's hinge sentence (§5.1 obligation
-  3).
-- None of this is specified here beyond the interface shape. It lives
-  in `WorldWeaver.ts` per T109 step 6.
+**Engine (weaver + reducer).** The following are **hard requirements**
+on the engine work, not soft suggestions. They exist because §5.1's
+closing-chamber obligations are unsatisfiable without them. Implementation
+belongs to the weaver + reducer tasks (T99 + T100 per
+`docs/plans/react-mobile-mvp.prq.md`), written *against* this doc; the
+weaver agent must not deprioritize any of the four:
+
+1. **Seeded path-list — required.** The weaver must produce and retain
+   the ordered list of rooms visited in this braid and make it
+   available to the grammar when a closing chamber is rendered (per
+   §5.1 obligation 1). Today the transcript carries this implicitly;
+   the closing chamber needs it explicitly as a structured input.
+2. **Dominant-verb path-pattern classifier — required.** The weaver
+   (or the reducer) must compute a classifier over the walk
+   (Acceptor / Rejector / Questioner / Tracer, per §5.1) and expose
+   the label as a grammar input to the closing chamber, so the
+   correct closing variant is selected per §5.3.
+3. **Last-connection-node-crossed tracking — required.** The weaver
+   must track the last connection-node the player traversed so the
+   closing can re-surface that node's hinge sentence (§5.1 obligation
+   3).
+4. **Closing-chamber fallback router — required.** The engine must
+   implement the deterministic fallback from §5.4: on turn-cap
+   without a closing, the next `TRACE BACK` (or the next movement
+   within three turns) routes to a seeded closing chamber in the
+   current world. This is what makes the "every seed closes"
+   guarantee a 100% bar rather than a 99% target.
+
+Interface shapes are deferred to the weaver task itself; what is
+contractual *here* is that each of the four capabilities exists and is
+exposed to the grammar layer. If any one of them is absent, §5's
+closings cannot meet their obligations, and the merge bar for T109
+step 5 (authoring) is not met.
 
 **Schema/loader, authoring.** Engineering, not design; lives outside
 these three docs.
