@@ -56,8 +56,12 @@ case midnight {
   room office {
     title "Your Office — 11:47 PM"
     prose <<<
-      The phone had rung seven times before you answered.
-      Seven felt like a number someone had counted.
+      The phone had rung seven times before you answered. Seven felt
+      like a number someone had counted. The bakelite of the receiver
+      is still warm in your hand. The chair across the desk holds a
+      thin register of jasmine — a perfume you half-remember. The
+      window to the fire escape has not been opened tonight, or has
+      it.
     >>>
     rhetorical premise
 

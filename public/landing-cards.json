@@ -1,0 +1,110 @@
+[
+  {
+    "hour": 0,
+    "caseId": "midnight",
+    "title": "A Voice Before Dawn",
+    "oneLine": "A voice before dawn, counting rings.",
+    "personaDisplayName": "Harrison Drake",
+    "personaEra": "Los Angeles, 1946",
+    "locked": false
+  },
+  {
+    "hour": 1,
+    "caseId": "locked-1",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 2,
+    "caseId": "locked-2",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 3,
+    "caseId": "locked-3",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 4,
+    "caseId": "locked-4",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 5,
+    "caseId": "locked-5",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 6,
+    "caseId": "locked-6",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 7,
+    "caseId": "locked-7",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 8,
+    "caseId": "locked-8",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 9,
+    "caseId": "locked-9",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 10,
+    "caseId": "locked-10",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  },
+  {
+    "hour": 11,
+    "caseId": "locked-11",
+    "title": "— coming soon —",
+    "oneLine": "This hour has not yet been authored.",
+    "personaDisplayName": "",
+    "personaEra": "",
+    "locked": true
+  }
+]

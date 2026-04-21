@@ -21,6 +21,7 @@
     "cap-sync:android": "pnpm exec cap sync android",
     "cap-sync:ios": "pnpm exec cap sync ios",
     "brainstorm": "tsx tools/brainstorm/cli.ts",
+    "build-game-db": "tsx tools/build-game-db/cli.ts",
     "verify": "pnpm verify-corpus && pnpm check && pnpm typecheck && pnpm test && vite build && pnpm check-bundle"
   },
   "devDependencies": {
