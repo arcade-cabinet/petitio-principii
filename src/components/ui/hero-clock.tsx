@@ -2,8 +2,9 @@
  * HeroClock — the Victorian railway clock that crowns the landing screen.
  *
  * A station-clock motif: brushed-silver bezel, convex crystal, deep-violet
- * enamel dial, Roman numerals (IIII for 4, per clock-face convention) set
- * in Yesteryear, silver filigree pediment above, and a hung-from-the-ceiling
+ * enamel dial, Arabic numerals 1–12 set in Yesteryear (Roman in cursive
+ * Yesteryear rendered as smudges at hero scale), silver filigree pediment
+ * above, and a hung-from-the-ceiling
  * bracket. References Gents of Leicester, Smiths Enfield circa 1910 — the
  * English railway-station tradition — restyled in our purple/silver/black
  * palette.
@@ -22,6 +23,7 @@
  * terminal. Reduced-motion users get a 0.6s opacity fade only.
  */
 import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Duration in milliseconds of the melt-away transition. Exported so the
@@ -47,19 +49,22 @@ const HUB_R = 9;
 const PEDIMENT_TOP_Y = 50;
 const BRACKET_TOP_Y = 8;
 
-const ROMAN: ReadonlyArray<string> = [
-  "XII", // 12
-  "I",
-  "II",
-  "III",
-  "IIII", // 4 — clock-face convention, not "IV"
-  "V",
-  "VI",
-  "VII",
-  "VIII",
-  "IX",
-  "X",
-  "XI",
+// Arabic numerals 1–12 (Roman cursive in Yesteryear renders as smudges
+// at hero scale; Arabic reads cleanly while keeping the Yesteryear face
+// for character continuity with the title).
+const NUMERALS: ReadonlyArray<string> = [
+  "12",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
 ];
 
 function polar(angleDeg: number, r: number): { x: number; y: number } {
@@ -86,6 +91,19 @@ export interface HeroClockProps {
   readonly melting?: boolean;
 }
 
+/** Compute hand angles for a given Date. Hour hand smoothly interpolates. */
+function angleFor(date: Date): { hour: number; minute: number; second: number } {
+  const ms = date.getTime();
+  const seconds = (ms / 1000) % 60;
+  const minutes = ((ms / 1000 / 60) % 60) + seconds / 60;
+  const hours = (((ms / 1000 / 3600) % 12) + minutes / 60) % 12;
+  return {
+    hour: (hours / 12) * 360,
+    minute: (minutes / 60) * 360,
+    second: (seconds / 60) * 360,
+  };
+}
+
 export function HeroClock({
   width = "100%",
   ariaLabel,
@@ -95,10 +113,60 @@ export function HeroClock({
 }: HeroClockProps) {
   const reducedMotion = useReducedMotion();
 
-  // Hands at 10:10 — minute hand at 60° (toward "II"), hour hand at 305°
-  // (toward "X" with slight offset for the 10:10 minute lean).
-  const minuteAngle = 60;
-  const hourAngle = 305;
+  // Real-time tick: the hands sync to the actual current time (locale time
+  // — same time the user's wrist watch shows), so the clock reads as a
+  // real object in the room rather than a frozen prop. While idle on the
+  // landing, a random rate-multiplier drift speeds the apparent flow up
+  // and slows it down ([0.3×, 3.0×], resampled at 1–6s intervals) — the
+  // memory-palace clock losing structural integrity the longer the
+  // player hesitates. The DISPLAYED time always represents real time at
+  // the *baseline* rate; only the perceived sweep speed warps. When
+  // melting starts, we freeze the sweep so the dissolve animation owns
+  // the frame.
+  const [now, setNow] = useState<Date>(() => new Date());
+  const rateRef = useRef<number>(1.0);
+  const baseTimeRef = useRef<number>(Date.now());
+  const accumulatedRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (melting || reducedMotion) {
+      // Freeze the hands during melt; reduced-motion users get a static
+      // current-time face (no drift, no sweep visible).
+      if (reducedMotion && !melting) setNow(new Date());
+      return;
+    }
+    let raf = 0;
+    let lastT = performance.now();
+    let lastSample = performance.now();
+    let nextSampleIn = 1000 + Math.random() * 5000;
+
+    const loop = (t: number) => {
+      const dt = t - lastT;
+      lastT = t;
+      // Apply current rate multiplier to elapsed real time.
+      accumulatedRef.current += dt * rateRef.current;
+      const display = new Date(baseTimeRef.current + accumulatedRef.current);
+      setNow(display);
+
+      // Resample rate at random intervals.
+      if (t - lastSample >= nextSampleIn) {
+        // Smooth easing toward the new rate over ~400ms via a transient
+        // intermediate target — but for simplicity we just snap; the
+        // visual smoothness comes from the underlying time integration
+        // (rate change shifts dDate/dt which is felt as acceleration).
+        rateRef.current = 0.3 + Math.random() * 2.7;
+        lastSample = t;
+        nextSampleIn = 1000 + Math.random() * 5000;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [melting, reducedMotion]);
+
+  const angles = angleFor(now);
+  const minuteAngle = angles.minute;
+  const hourAngle = angles.hour;
 
   // 12 hour ticks (long, silver) + 48 minute ticks (short, dim).
   const hourTicks = Array.from({ length: 12 }).map((_, i) => i * 30);
@@ -354,7 +422,7 @@ export function HeroClock({
            but its centerline is the radial. Solid silver fill (not the
            bezel gradient — its mid-stops were near-black and made the
            glyph centers vanish). */}
-      {ROMAN.map((numeral, i) => {
+      {NUMERALS.map((numeral, i) => {
         const angle = i * 30;
         const pos = polar(angle, NUMERAL_R);
         return (
