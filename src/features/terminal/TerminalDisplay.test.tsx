@@ -177,7 +177,7 @@ describe("TerminalDisplay three-zone projection", () => {
     }
   });
 
-  it("reveals rhetorical verbs contextually — LOOK plus at most one teaching verb on turn 0", () => {
+  it("reveals rhetorical verbs contextually — LOOK + at most one ENABLED teaching verb on turn 0", () => {
     const transcript = [
       entry({ kind: "title", text: "Opening", turnId: 0 }),
       entry({ kind: "narration", text: "Start.", turnId: 0 }),
@@ -193,15 +193,17 @@ describe("TerminalDisplay three-zone projection", () => {
     );
     // Per the contextual-surface design brief: on a brand-new game, only
     // LOOK plus a single pedagogical verb (the keycap layout's primary)
-    // should be visible. The other rhetorical verbs unlock as the player
-    // uses them or once they've used ≥3 distinct verbs / turnCount ≥ 8.
+    // should be ENABLED. The SCUMM-style VerbPanel renders all 7 verb
+    // buttons always (so the layout doesn't jitter as the surface
+    // expands), but disables those not currently surfaced.
     expect(screen.getByRole("button", { name: /Look/i })).toBeInTheDocument();
     const verbButtons = Array.from(
-      document.querySelectorAll('button[data-variant="verb"]')
-    ) as HTMLElement[];
-    expect(verbButtons.length).toBeLessThanOrEqual(2);
-    const labels = verbButtons.map((b) => b.textContent?.toLowerCase() ?? "");
-    expect(labels.some((l) => /look/.test(l))).toBe(true);
+      document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
+    );
+    const enabled = verbButtons.filter((b) => !b.disabled);
+    expect(enabled.length).toBeLessThanOrEqual(2);
+    const enabledLabels = enabled.map((b) => b.textContent?.toLowerCase() ?? "");
+    expect(enabledLabels.some((l) => /look/.test(l))).toBe(true);
   });
 
   it("opens the full rhetorical verb set once the tutorial window has ended", () => {
@@ -235,7 +237,7 @@ describe("TerminalDisplay three-zone projection", () => {
     }
   });
 
-  it("renders cardinal direction keycaps that appear anywhere in the graph as disabled silhouettes when unavailable here", () => {
+  it("hosts an interactive 8-cardinal compass rose; vertical traversal lives on Up/Down keycaps", () => {
     const transcript = [entry({ kind: "narration", text: "You are here.", turnId: 0 })];
     render(
       <TerminalDisplay
@@ -246,17 +248,20 @@ describe("TerminalDisplay three-zone projection", () => {
         onHintDismiss={vi.fn()}
       />
     );
-    // mockRoom() exposes only "north" from current room, but the graph
-    // may contain other cardinals — and cardinals always render so the
-    // compass grid doesn't jitter. Non-cardinals (Up/Down/Back/Fwd),
-    // however, only render when available as an exit from this room.
-    const north = screen.getByRole("button", { name: /^N$/ });
-    expect(north).not.toBeDisabled();
-    // Non-cardinals should NOT be present on a room whose only exit is north.
-    expect(screen.queryByRole("button", { name: /^Up$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Down$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Back$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Fwd$/ })).toBeNull();
+    // The compass rose hosts the 8 horizontal cardinals (N/NE/E/SE/S/SW/W/NW)
+    // — they're SVG-button hit-areas inside the HEADING panel, not keycaps.
+    // mockRoom() exposes only "north" from current room; that direction
+    // should be enabled, others disabled.
+    const compassN = screen.getByRole("button", { name: /^N — north/i });
+    expect(compassN).not.toHaveAttribute("aria-disabled", "true");
+    const compassS = screen.getByRole("button", { name: /^S — south/i });
+    expect(compassS).toHaveAttribute("aria-disabled", "true");
+    // Up/Down keycaps live on the FUTURE zone alongside the verb panel.
+    // mockRoom() has no vertical exits so both should be disabled.
+    const upKey = screen.getByRole("button", { name: /^Up$/ });
+    expect(upKey).toBeDisabled();
+    const downKey = screen.getByRole("button", { name: /^Down$/ });
+    expect(downKey).toBeDisabled();
   });
 
   // ─────────────────────────────────────────────────────────────────────
