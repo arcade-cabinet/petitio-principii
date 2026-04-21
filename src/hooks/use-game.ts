@@ -15,9 +15,18 @@ import { ArgumentAgent } from "@/engine/ai/argument-agent";
 import { sfxForRhetoricalType } from "@/lib/audio-manifest";
 import * as mobile from "@/lib/mobile";
 import { readTranscript } from "@/world";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudio } from "./use-audio";
 import { type WorldHandle, useWorld } from "./use-world";
+
+/**
+ * The transcript substring that identifies a Triumphant circle-closing
+ * response from the argument agent (see grammars.json, "accept.triumphant"
+ * template). When this phrase first appears in a narration-kind line, the
+ * circle has just closed — the one and only event that should fire the
+ * success haptic per PRD T74.
+ */
+const TRIUMPHANT_MARKER = "Petitio Principii";
 
 /**
  * Composition hook — wires React state, the koota world handle, the pure
@@ -50,6 +59,10 @@ export function useGame(): GameHandle {
   // so the same seed + same player acts produce the same narration.
   const agentRef = useRef<ArgumentAgent | null>(null);
   const seedRef = useRef<number>(0);
+  // Latch so the Triumphant success haptic fires at most once per game.
+  // Reset in startGame / requestNewGame; checked in the transcript effect
+  // below. See PRD T74 — "ACCEPT in a circular room → success haptic".
+  const triumphantFiredRef = useRef(false);
 
   /** Rebuild state.transcript + state.output from the koota world. */
   const project = useCallback(
@@ -93,6 +106,8 @@ export function useGame(): GameHandle {
     async (seed: number) => {
       audio.stopBgm();
       seedRef.current = seed;
+      // Re-arm the Triumphant-haptic latch for the new game.
+      triumphantFiredRef.current = false;
       // Hide the status bar entering the game (immersive mode). No-op on web.
       void mobile.statusBarHide();
 
@@ -142,6 +157,8 @@ export function useGame(): GameHandle {
     audio.playSfx("ui.back");
     // Restore status bar when returning to the landing screen. No-op on web.
     void mobile.statusBarShow();
+    // Reset the Triumphant-haptic latch so the next game can fire it.
+    triumphantFiredRef.current = false;
     world.discard();
     agentRef.current = null;
     setState(createInitialGameState());
@@ -151,10 +168,16 @@ export function useGame(): GameHandle {
     (raw: string) => {
       if (!raw.trim()) return;
       audio.playSfx("ui.press");
-      // Fire haptics for ACCEPT / REJECT on native. No-op on web.
+      // Warning haptic fires on every REJECT — the friction is intentional
+      // per PRD T74 (REJECT is a costly rhetorical move, the body should
+      // feel the weight). Success haptic is NOT fired here; it's gated on
+      // the Triumphant circle-closing response, watched for in the effect
+      // below.
+      // TODO(T98): rewire when Move type lands — the clock-ui agent will
+      // replace string-based dispatch with `Move` objects, and this
+      // stringly-typed verb check will silently stop matching.
       const verb = raw.trim().toLowerCase();
-      if (verb === "accept") void mobile.hapticSuccess();
-      else if (verb === "reject") void mobile.hapticWarning();
+      if (verb === "reject") void mobile.hapticWarning();
       setState((prev) => {
         const bridge = makeBridge();
         if (!bridge) return prev;
@@ -177,6 +200,22 @@ export function useGame(): GameHandle {
     },
     [audio, makeBridge, project]
   );
+
+  // Success haptic fires exactly once per game, on the Triumphant accept
+  // response — the one that surfaces "Petitio Principii" in the transcript.
+  // Watching the transcript projection (rather than the raw verb) matches
+  // PRD T74's spec ("ACCEPT in a circular room → success haptic") precisely
+  // and defends against the clock-ui migration changing verb plumbing.
+  useEffect(() => {
+    if (triumphantFiredRef.current) return;
+    const hit = state.transcript.some(
+      (e) => e.kind === "narration" && e.text.includes(TRIUMPHANT_MARKER)
+    );
+    if (hit) {
+      triumphantFiredRef.current = true;
+      void mobile.hapticSuccess();
+    }
+  }, [state.transcript]);
 
   const dismissHint = useCallback(() => {
     setState((prev) => dismissActiveHint(prev));

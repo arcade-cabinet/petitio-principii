@@ -37,14 +37,21 @@ async function hideSplash(): Promise<void> {
 
 /**
  * Initialize the native mobile surface. Safe to call on the web — does
- * nothing. Resolves after both status bar and splash screen have been
- * configured (or immediately on non-native platforms).
+ * nothing. Resolves after status bar / splash screen / visibility-reset
+ * have all been configured (or immediately on non-native platforms).
+ *
+ * Visibility-reset note: the OS persists status-bar hidden/visible state
+ * across kill-and-relaunch — if the app was killed mid-game while the
+ * status bar was hidden, the next cold-start lands on the landing screen
+ * but without its status bar. We defensively call `statusBarShow()` here
+ * so every cold launch starts with the bar visible; `startGame()` will
+ * hide it again when the player commits to a new game.
  */
 export async function init(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
 
   try {
-    await Promise.all([configureStatusBar(), hideSplash()]);
+    await Promise.all([configureStatusBar(), hideSplash(), statusBarShow()]);
   } catch (err) {
     // A plugin failure must never block the app from rendering.
     // Log and continue; the user still gets to play the game.
