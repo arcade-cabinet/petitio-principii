@@ -167,6 +167,7 @@ export function CompassRose({
               aria-label={`${label} — ${id}${isAvailable ? "" : " (no exit)"}`}
               aria-disabled={!isAvailable}
               data-direction={id}
+              className="compass-hit-area"
               onClick={isAvailable ? () => onDirection(id) : undefined}
               onKeyDown={(e) => {
                 if (!isAvailable) return;
@@ -177,7 +178,6 @@ export function CompassRose({
               }}
               style={{
                 cursor: isAvailable ? "pointer" : "default",
-                outline: "none",
               }}
             />
             {isActive && (

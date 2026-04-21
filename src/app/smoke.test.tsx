@@ -125,32 +125,33 @@ describe("App end-to-end smoke", () => {
       timeout: 3000,
     });
 
-    // The contextual keycap surface only ENABLES LOOK + one teaching verb
-    // at a time during the tutorial window (≤ 3 distinct non-LOOK verbs
-    // used AND turnCount < 8). VerbPanel renders all 7 verb buttons
-    // always (disabling those not currently surfaced), so we must filter
-    // to ENABLED non-LOOK buttons only when burning down the tutorial.
-    // We extract the leading word of each button's text so subtitle text
-    // doesn't pollute the dedup set.
-    const labelOf = (b: HTMLButtonElement) =>
-      (b.textContent?.trim().split(/\s+/)[0] ?? "").toLowerCase();
-    const clicked = new Set<string>();
-    for (let i = 0; i < 20 && clicked.size < 3; i++) {
-      const verbButtons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
-      );
-      const pickable = verbButtons.find(
-        (b) => !b.disabled && labelOf(b) !== "look" && !clicked.has(labelOf(b))
-      );
-      if (!pickable) break;
-      const lbl = labelOf(pickable);
-      clicked.add(lbl);
-      await user.click(pickable);
+    // Burn the tutorial window. VerbPanel renders all 7 verb buttons always
+    // but gates availability via `disabled` per computeKeycapSurface: during
+    // tutorial only LOOK + one teaching verb is enabled. Two unlock paths:
+    //   (a) 3 distinct non-LOOK verbs used, or
+    //   (b) turnCount >= 8.
+    // Since LOOK always exists (and always bumps turnCount in the reducer),
+    // the simplest, race-free way to burn the tutorial in a test is to tap
+    // LOOK nine times and let path (b) trigger. Production users take path
+    // (a) by naturally trying verbs; the test doesn't need to exercise the
+    // per-verb gating logic (that's covered by keycapSurface.test.ts).
+    for (let i = 0; i < 9; i++) {
+      await user.click(screen.getByRole("button", { name: /^Look\b/i }));
     }
 
     // Drive TRACE BACK until present zone says "circular-atrium" / contains
     // a circular-room cue, or up to 12 hops (safety bound).
-    const traceBtn = await screen.findByRole("button", { name: /^Trace Back\b/i });
+    // VerbPanel renders every verb always but gates availability via `disabled`.
+    // `findByRole` only checks presence, not enabled state — wait for the
+    // tutorial window to unlock Trace Back before clicking, or we silently
+    // no-op and skip the intended flow. Threshold is 3 distinct non-LOOK
+    // verbs OR turn ≥ 8 (computeKeycapSurface); the loop above usually hits
+    // the verb count, but the turn count is a reliable fallback.
+    await waitFor(
+      () => expect(screen.getByRole("button", { name: /^Trace Back\b/i })).toBeEnabled(),
+      { timeout: 5000 }
+    );
+    const traceBtn = screen.getByRole("button", { name: /^Trace Back\b/i });
     let inCircle = false;
     for (let i = 0; i < 12 && !inCircle; i++) {
       await user.click(traceBtn);
@@ -170,6 +171,8 @@ describe("App end-to-end smoke", () => {
 
     // ACCEPT in circle/meta closes the argument. (VerbPanel aria-label is
     // "Accept — concede the point", so match by leading word.)
+    // Same waitFor guard as Trace Back — disabled buttons no-op silently.
+    await waitFor(() => expect(screen.getByRole("button", { name: /^Accept\b/i })).toBeEnabled());
     await user.click(screen.getByRole("button", { name: /^Accept\b/i }));
 
     // Closing-edge SVG element OR Triumphant text in transcript OR present

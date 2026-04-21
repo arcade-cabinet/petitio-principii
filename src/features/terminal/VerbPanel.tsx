@@ -121,10 +121,10 @@ const GROUP_TINT: Record<GroupId, string> = {
 };
 
 export interface VerbPanelProps {
-  /** Verb labels currently surfaced (from computeKeycapSurface). */
-  readonly available: ReadonlySet<string>;
+  /** Verbs currently surfaced (from computeKeycapSurface). */
+  readonly available: ReadonlySet<VerbId>;
   /** Optional set of verbs to highlight as `primary` (one most plausibly useful). */
-  readonly primary?: ReadonlySet<string>;
+  readonly primary?: ReadonlySet<VerbId>;
   readonly onVerb: (verb: VerbId) => void;
 }
 

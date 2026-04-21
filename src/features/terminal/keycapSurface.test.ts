@@ -84,7 +84,15 @@ describe("computeKeycapSurface", () => {
       usedVerbs: used,
       layout: neutralLayout(),
     });
-    for (const v of ["look", "examine", "question", "ask why", "accept", "reject", "trace back"]) {
+    for (const v of [
+      "look",
+      "examine",
+      "question",
+      "ask why",
+      "accept",
+      "reject",
+      "trace back",
+    ] as const) {
       expect(s.verbs.has(v)).toBe(true);
     }
   });

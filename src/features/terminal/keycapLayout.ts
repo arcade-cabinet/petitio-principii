@@ -83,11 +83,11 @@ export function computeKeycapLayout(
   const { room, turnCount, usedVerbs, circleClosed } = ctx;
 
   // Rhetorical emphasis ----------------------------------------------------
-  // One primary at most. The rules, in priority:
+  // One primary at most. Rules apply in order — first match wins:
   //   1. Circle already closed → traceBack is primary (explore the shape).
   //   2. In a circular/meta room and accept not yet used → accept is primary.
-  //   3. Turn 0 (brand-new player, never looked) → look is primary.
-  //   4. Turn 1 (looked, never examined) → examine is primary.
+  //   3. Never looked AND (turn 0, OR turn 1 with no look yet) → look is primary.
+  //   4. Otherwise any turn ≥ 1 where examine is unused → examine is primary.
   //   5. Otherwise → nothing is primary; emphasis is calm/charged only.
   let primary: keyof RhetoricalEmphasis | null = null;
   if (circleClosed) {

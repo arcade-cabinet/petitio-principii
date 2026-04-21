@@ -6,7 +6,7 @@ import { HeadingPanel } from "@/features/terminal/HeadingPanel";
 import { MapPanel } from "@/features/terminal/MapPanel";
 import { type DeckPanel, PanelDeck } from "@/features/terminal/PanelDeck";
 import { PresentPanel } from "@/features/terminal/PresentPanel";
-import { VerbPanel } from "@/features/terminal/VerbPanel";
+import { type VerbId, VerbPanel } from "@/features/terminal/VerbPanel";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
 import { computeKeycapSurface } from "@/features/terminal/keycapSurface";
@@ -375,10 +375,10 @@ export function TerminalDisplay({
  *  verb labels currently marked `primary` (for VerbPanel highlighting). */
 function primaryVerbSet(
   layout: ReturnType<typeof computeKeycapLayout> | null
-): ReadonlySet<string> {
-  const set = new Set<string>();
+): ReadonlySet<VerbId> {
+  const set = new Set<VerbId>();
   if (!layout) return set;
-  const map: Array<[string, keyof typeof layout.rhetorical]> = [
+  const map: Array<[VerbId, keyof typeof layout.rhetorical]> = [
     ["look", "look"],
     ["examine", "examine"],
     ["question", "question"],

@@ -253,3 +253,18 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-inline-start: env(safe-area-inset-left, 0px);
 }
+
+/* Compass-rose keyboard focus ring.
+ * Interactive SVG wedges are <circle role="button"> which can't use a default
+ * focus outline visibly (SVG outline rendering is inconsistent across browsers).
+ * A stroked focus ring gives keyboard users a clear indicator without breaking
+ * the rose's painterly aesthetic. :focus-visible only triggers for keyboard
+ * focus, so mouse/touch clicks don't leave a lingering ring. */
+.compass-hit-area {
+  outline: none;
+}
+.compass-hit-area:focus-visible {
+  stroke: #c4b5fd;
+  stroke-width: 2;
+  stroke-dasharray: 3 2;
+}
