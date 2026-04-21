@@ -53,16 +53,14 @@ describe("App end-to-end smoke", () => {
     const begin = screen.getByRole("button", { name: /begin argument/i });
     await user.click(begin);
 
-    // The terminal's verb keycaps appear once the game starts. Contextual
-    // surface only exposes LOOK + one pedagogical verb on the opening
-    // turn (which one depends on the starting room), so we assert on
-    // LOOK + the presence of *some* rhetorical verb keycap.
+    // After beginning, the RailroadClock renders with all 11 interactive
+    // slots always visible (T102 — no contextual hiding). Assert LOOK slot
+    // is present and that at least 7 action slots (the full action ring)
+    // are rendered.
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /look/i })).toBeInTheDocument();
-      const verbButtons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
-      );
-      expect(verbButtons.length).toBeGreaterThanOrEqual(2);
+      const clockSlots = Array.from(document.querySelectorAll('[role="button"][data-slot-id]'));
+      expect(clockSlots.length).toBeGreaterThanOrEqual(7);
     });
   });
 
@@ -112,26 +110,13 @@ describe("App end-to-end smoke", () => {
     await user.click(screen.getByRole("button", { name: /begin argument/i }));
     await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument());
 
-    // The contextual keycap surface only exposes LOOK + one teaching verb
-    // at a time during the tutorial window (≤ 3 distinct non-LOOK verbs
-    // used AND turnCount < 8). TRACE BACK is late in the pedagogy order,
-    // so we first burn three distinct non-LOOK verbs to unlock the full
-    // set. Any verb visible on the current turn counts — we iterate the
-    // currently-rendered verb buttons until we've clicked three distinct.
-    const clicked = new Set<string>();
-    for (let i = 0; i < 20 && clicked.size < 3; i++) {
-      const verbButtons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
-      );
-      const pickable = verbButtons.find((b) => {
-        const label = (b.textContent ?? "").toLowerCase();
-        return !/look/.test(label) && !clicked.has(label.trim());
-      });
-      if (!pickable) break;
-      const label = (pickable.textContent ?? "").toLowerCase().trim();
-      clicked.add(label);
-      await user.click(pickable);
-    }
+    // The clock always exposes all 11 slots (T102 — no contextual hiding).
+    // TRACE BACK is always available. We click EXAMINE once to exercise
+    // the action ring before driving the trace-back path.
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /examine/i })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: /examine/i }));
 
     // Drive TRACE BACK until present zone says "circular-atrium" / contains
     // a circular-room cue, or up to 12 hops (safety bound).
