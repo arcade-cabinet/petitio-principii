@@ -113,7 +113,7 @@ export function App() {
             <TerminalDisplay
               state={game.state}
               world={game.world}
-              onMove={game.submitMove}
+              onCommand={game.submitCommand}
               onNewGame={game.requestNewGame}
               onHintDismiss={game.dismissHint}
             />
