@@ -13,6 +13,7 @@ export type SfxKey =
   | "ui.confirm"
   | "ui.deny"
   | "ui.reveal"
+  | "ui.melt-away"
   | "rhetoric.accept"
   | "rhetoric.reject"
   | "rhetoric.question"

@@ -25,6 +25,7 @@ export const SFX_MANIFEST: Readonly<Record<SfxKey, string>> = {
   "ui.confirm": "/audio/sfx/ui-confirm.ogg",
   "ui.deny": "/audio/sfx/ui-deny.ogg",
   "ui.reveal": "/audio/sfx/ui-reveal.ogg",
+  "ui.melt-away": "/audio/sfx/ui-melt-away.ogg",
   "rhetoric.accept": "/audio/sfx/rhetoric-accept.ogg",
   "rhetoric.reject": "/audio/sfx/rhetoric-reject.ogg",
   "rhetoric.question": "/audio/sfx/rhetoric-question.ogg",

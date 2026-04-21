@@ -62,9 +62,23 @@ export interface HeroClockProps {
   readonly today?: string;
   /** Current seed; rendered in the sub-dial near the hub. */
   readonly seed?: number;
+  /**
+   * When true, the clock dissolves with downward gravity, opacity fade,
+   * and a slight rotation — the visual companion to the lore line
+   * `*therefore the watch melts*` (docs/VOICE.md). Used for the
+   * landing→game transition. Animation duration is ~1.4s; the parent is
+   * responsible for unmounting the clock once the melt completes.
+   */
+  readonly melting?: boolean;
 }
 
-export function HeroClock({ width = "100%", ariaLabel, today, seed }: HeroClockProps) {
+export function HeroClock({
+  width = "100%",
+  ariaLabel,
+  today,
+  seed,
+  melting = false,
+}: HeroClockProps) {
   const reducedMotion = useReducedMotion();
 
   // Hands at 10:10 — minute hand at 60° (toward "II"), hour hand at 305°
@@ -78,12 +92,35 @@ export function HeroClock({ width = "100%", ariaLabel, today, seed }: HeroClockP
     .map((_, i) => i * 6)
     .filter((a) => a % 30 !== 0);
 
-  const breathe = reducedMotion
-    ? {}
-    : {
-        animate: { scale: [1, 1.005, 1] },
-        transition: { duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" as const },
-      };
+  // Two animation modes: idle (slow breathe) and melting (one-shot dissolve).
+  // The melting variants override the breathing scale and add downward
+  // translation, opacity fade, rotation, and a slight horizontal skew that
+  // sells the "softening" of the SVG geometry. Reduced-motion users get the
+  // opacity fade only — no movement.
+  const animateProps = melting
+    ? reducedMotion
+      ? { animate: { opacity: 0 }, transition: { duration: 0.6, ease: "easeIn" as const } }
+      : {
+          animate: {
+            opacity: 0,
+            y: 80,
+            rotate: 8,
+            scale: 0.95,
+            skewX: 6,
+            filter: "blur(4px)",
+          },
+          transition: { duration: 1.4, ease: [0.55, 0.04, 0.7, 0.95] as const },
+        }
+    : reducedMotion
+      ? {}
+      : {
+          animate: { scale: [1, 1.005, 1] },
+          transition: {
+            duration: 6,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut" as const,
+          },
+        };
 
   return (
     <motion.svg
@@ -94,7 +131,7 @@ export function HeroClock({ width = "100%", ariaLabel, today, seed }: HeroClockP
         ariaLabel ?? "Petitio Principii — a Victorian station clock hung above the landing"
       }
       role="img"
-      {...breathe}
+      {...animateProps}
     >
       <defs>
         {/* Brushed-silver gradient for the bezel ring. */}

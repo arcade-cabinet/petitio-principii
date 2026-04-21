@@ -2,6 +2,7 @@ import { AppearanceControls } from "@/components/ui/appearance-controls";
 import { HeroClock } from "@/components/ui/hero-clock";
 import { generatePhrase, generateSeed } from "@/engine";
 import { useAppearance } from "@/hooks/use-appearance";
+import { useAudio } from "@/hooks/use-audio";
 import { useEffect, useMemo, useState } from "react";
 
 /**
@@ -61,6 +62,7 @@ export interface NewGameIncantationProps {
 
 export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
   const appearance = useAppearance();
+  const audio = useAudio();
   const urlSeed = useMemo(() => seedFromURL(), []);
   const today = useMemo(() => todayUTC(), []);
   const todaySeedValue = useMemo(() => dateSeed(today), [today]);
@@ -73,6 +75,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
   const [customInput, setCustomInput] = useState("");
   const [customError, setCustomError] = useState("");
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">("idle");
+  const [melting, setMelting] = useState(false);
 
   const phrase = useMemo(() => generatePhrase(seed), [seed]);
 
@@ -107,6 +110,24 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
     setShareStatus("idle");
   };
 
+  // Begin flow: unlock audio + fire the melt SFX synchronously inside the
+  // click stack frame (mobile audio gesture requirement), trigger the melt
+  // animation, then call onBegin once the dissolve has had time to land.
+  // The 1.4s matches HeroClock's melting transition duration; reduced-motion
+  // users get a 0.6s fade instead.
+  const handleBegin = () => {
+    audio.unlock();
+    audio.playSfx("ui.melt-away");
+    setMelting(true);
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const delayMs = reducedMotion ? 600 : 1400;
+    setTimeout(() => {
+      void onBegin(seed);
+    }, delayMs);
+  };
+
   const handleShare = async () => {
     const shareURL = buildShareURL(seed);
     try {
@@ -132,7 +153,7 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
               [shape-outside:circle(50%)]
             "
           >
-            <HeroClock today={today} seed={seed} />
+            <HeroClock today={today} seed={seed} melting={melting} />
           </div>
 
           <h1
@@ -202,7 +223,8 @@ export function NewGameIncantation({ onBegin }: NewGameIncantationProps) {
           <div className="clear-both mt-10 flex flex-col gap-3 sm:max-w-[420px]">
             <button
               type="button"
-              onClick={() => onBegin(seed)}
+              onClick={handleBegin}
+              disabled={melting}
               className="
                 min-h-[52px] rounded-[5px]
                 border border-[var(--color-violet)]

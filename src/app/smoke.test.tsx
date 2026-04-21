@@ -59,13 +59,18 @@ describe("App end-to-end smoke", () => {
     // surface only exposes LOOK + one pedagogical verb on the opening
     // turn (which one depends on the starting room), so we assert on
     // LOOK + the presence of *some* rhetorical verb keycap.
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /look/i })).toBeInTheDocument();
-      const verbButtons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
-      );
-      expect(verbButtons.length).toBeGreaterThanOrEqual(2);
-    });
+    // The Begin button triggers a 1.4s melt animation before transitioning
+    // (HeroClock dissolve), so allow a generous wait window.
+    await waitFor(
+      () => {
+        expect(screen.getByRole("button", { name: /look/i })).toBeInTheDocument();
+        const verbButtons = Array.from(
+          document.querySelectorAll<HTMLButtonElement>('button[data-variant="verb"]')
+        );
+        expect(verbButtons.length).toBeGreaterThanOrEqual(2);
+      },
+      { timeout: 3000 }
+    );
   });
 
   it("pressing LOOK once appends at least one new transcript line to the present", async () => {
@@ -73,7 +78,9 @@ describe("App end-to-end smoke", () => {
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: /begin argument/i }));
-    await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument(), {
+      timeout: 3000,
+    });
 
     const beforeText = screen.getByTestId("present-zone").textContent ?? "";
     await user.click(screen.getByRole("button", { name: /^Look$/i }));
@@ -112,7 +119,9 @@ describe("App end-to-end smoke", () => {
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: /begin argument/i }));
-    await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("present-zone")).toBeInTheDocument(), {
+      timeout: 3000,
+    });
 
     // The contextual keycap surface only exposes LOOK + one teaching verb
     // at a time during the tutorial window (≤ 3 distinct non-LOOK verbs
