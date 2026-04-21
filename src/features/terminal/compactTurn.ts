@@ -36,7 +36,18 @@ const GLYPH_ASK_WHY = "¿";
 const GLYPH_TRACE = "↶";
 const GLYPH_SYSTEM = "·";
 
-const MOVEMENT_VERBS = new Set(["north", "south", "east", "west", "up", "down", "back", "forward"]);
+const MOVEMENT_VERBS = new Set([
+  "north",
+  "northeast",
+  "east",
+  "southeast",
+  "south",
+  "southwest",
+  "west",
+  "northwest",
+  "up",
+  "down",
+]);
 
 const VERB_GLYPH: Record<string, string> = {
   accept: GLYPH_ACCEPT,

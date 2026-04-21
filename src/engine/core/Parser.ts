@@ -1,19 +1,33 @@
 import type { CommandVerb, ParsedCommand } from "./Command";
 
 const DIRECTION_ALIASES: Record<string, CommandVerb> = {
+  // Cardinals (full + single-letter shortcuts)
   n: "north",
   s: "south",
   e: "east",
   w: "west",
-  u: "up",
-  d: "down",
   north: "north",
   south: "south",
   east: "east",
   west: "west",
+  // Diagonals (full + two-letter shortcuts)
+  ne: "northeast",
+  nw: "northwest",
+  se: "southeast",
+  sw: "southwest",
+  northeast: "northeast",
+  northwest: "northwest",
+  southeast: "southeast",
+  southwest: "southwest",
+  // Vertical
+  u: "up",
+  d: "down",
   up: "up",
   down: "down",
-  back: "back",
+  // No `back` / `forward` — those were 2D-game crutches and are not
+  // part of the 3D memory-palace direction model. The transcript
+  // records where the player came from. The rhetorical `trace back`
+  // verb (under VERB_ALIASES) is unrelated to spatial reverse.
 };
 
 const VERB_ALIASES: Record<string, CommandVerb> = {

@@ -28,13 +28,15 @@ function neutralLayout(): KeycapLayout {
     },
     directions: {
       north: { available: true, alreadyTraversed: false },
-      south: { available: false, alreadyTraversed: false },
+      northeast: { available: false, alreadyTraversed: false },
       east: { available: false, alreadyTraversed: false },
+      southeast: { available: false, alreadyTraversed: false },
+      south: { available: false, alreadyTraversed: false },
+      southwest: { available: false, alreadyTraversed: false },
       west: { available: false, alreadyTraversed: false },
+      northwest: { available: false, alreadyTraversed: false },
       up: { available: false, alreadyTraversed: false },
       down: { available: false, alreadyTraversed: false },
-      back: { available: false, alreadyTraversed: false },
-      forward: { available: false, alreadyTraversed: false },
     },
   };
 }
@@ -85,6 +87,27 @@ describe("computeKeycapSurface", () => {
     for (const v of ["look", "examine", "question", "ask why", "accept", "reject", "trace back"]) {
       expect(s.verbs.has(v)).toBe(true);
     }
+  });
+
+  // Regression: parseCommand normalizes "ask why" → "ask" and "trace back" → "trace",
+  // so usedVerbs always contains the parsed (canonical) form. Earlier code looked up
+  // membership by the display label ("ask why" / "trace back") via an unsafe
+  // `as CommandVerb` cast — those two verbs never registered as used and the
+  // contextual surface stayed stuck in tutorial mode.
+  it("recognizes parsed verbs ('ask', 'trace') as the used form for 'ask why' / 'trace back'", () => {
+    const r = room();
+    const rooms = new Map<string, Room>([["r", r]]);
+    const used: Set<CommandVerb> = new Set(["examine", "ask", "trace"]);
+    const s = computeKeycapSurface({
+      rooms,
+      currentRoom: r,
+      turnCount: 4,
+      usedVerbs: used,
+      layout: neutralLayout(),
+    });
+    expect(s.verbs.has("ask why")).toBe(true);
+    expect(s.verbs.has("trace back")).toBe(true);
+    expect(s.verbs.has("examine")).toBe(true);
   });
 
   it("opens the full set once turnCount reaches the turn threshold", () => {

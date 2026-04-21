@@ -56,7 +56,20 @@ export interface KeycapLayout {
   readonly directions: Readonly<Record<string, DirectionState>>;
 }
 
-const ALL_DIRECTIONS = ["north", "south", "east", "west", "up", "down", "back", "forward"] as const;
+// 10 spatial primitives — 8 horizontal cardinals + 2 vertical.
+// No `back` / `forward` (those were 2D-game crutches, retired).
+const ALL_DIRECTIONS = [
+  "north",
+  "northeast",
+  "east",
+  "southeast",
+  "south",
+  "southwest",
+  "west",
+  "northwest",
+  "up",
+  "down",
+] as const;
 
 function isCircleRoom(room: Room): boolean {
   return room.rhetoricalType === "circular" || room.rhetoricalType === "meta";

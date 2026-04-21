@@ -3,6 +3,10 @@ import { createSeededRandom, pickRandom, shuffleArray } from "../prng/seedRandom
 import type { Passage } from "./Passage";
 import type { Direction, Exit, Room } from "./Room";
 
+// PRNG generator currently emits 6 directions (4 cardinals + vertical).
+// Diagonals (NE/SE/SW/NW) are reserved for the authored-worlds weaver
+// (T10 in this batch) — the random-shuffle generator can't author them
+// meaningfully, but the type system supports them.
 const DIRECTIONS: Direction[] = ["north", "south", "east", "west", "up", "down"];
 
 function oppositeDirection(dir: Direction): Direction {
@@ -11,10 +15,12 @@ function oppositeDirection(dir: Direction): Direction {
     south: "north",
     east: "west",
     west: "east",
+    northeast: "southwest",
+    southwest: "northeast",
+    northwest: "southeast",
+    southeast: "northwest",
     up: "down",
     down: "up",
-    back: "forward",
-    forward: "back",
   };
   return opposites[dir];
 }
@@ -100,7 +106,11 @@ export function generateArgumentGraph(seed: number): ArgumentGraph {
   const circularRoom = rooms.get("circular-atrium");
   if (circularRoom && roomIds.length > 1) {
     const targetId = roomIds[Math.floor(rng() * roomIds.length)];
-    const loopDir: Direction = "back";
+    // Self-loop direction. The original used "back" (now retired); "down"
+    // is the natural fit for a circular-atrium-to-itself loop in the
+    // 3D model — the room loops back via a stair. (Authored worlds will
+    // replace this whole codepath in T10.)
+    const loopDir: Direction = "down";
     const hasLoop = circularRoom.exits.some((e) => e.direction === loopDir);
     if (!hasLoop && targetId) {
       circularRoom.exits.push({
