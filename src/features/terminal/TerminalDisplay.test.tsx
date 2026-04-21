@@ -1,3 +1,4 @@
+import type { Move } from "@/components/ui/railroad-clock";
 import type { GameState, TranscriptEntry } from "@/engine";
 import type { WorldHandle } from "@/hooks/use-world";
 import { render, screen } from "@testing-library/react";
@@ -29,19 +30,17 @@ function mockMatchMedia(matches: boolean) {
 }
 
 /**
- * T55 — TerminalDisplay three-zone projection.
+ * T55 / T102 — TerminalDisplay clock layout tests.
  *
- * Verifies the UI layer correctly splits state.transcript into PAST (all
- * turns but the last) and PRESENT (the last turn) via the turnId field
- * added in T47, and renders the keycap emphasis computed in T50.
+ * Verifies the UI layer correctly splits state.transcript into PAST and
+ * PRESENT zones, and that the RailroadClock is rendered with the correct
+ * slots. Adapted from the prior PanelDeck test suite to match the new
+ * clock-centric TerminalDisplay (T102).
  *
- * RTL is intentionally sparse here — the rendering logic is simple, the
- * *classification* of entries into zones is the interesting thing.
- * Three test fixtures at increasing session lengths cover:
- *
- *   1. Start of game: no past zone, present shows the opening.
- *   2. Mid game: past + present split correctly.
- *   3. After many turns: past compacts without scroll-causing overflow.
+ * Key changes from the keycap-based version:
+ *   - No `data-variant="verb"` buttons (KeyCap is retired).
+ *   - Clock slots are SVG `role="button"` elements with aria-labels.
+ *   - All 11 slots always rendered (no contextual hiding).
  */
 
 // Minimal room factory for the fixtures.
@@ -118,152 +117,103 @@ function mockWorld(): WorldHandle {
   };
 }
 
-describe("TerminalDisplay three-zone projection", () => {
+function renderDisplay(state: GameState, world = mockWorld(), onMove: (m: Move) => void = vi.fn()) {
+  render(
+    <TerminalDisplay
+      state={state}
+      world={world}
+      onMove={onMove}
+      onNewGame={vi.fn()}
+      onHintDismiss={vi.fn()}
+    />
+  );
+}
+
+describe("TerminalDisplay (T102 clock layout)", () => {
   it("on a fresh game (turn 0 only), renders no past entries and the present has the opening", () => {
     const transcript = [
       entry({ kind: "title", text: "The Rotunda", turnId: 0 }),
       entry({ kind: "narration", text: "A rotunda with seven entrances.", turnId: 0 }),
     ];
-    render(
-      <TerminalDisplay
-        state={mockState(transcript)}
-        world={mockWorld()}
-        onCommand={vi.fn()}
-        onNewGame={vi.fn()}
-        onHintDismiss={vi.fn()}
-      />
-    );
+    renderDisplay(mockState(transcript));
     expect(screen.queryByTestId("past-zone")).toBeNull();
     const present = screen.getByTestId("present-zone");
     expect(present).toHaveTextContent("A rotunda with seven entrances.");
   });
 
-  it("on a multi-turn game, splits past (all turns except last) from present (last turn)", () => {
-    // Force landscape so the PAST drawer is always-expanded — this test
-    // checks classification, not the responsive collapse behavior (which
-    // T62's dedicated tests cover).
-    const undo = mockMatchMedia(false);
-    try {
-      const transcript = [
-        entry({ kind: "title", text: "The Rotunda", turnId: 0 }),
-        entry({ kind: "narration", text: "A rotunda.", turnId: 0 }),
-        entry({ kind: "echo", text: "> north", turnId: 1 }),
-        entry({ kind: "title", text: "The Balcony", turnId: 1 }),
-        entry({ kind: "narration", text: "You stand on the balcony.", turnId: 1 }),
-        entry({ kind: "echo", text: "> accept", turnId: 2 }),
-        entry({ kind: "narration", text: "You accept the step.", turnId: 2 }),
-      ];
-      render(
-        <TerminalDisplay
-          state={mockState(transcript)}
-          world={mockWorld()}
-          onCommand={vi.fn()}
-          onNewGame={vi.fn()}
-          onHintDismiss={vi.fn()}
-        />
-      );
+  it("on a multi-turn game, splits past (all turns except last) from present (last turn)", async () => {
+    const transcript = [
+      entry({ kind: "title", text: "The Rotunda", turnId: 0 }),
+      entry({ kind: "narration", text: "A rotunda.", turnId: 0 }),
+      entry({ kind: "echo", text: "> north", turnId: 1 }),
+      entry({ kind: "title", text: "The Balcony", turnId: 1 }),
+      entry({ kind: "narration", text: "You stand on the balcony.", turnId: 1 }),
+      entry({ kind: "echo", text: "> accept", turnId: 2 }),
+      entry({ kind: "narration", text: "You accept the step.", turnId: 2 }),
+    ];
 
-      // Past should have 2 entries (turn 0 + turn 1); present is turn 2.
-      const pastEntries = screen.getAllByTestId("past-entry");
-      expect(pastEntries).toHaveLength(2);
+    const user = userEvent.setup();
+    renderDisplay(mockState(transcript));
 
-      const present = screen.getByTestId("present-zone");
-      expect(present).toHaveTextContent("> accept");
-      expect(present).toHaveTextContent("You accept the step.");
-      // The previous turn's description should NOT be in the present zone.
-      expect(present).not.toHaveTextContent("You stand on the balcony.");
-    } finally {
-      undo();
-    }
+    // Click the past toggle to expand.
+    await user.click(screen.getByTestId("past-zone-toggle"));
+
+    // Past should have 2 entries (turn 0 + turn 1); present is turn 2.
+    const pastEntries = screen.getAllByTestId("past-entry");
+    expect(pastEntries).toHaveLength(2);
+
+    const present = screen.getByTestId("present-zone");
+    expect(present).toHaveTextContent("> accept");
+    expect(present).toHaveTextContent("You accept the step.");
+    // The previous turn's description should NOT be in the present zone.
+    expect(present).not.toHaveTextContent("You stand on the balcony.");
   });
 
-  it("reveals rhetorical verbs contextually — LOOK plus at most one teaching verb on turn 0", () => {
+  it("renders all 11 clock slots always visible", () => {
     const transcript = [
       entry({ kind: "title", text: "Opening", turnId: 0 }),
       entry({ kind: "narration", text: "Start.", turnId: 0 }),
     ];
-    render(
-      <TerminalDisplay
-        state={mockState(transcript)}
-        world={mockWorld()}
-        onCommand={vi.fn()}
-        onNewGame={vi.fn()}
-        onHintDismiss={vi.fn()}
-      />
-    );
-    // Per the contextual-surface design brief: on a brand-new game, only
-    // LOOK plus a single pedagogical verb (the keycap layout's primary)
-    // should be visible. The other rhetorical verbs unlock as the player
-    // uses them or once they've used ≥3 distinct verbs / turnCount ≥ 8.
-    expect(screen.getByRole("button", { name: /Look/i })).toBeInTheDocument();
-    const verbButtons = Array.from(
-      document.querySelectorAll('button[data-variant="verb"]')
-    ) as HTMLElement[];
-    expect(verbButtons.length).toBeLessThanOrEqual(2);
-    const labels = verbButtons.map((b) => b.textContent?.toLowerCase() ?? "");
-    expect(labels.some((l) => /look/.test(l))).toBe(true);
+    renderDisplay(mockState(transcript));
+
+    // All 11 interactive slots must be present (4 directions + 7 actions).
+    const slotButtons = document.querySelectorAll('[role="button"][data-slot-id]');
+    expect(slotButtons).toHaveLength(11);
   });
 
-  it("opens the full rhetorical verb set once the tutorial window has ended", () => {
-    // Tutorial ends after ≥3 distinct non-LOOK verbs OR turnCount ≥ 8.
+  it("clock slot tap fires onMove with tap+slot", async () => {
     const transcript = [
       entry({ kind: "title", text: "Opening", turnId: 0 }),
       entry({ kind: "narration", text: "Start.", turnId: 0 }),
-      entry({ kind: "echo", text: "> examine", turnId: 1 }),
-      entry({ kind: "echo", text: "> question", turnId: 2 }),
-      entry({ kind: "echo", text: "> accept", turnId: 3 }),
     ];
-    render(
-      <TerminalDisplay
-        state={{ ...mockState(transcript), turnCount: 3 }}
-        world={mockWorld()}
-        onCommand={vi.fn()}
-        onNewGame={vi.fn()}
-        onHintDismiss={vi.fn()}
-      />
-    );
-    for (const label of [
-      "Look",
-      "Examine",
-      "Question",
-      "Ask Why",
-      "Accept",
-      "Reject",
-      "Trace Back",
-    ]) {
-      expect(screen.getByRole("button", { name: new RegExp(label, "i") })).toBeInTheDocument();
-    }
+    const onMove = vi.fn();
+    const user = userEvent.setup();
+    renderDisplay(mockState(transcript), mockWorld(), onMove);
+
+    // Click the LOOK slot.
+    const lookSlot = screen.getByRole("button", { name: /Look/i });
+    await user.click(lookSlot);
+
+    expect(onMove).toHaveBeenCalledWith({ kind: "tap", slot: "LOOK" });
   });
 
-  it("renders cardinal direction keycaps that appear anywhere in the graph as disabled silhouettes when unavailable here", () => {
+  it("direction slots disabled when direction is not available", () => {
     const transcript = [entry({ kind: "narration", text: "You are here.", turnId: 0 })];
-    render(
-      <TerminalDisplay
-        state={mockState(transcript)}
-        world={mockWorld()}
-        onCommand={vi.fn()}
-        onNewGame={vi.fn()}
-        onHintDismiss={vi.fn()}
-      />
-    );
-    // mockRoom() exposes only "north" from current room, but the graph
-    // may contain other cardinals — and cardinals always render so the
-    // compass grid doesn't jitter. Non-cardinals (Up/Down/Back/Fwd),
-    // however, only render when available as an exit from this room.
-    const north = screen.getByRole("button", { name: /^N$/ });
-    expect(north).not.toBeDisabled();
-    // Non-cardinals should NOT be present on a room whose only exit is north.
-    expect(screen.queryByRole("button", { name: /^Up$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Down$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Back$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Fwd$/ })).toBeNull();
+    renderDisplay(mockState(transcript));
+
+    // mockRoom only has a north exit → UP should be enabled; others disabled.
+    const upSlot = screen.getByRole("button", { name: /Up/i });
+    expect(upSlot).toHaveAttribute("aria-disabled", "false");
+
+    const downSlot = screen.getByRole("button", { name: /Down/i });
+    expect(downSlot).toHaveAttribute("aria-disabled", "true");
   });
 
   // ─────────────────────────────────────────────────────────────────────
-  // T62 — responsive past drawer
+  // PAST drawer toggle
   // ─────────────────────────────────────────────────────────────────────
 
-  describe("PAST drawer responsive behavior (T62)", () => {
+  describe("PAST drawer behavior", () => {
     let restore: (() => void) | null = null;
 
     afterEach(() => {
@@ -285,40 +235,20 @@ describe("TerminalDisplay three-zone projection", () => {
       ];
     }
 
-    it("portrait: PAST collapsed by default; toggle button rendered", () => {
-      restore = mockMatchMedia(true); // (max-width: 640px) matches
+    it("PAST collapsed by default; toggle button rendered", () => {
+      restore = mockMatchMedia(true);
+      renderDisplay(mockState(multiTurnTranscript()));
 
-      render(
-        <TerminalDisplay
-          state={mockState(multiTurnTranscript())}
-          world={mockWorld()}
-          onCommand={vi.fn()}
-          onNewGame={vi.fn()}
-          onHintDismiss={vi.fn()}
-        />
-      );
-
-      // Toggle button visible with the "▸ earlier — N turns" label.
       const toggle = screen.getByTestId("past-zone-toggle");
       expect(toggle).toHaveAttribute("aria-expanded", "false");
       expect(toggle).toHaveTextContent(/earlier — 2 turns/i);
-      // Entries hidden when collapsed.
       expect(screen.queryByTestId("past-zone")).toBeNull();
     });
 
-    it("portrait: clicking the toggle expands the drawer", async () => {
+    it("clicking the toggle expands the drawer", async () => {
       restore = mockMatchMedia(true);
-
       const user = userEvent.setup();
-      render(
-        <TerminalDisplay
-          state={mockState(multiTurnTranscript())}
-          world={mockWorld()}
-          onCommand={vi.fn()}
-          onNewGame={vi.fn()}
-          onHintDismiss={vi.fn()}
-        />
-      );
+      renderDisplay(mockState(multiTurnTranscript()));
 
       await user.click(screen.getByTestId("past-zone-toggle"));
 
@@ -326,26 +256,6 @@ describe("TerminalDisplay three-zone projection", () => {
       expect(past).toBeInTheDocument();
       expect(screen.getAllByTestId("past-entry")).toHaveLength(2);
       expect(screen.getByTestId("past-zone-toggle")).toHaveAttribute("aria-expanded", "true");
-    });
-
-    it("landscape: PAST always expanded; no toggle button", () => {
-      restore = mockMatchMedia(false); // matchMedia returns false → landscape
-
-      render(
-        <TerminalDisplay
-          state={mockState(multiTurnTranscript())}
-          world={mockWorld()}
-          onCommand={vi.fn()}
-          onNewGame={vi.fn()}
-          onHintDismiss={vi.fn()}
-        />
-      );
-
-      // Entries visible immediately.
-      expect(screen.getByTestId("past-zone")).toBeInTheDocument();
-      expect(screen.getAllByTestId("past-entry")).toHaveLength(2);
-      // Toggle absent at landscape.
-      expect(screen.queryByTestId("past-zone-toggle")).toBeNull();
     });
 
     it("singular vs plural in the toggle label (1 turn vs N turns)", () => {
@@ -357,17 +267,7 @@ describe("TerminalDisplay three-zone projection", () => {
         entry({ kind: "narration", text: "You moved.", turnId: 1 }),
       ];
 
-      render(
-        <TerminalDisplay
-          state={mockState(oneTurnPast)}
-          world={mockWorld()}
-          onCommand={vi.fn()}
-          onNewGame={vi.fn()}
-          onHintDismiss={vi.fn()}
-        />
-      );
-
-      // Past has only turn 0 (turn 1 is the present).
+      renderDisplay(mockState(oneTurnPast));
       expect(screen.getByTestId("past-zone-toggle")).toHaveTextContent(/1 turn$/);
     });
   });
