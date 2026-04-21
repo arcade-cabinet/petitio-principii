@@ -1,10 +1,11 @@
-import { BezelPanel } from "@/components/ui/bezel-panel";
-import { type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
+import type { CompassHeading } from "@/components/ui/compass-rose";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
-import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
-import { HintLine } from "@/features/terminal/HintLine";
+import { HeadingPanel } from "@/features/terminal/HeadingPanel";
+import { MapPanel } from "@/features/terminal/MapPanel";
+import { type DeckPanel, PanelDeck } from "@/features/terminal/PanelDeck";
+import { PresentPanel } from "@/features/terminal/PresentPanel";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
 import { computeKeycapSurface } from "@/features/terminal/keycapSurface";
@@ -21,7 +22,6 @@ import {
   MoveDiagonal,
   RotateCcw,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
@@ -193,185 +193,113 @@ export function TerminalDisplay({
     if (pastRef.current) pastRef.current.scrollTop = pastRef.current.scrollHeight;
   }, [pastLength, pastExpanded]);
 
+  // Room-visit tally from the world. The HeadingPanel shows this next to
+  // the compass rose; it's the count the old "Argument map: N visited"
+  // strip used to own, now promoted to a proper HUD readout.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: koota mutations drive updates through transcript length
+  const visitedCount = useMemo(() => {
+    const history = world.readVisitHistory();
+    return new Set(history.map((h) => h.roomId)).size;
+  }, [world, state.transcript.length]);
+
+  // The PanelDeck rows: on landscape, all three panels sit side-by-side
+  // across the chassis; on narrow portrait the deck becomes scroll-snap
+  // pages the player swipes between. Widths via flex weight — PRESENT
+  // gets the lion's share (2x), flanked by HEADING + MAP.
+  const deckPanels: DeckPanel[] = [
+    {
+      id: "heading",
+      label: "Heading",
+      weight: 1,
+      content: <HeadingPanel heading={lastCardinalHeading} visitedCount={visitedCount} />,
+    },
+    {
+      id: "present",
+      label: "Present",
+      weight: 2,
+      content: (
+        <PresentPanel
+          currentRoom={currentRoom}
+          present={present}
+          activeHint={state.activeHint}
+          onHintDismiss={onHintDismiss}
+        />
+      ),
+    },
+    {
+      id: "map",
+      label: "Argument map",
+      weight: 1,
+      content: <MapPanel state={state} world={world} />,
+    },
+  ];
+
   return (
     <div className="relative z-10 flex h-full w-full flex-col gap-4 p-4 md:p-6">
-      {/* Display surface */}
-      <BezelPanel
-        className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
-        rivets="corners-mid-all"
-        rivetSize={12}
-      >
-        {/* Compass rose — anchored to the BezelPanel, not the scrolling
-            present-zone, so it always sits at the panel's visual bottom
-            regardless of content length. Responsive: hidden below md
-            where prose fills the panel. pointer-events-none so taps
-            pass through; heading is diegetic (the needle reacts to the
-            cardinal the player just committed to). */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-4 left-4 z-0 hidden md:block select-none"
-          style={{
-            width: "clamp(180px, 22vw, 240px)",
-            opacity: 0.25,
-            mixBlendMode: "plus-lighter",
-          }}
+      {/* Chassis-level header: brand + new-game action. Sits OUTSIDE the
+          panel deck so the display surface is pure game content. */}
+      <div className="flex flex-shrink-0 items-baseline justify-between px-1">
+        <span className="font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.22em] text-[var(--color-dim)] uppercase">
+          Petitio Principii
+        </span>
+        <button
+          type="button"
+          onClick={onNewGame}
+          className="font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.18em] text-[var(--color-muted)] uppercase hover:text-[var(--color-violet)]"
         >
-          <CompassRose heading={lastCardinalHeading} size="100%" />
-        </div>
-        {/* Header */}
-        <div className="flex items-baseline justify-between px-6 pt-4 pb-2 border-b border-[var(--color-panel-edge)]/60">
-          <span className="font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.22em] text-[var(--color-dim)] uppercase">
-            Petitio Principii
-          </span>
-          <button
-            type="button"
-            onClick={onNewGame}
-            className="font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.18em] text-[var(--color-muted)] uppercase hover:text-[var(--color-violet)]"
-          >
-            New Game
-          </button>
-        </div>
+          New Game
+        </button>
+      </div>
 
-        {/* Argument map — geometry of the walk so far. Always visible. */}
-        <ArgumentMapOverlay state={state} world={world} />
-
-        {/* PAST zone — compacted turn summaries.
-            Portrait: collapsed-by-default header, tap to expand.
-            Landscape: always-visible scrollable rail.
-            Per docs/UX.md §1.1 + §3 (T62). */}
-        {compactedPast.length > 0 && (
-          <>
-            {/* Portrait-only collapse toggle. Always rendered in DOM (so
-                screen readers can navigate), hidden via CSS at landscape
-                breakpoints to keep the layout consistent there. */}
-            {viewport === "portrait" && (
-              <button
-                type="button"
-                onClick={() => setPastExpanded((v) => !v)}
-                className="px-6 py-2 border-b border-[var(--color-panel-edge)]/30 text-left font-[family-name:var(--font-display)] text-[0.85rem] text-[var(--color-muted)] hover:text-[var(--color-highlight)]"
-                aria-expanded={pastExpanded}
-                aria-controls="past-zone-list"
-                data-testid="past-zone-toggle"
-              >
-                {pastExpanded ? "▾" : "▸"} earlier — {compactedPast.length}{" "}
-                {compactedPast.length === 1 ? "turn" : "turns"}
-              </button>
-            )}
-            {/* Entry list — visible on landscape always, on portrait only
-                when expanded. */}
-            {pastExpanded && (
-              <div
-                id="past-zone-list"
-                ref={pastRef}
-                className={`
-                  max-h-[30%] overflow-y-auto overflow-x-hidden
-                  px-6 py-2 border-b border-[var(--color-panel-edge)]/30
-                  font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3]
-                  text-[var(--color-dim)]
-                  [scrollbar-width:thin] [scrollbar-color:var(--color-panel-edge)_transparent]
-                `}
-                aria-label="Turn history"
-                data-testid="past-zone"
-              >
-                {compactedPast.map((c) => (
-                  <div
-                    key={c.turnId}
-                    className="truncate"
-                    title={c.full}
-                    data-testid="past-entry"
-                    data-turn-id={c.turnId}
-                  >
-                    <span className="inline-block w-[1.2em] text-[var(--color-muted)]">
-                      {c.glyph}
-                    </span>
-                    <span>{c.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* PRESENT zone — current room title + description + latest response. */}
-        <div
-          className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
-          aria-live="polite"
-          aria-atomic="true"
-          data-testid="present-zone"
-        >
-          {/* Room title — crossfade on movement (T66, 300ms). The
-              AnimatePresence wraps a single keyed motion.div so each new
-              room's title fades in while the previous one fades out.
-              prefers-reduced-motion is respected automatically by Motion. */}
-          <AnimatePresence mode="wait">
-            {currentRoom && (
-              <motion.div
-                key={currentRoom.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="relative z-10 pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
-                style={{
-                  textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
-                }}
-                data-testid="present-room-title"
-              >
-                {currentRoom.title}
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {/* Present body — crossfade on new turn (T66, 180ms). Keyed by
-              the present turnId so a new turn replaces, not appends. */}
-          {present && (
-            <motion.div
-              key={`turn-${present.turnId}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className={`
-                relative z-10
-                font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
-                leading-[1.55] text-[var(--color-silver)]
-              `}
-              style={{ textShadow: "0 0 2px rgba(192,192,255,0.35)" }}
+      {/* PAST rail on landscape sits above the deck; on portrait it's a
+          collapsible strip. Keeping it outside the panel deck so it
+          remains a persistent rail that works across pane swipes. */}
+      {compactedPast.length > 0 && (
+        <>
+          {viewport === "portrait" && (
+            <button
+              type="button"
+              onClick={() => setPastExpanded((v) => !v)}
+              className="flex-shrink-0 px-1 py-2 text-left font-[family-name:var(--font-display)] text-[0.85rem] text-[var(--color-muted)] hover:text-[var(--color-highlight)]"
+              aria-expanded={pastExpanded}
+              aria-controls="past-zone-list"
+              data-testid="past-zone-toggle"
             >
-              {present.entries.map((entry) => {
-                if (entry.kind === "spacer") {
-                  return (
-                    <div key={entry.id} className="h-[1.55em]">
-                      &nbsp;
-                    </div>
-                  );
-                }
-                if (entry.kind === "echo") {
-                  return (
-                    <div
-                      key={entry.id}
-                      className="text-[var(--color-violet)] mt-2"
-                      style={{ textShadow: "0 0 4px rgba(122,92,255,0.5)" }}
-                    >
-                      {entry.text}
-                    </div>
-                  );
-                }
-                if (entry.kind === "title") {
-                  // We already render the room title above; suppress the
-                  // duplicate that comes in via the transcript.
-                  return null;
-                }
-                return (
-                  <div key={entry.id} className="whitespace-pre-wrap break-words">
-                    {entry.text}
-                  </div>
-                );
-              })}
-            </motion.div>
+              {pastExpanded ? "▾" : "▸"} earlier — {compactedPast.length}{" "}
+              {compactedPast.length === 1 ? "turn" : "turns"}
+            </button>
           )}
-          {/* Active onboarding hint — fades in/out via Motion One. T63. */}
-          <HintLine hint={state.activeHint} onDismiss={onHintDismiss} />
-        </div>
-      </BezelPanel>
+          {pastExpanded && (
+            <div
+              id="past-zone-list"
+              ref={pastRef}
+              className="max-h-[18%] overflow-y-auto overflow-x-hidden px-2 py-2 font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3] text-[var(--color-dim)] [scrollbar-color:var(--color-panel-edge)_transparent] [scrollbar-width:thin]"
+              aria-label="Turn history"
+              data-testid="past-zone"
+            >
+              {compactedPast.map((c) => (
+                <div
+                  key={c.turnId}
+                  className="truncate"
+                  title={c.full}
+                  data-testid="past-entry"
+                  data-turn-id={c.turnId}
+                >
+                  <span className="inline-block w-[1.2em] text-[var(--color-muted)]">
+                    {c.glyph}
+                  </span>
+                  <span>{c.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* The deck itself — three bezel-framed panels. */}
+      <div className="min-h-0 flex-1">
+        <PanelDeck panels={deckPanels} defaultPanelId="present" />
+      </div>
 
       {/* FUTURE zone — rhetorical verbs, directions */}
       <div className="flex flex-col gap-3">
