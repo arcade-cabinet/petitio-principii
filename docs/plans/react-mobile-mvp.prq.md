@@ -281,6 +281,32 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 
     - **Verify**: (1) World A playable standalone via a `?world=a` url param, full 40-room solo tour holds together; tester reads it aloud and reports coherent voice + discoverable throughline. (2) World B same. (3) 10 seeded weaves produce 10 distinct walks; all 10 playable start-to-close; manual review by a reader unfamiliar with the project confirms each reads as a designed walk, not a random tour. (4) Blackboard test (from T107) passes when a player draws a map after a seeded playthrough — the drawn map is correctly labelled with World A + World B rooms even though they were braided. (5) **Narrative density test** — every room has at least one of: a memorable description, a gnome encounter, a meaningful dead-end, a callback to another room, a pun or turn of phrase that someone would quote. Zork's test: can you describe any single room to a friend in a way that makes them want to visit it? Apply to every authored room. (6) **Voice audit** — blind-read test — given 10 random rooms, a tester can correctly assign each to World A or World B from the prose alone ≥ 90% of the time. The worlds have distinct authorial voices. (7) `docs/WORLDS.md` committed with full design of both worlds + connection-node table + voice guidelines.
 
+- [ ] **T110** **Room groups — multi-room puzzles via Koota traits.** Today every room is a standalone entity; nothing expresses "these 5 rooms form a single puzzle space." Adventure's Twisty Little Maze, Zork's Flood Control Dam 3, the Coal Mine sequence all work because the authors modelled *groups* of rooms sharing state and a solution condition. Koota ECS is the right substrate for that.
+
+    New traits:
+    - `PuzzleGroup({ id, kind, rooms: RoomId[], binding: 'world-locked' | 'world-bridging', worlds?: ('A' | 'B')[], bridgeNodes?: RoomId[], state: JSON })` — attached to a synthetic group entity; `kind` selects the mechanic; `binding` decides whether the group must stay inside one authorial world or is specifically designed to span both; `state` holds puzzle progress.
+    - `RoomMembership({ groupId })` — stamped on each member room pointing back.
+    - Room-scoped LOOK/EXAMINE/MOVE handlers consult the group's `kind` + `state` before emitting prose.
+
+    **Two binding modes** for groups, each unlocking a different authoring power:
+
+    - **`world-locked`** — all member rooms come from the same world (A or B). Preserves coherence when the puzzle's mechanic depends on a unified authorial voice: the Twisty Little Maze's "all alike" prose only works if a single author wrote every room's similar-but-different body; the Flood Control Dam's valve/water semantics need a consistent physics. When the weaver lands in a member of a world-locked group, it suppresses cross-world hopping for the duration — the walk stays in that world until the group's exit condition fires. Then weaving resumes.
+    - **`world-bridging`** — members are drawn from both worlds deliberately. The puzzle IS the player recognizing that A and B are aspects of the same underlying rhetorical problem. A `dual-premise-test` group has one premise-encounter authored in World A and a sibling encounter authored in World B; the solution depends on seeing them as the same move dressed differently. The Figure Behind the Mirror gnome becomes a natural bridging group — she appears in meta rooms of both A and B, and her memory-aware commentary accumulates across both. The weaver, entering a bridging group, *guarantees* traversal of members from both worlds before the exit condition; hops between A-members and B-members happen via the group's own `bridgeNodes`, not the general connection-node pool. The blackboard-map a player draws will show this group crossing the A/B boundary — and that IS the puzzle.
+
+    Puzzle-group kinds native to our rhetorical setting:
+    - **`circular-trap`** (world-locked) — 3-5 rooms where every exit routes back into the group. Solution: ACCEPT from within. The group's state records `recognized: bool`; the LOOK prose leaks progressively more circularity hints across visits.
+    - **`false-premise-cascade`** (world-locked) — accepting any premise in group members sets a group flag; a later conclusion room in the group renders differently per accumulated flags.
+    - **`regress-spiral`** (world-locked) — ASK WHY walks deeper (within-group) into further member rooms; only TRACE BACK from a sufficient depth exits the group. `maxDepthReached` in state.
+    - **`mirror-gallery`** (world-bridging) — the Figure Behind the Mirror gnome (T108) follows the player across A and B member rooms; her commentary cross-references visits to any member in either world. Solution: acknowledge a specific accusation she makes.
+    - **`self-reference-recursion`** (world-locked) — the Chamber of Self-Reference as a 4-room terminal recursion; WorldWeaver keeps the braid inside the group until the player explicitly navigates out via a specific sequence.
+    - **`dual-premise-test`** (world-bridging) — two sibling premise rooms, one in World A and one in World B, hand-authored to present the same logical move under opposing aesthetics. Solution: the player must REJECT one and ACCEPT the other (either order) to exit the group — recognizing they are the same move in different clothing. Fails the exit if the player ACCEPTs or REJECTs both.
+    - **`twisty-little-maze`** (world-locked) — explicit homage: 5-7 rooms of near-identical prose with remembered-not-visible exits. Solution: EXAMINE produces a droppable "marker" item; marker-drop + revisit reveals the real exit. The Koota group tracks `markers: Map<RoomId, Direction>` and `lastActualRoom: RoomId`.
+
+    Integration with T109 weaving: a PuzzleGroup is a single weavable unit. Once the PRNG lands in a room that's part of a group, the walk stays within the group until the group's exit condition fires, then weaving resumes. This reproduces Adventure's "you're in the maze for a while, you solve it, you come out" pacing natively.
+
+    Authoring: each of World A and World B gets 2-3 puzzle groups hand-authored in `src/content/worlds/a.ts` / `b.ts`. Groups register their `kind`, member rooms, and any puzzle-state initializer.
+    - **Verify**: (1) Koota integration test — PuzzleGroup trait round-trips correctly; state mutations persist across room re-entries within the same session. (2) Each of the 5 `kind`s has a dedicated scripted test walking through a hand-authored example group and asserting the solution condition fires at the right beat. (3) A 5-seed playthrough log (in T68) captures at least one puzzle-group encounter per seed; the player's session transcript shows the group's narrative shape (entry → working through → solution → exit). (4) `docs/WORLDS.md` extended with a PUZZLE GROUPS section listing each kind + each authored instance per world.
+
 ### P29 — Final audit & release
 
 - [ ] **T94** Repo convergence audit — every doc in `docs/` has current frontmatter and reflects shipped state. `CLAUDE.md` + `AGENTS.md` + `README.md` + `CHANGELOG.md` + `STANDARDS.md` all reviewed. Broken links fixed. `docs/STATE.md` reflects all completed tasks.
@@ -296,7 +322,7 @@ The rationale: the prior PanelDeck / BezelPanel / chassis / rivet layering was m
 
 The project is complete when **all of the following are simultaneously true**:
 
-1. Every task T01 through T109 is marked VERIFIED_DONE in the batch state.
+1. Every task T01 through T110 is marked VERIFIED_DONE in the batch state.
 2. `pnpm verify` passes locally and in CI.
 3. A v0.1.0 release tag exists on `main` with signed artifacts for web, Android, and iOS.
 4. Five distinct seeds have been played to the circle-close end state and logged under `docs/playtest/`.
