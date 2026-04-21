@@ -1,10 +1,15 @@
+import { ConsentBanner } from "@/components/ui/consent-banner";
 import { ShareCard } from "@/components/ui/share-card";
 import { CrystalField } from "@/components/ui/crystal-field";
 import { NewGameIncantation } from "@/features/new-game/NewGameIncantation";
 import { TerminalDisplay } from "@/features/terminal/TerminalDisplay";
 import { useGame } from "@/hooks/use-game";
+import { initTelemetry, trackCircleClosed } from "@/lib/telemetry";
 import { isCircleClosed } from "@/world";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+
+// T81 — initialise telemetry once on app boot (reads consent from localStorage).
+initTelemetry();
 
 /**
  * App shell. Three layers, back to front:
@@ -18,8 +23,8 @@ import { useMemo } from "react";
  * card sitting directly on the nebula backdrop. The player presses
  * keys; nobody types. See docs/LORE.md.
  *
- * T93: When the circle closes, a ShareCard overlay appears so the player
- * can share their result as a canvas-rendered image.
+ * T81: Opt-in analytics via Plausible — consent banner on first launch.
+ * T93: When the circle closes, a ShareCard overlay appears.
  */
 export function App() {
   const game = useGame();
@@ -36,6 +41,19 @@ export function App() {
     () => game.world.readVisitHistory(),
     [game.world, game.state.transcript.length, game.state.currentRoomId],
   );
+
+  // T81 — fire circle_closed telemetry event once when the circle closes.
+  const circleTrackedRef = useRef(false);
+  useEffect(() => {
+    if (circleClosed && !circleTrackedRef.current) {
+      circleTrackedRef.current = true;
+      trackCircleClosed(game.state.seed, game.state.turnCount);
+    }
+    // Reset tracker when a new game starts.
+    if (!game.state.started) {
+      circleTrackedRef.current = false;
+    }
+  }, [circleClosed, game.state.started, game.state.seed, game.state.turnCount]);
 
   return (
     <div className="relative h-[100svh] w-screen overflow-hidden">
@@ -71,6 +89,9 @@ export function App() {
       ) : (
         <NewGameIncantation onBegin={game.startGame} />
       )}
+
+      {/* T81 — analytics consent banner (first launch only, defaults OFF) */}
+      <ConsentBanner />
     </div>
   );
 }

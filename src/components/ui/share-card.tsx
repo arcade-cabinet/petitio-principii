@@ -17,6 +17,7 @@
 import type { ArgumentMapNode } from "@/components/ui/argument-map";
 import type { RhetoricalType } from "@/content";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // ── canvas dimensions ────────────────────────────────────────────────────────
 const CARD_W = 1200;
@@ -195,6 +196,7 @@ export function ShareCard({
   phrase,
   turnCount,
 }: ShareCardProps) {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "done" | "error">("idle");
   const [dataURL, setDataURL] = useState<string | null>(null);
@@ -258,7 +260,7 @@ export function ShareCard({
       {dataURL && (
         <img
           src={dataURL}
-          alt={`Argument map for seed ${seed}: ${phrase}. ${turnCount} turns.`}
+          alt={t("share_card.alt", { seed, phrase, turns: turnCount })}
           className="w-full max-w-[480px] rounded-[4px] border border-[var(--color-panel-edge)] opacity-90"
           style={{ aspectRatio: "1200/630" }}
         />
@@ -269,7 +271,7 @@ export function ShareCard({
         type="button"
         onClick={handleShare}
         disabled={!dataURL || shareStatus === "sharing"}
-        aria-label="Share your argument result"
+        aria-label={t("share_card.share")}
         className={`
           min-h-[44px] px-8 rounded-[5px]
           border border-[var(--color-violet)]
@@ -286,12 +288,12 @@ export function ShareCard({
         `}
       >
         {shareStatus === "sharing"
-          ? "Sharing…"
+          ? t("share_card.sharing")
           : shareStatus === "done"
-            ? "Shared!"
+            ? t("share_card.shared")
             : shareStatus === "error"
-              ? "Share failed"
-              : "Share your argument"}
+              ? t("share_card.error")
+              : t("share_card.share")}
       </button>
     </div>
   );

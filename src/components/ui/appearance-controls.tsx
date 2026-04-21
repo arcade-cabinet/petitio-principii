@@ -6,13 +6,16 @@
  *
  * Rendered as a compact footer bar on the landing panel.
  * The incantation font (Yesteryear) is never affected.
+ *
+ * T82: labels go through i18next so they render in the active locale.
  */
 import { type AppearanceHandle, type TextSize } from "@/hooks/use-appearance";
+import { useTranslation } from "react-i18next";
 
-const TEXT_SIZES: { label: string; value: TextSize }[] = [
-  { label: "S", value: "small" },
-  { label: "M", value: "medium" },
-  { label: "L", value: "large" },
+const TEXT_SIZES: { labelKey: string; ariaKey: string; value: TextSize }[] = [
+  { labelKey: "settings.text_size_small", ariaKey: "settings.text_size_small_aria", value: "small" },
+  { labelKey: "settings.text_size_medium", ariaKey: "settings.text_size_medium_aria", value: "medium" },
+  { labelKey: "settings.text_size_large", ariaKey: "settings.text_size_large_aria", value: "large" },
 ];
 
 interface AppearanceControlsProps {
@@ -21,6 +24,7 @@ interface AppearanceControlsProps {
 
 export function AppearanceControls({ appearance }: AppearanceControlsProps) {
   const { dyslexia, textSize, toggleDyslexia, setTextSize } = appearance;
+  const { t } = useTranslation();
 
   return (
     <div
@@ -49,21 +53,21 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
           `}
           aria-hidden="true"
         />
-        Dyslexic Font
+        {t("settings.dyslexic_font")}
       </button>
 
       {/* T86 — Text size stepper */}
       <div
         className="flex items-center gap-1"
         role="group"
-        aria-label="Text size"
+        aria-label={t("settings.text_size_label")}
       >
-        {TEXT_SIZES.map(({ label, value }) => (
+        {TEXT_SIZES.map(({ labelKey, ariaKey, value }) => (
           <button
             key={value}
             type="button"
             aria-pressed={textSize === value}
-            aria-label={`Text size ${value}`}
+            aria-label={t(ariaKey)}
             onClick={() => setTextSize(value)}
             className={`
               min-h-[28px] min-w-[28px] rounded-[3px]
@@ -77,7 +81,7 @@ export function AppearanceControls({ appearance }: AppearanceControlsProps) {
               }
             `}
           >
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>
