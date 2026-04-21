@@ -1,10 +1,15 @@
-import { GlowingPanel } from "@/components/ui/glowing-panel";
+import type { CompassHeading } from "@/components/ui/compass-rose";
 import { KeyCap } from "@/components/ui/keycap";
 import type { CommandVerb, GameState, TranscriptEntry } from "@/engine";
 import { parseCommand } from "@/engine";
-import { ArgumentMapOverlay } from "@/features/terminal/ArgumentMapOverlay";
+import { HeadingPanel } from "@/features/terminal/HeadingPanel";
+import { MapPanel } from "@/features/terminal/MapPanel";
+import { type DeckPanel, PanelDeck } from "@/features/terminal/PanelDeck";
+import { PresentPanel } from "@/features/terminal/PresentPanel";
 import { compactTurns } from "@/features/terminal/compactTurn";
 import { computeKeycapLayout } from "@/features/terminal/keycapLayout";
+import { computeKeycapSurface } from "@/features/terminal/keycapSurface";
+import { useViewport } from "@/hooks/use-viewport";
 import type { WorldHandle } from "@/hooks/use-world";
 import { isCircleClosed } from "@/world";
 import {
@@ -17,7 +22,7 @@ import {
   MoveDiagonal,
   RotateCcw,
 } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * TerminalDisplay — the in-game view.
@@ -38,16 +43,20 @@ export interface TerminalDisplayProps {
   world: WorldHandle;
   onCommand: (raw: string) => void;
   onNewGame: () => void;
+  /** Clear the active onboarding hint (tap-dismiss + auto-fade). */
+  onHintDismiss: () => void;
 }
 
-const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string; hint?: string }> = [
-  { label: "Look", verb: "look", hint: "L" },
-  { label: "Examine", verb: "examine", hint: "X" },
-  { label: "Question", verb: "question", hint: "Q" },
+// The game is click/tap-only (mobile-first, no keyboard). Keycap labels
+// stand on their own; there are no keyboard shortcuts to display.
+const RHETORICAL_VERBS: ReadonlyArray<{ label: string; verb: string }> = [
+  { label: "Look", verb: "look" },
+  { label: "Examine", verb: "examine" },
+  { label: "Question", verb: "question" },
   { label: "Ask Why", verb: "ask why" },
   { label: "Accept", verb: "accept" },
   { label: "Reject", verb: "reject" },
-  { label: "Trace Back", verb: "trace back", hint: "T" },
+  { label: "Trace Back", verb: "trace back" },
 ];
 
 /**
@@ -71,8 +80,29 @@ function groupByTurn(
   return turns;
 }
 
-export function TerminalDisplay({ state, world, onCommand, onNewGame }: TerminalDisplayProps) {
+export function TerminalDisplay({
+  state,
+  world,
+  onCommand,
+  onNewGame,
+  onHintDismiss,
+}: TerminalDisplayProps) {
   const pastRef = useRef<HTMLDivElement>(null);
+  const viewport = useViewport();
+  // PAST zone collapses on portrait by default; landscape always expanded.
+  // Per-viewport user override stored in a Map so a portrait→landscape
+  // rotation doesn't strand the user with a closed drawer they explicitly
+  // opened on the prior viewport. CodeRabbit caught a stale-frame edge
+  // case in the prior version (state + effect → first frame after viewport
+  // change rendered with the old default).
+  const [overrides, setOverrides] = useState<{ portrait?: boolean; landscape?: boolean }>({});
+  const pastExpanded = overrides[viewport] ?? viewport === "landscape";
+  const setPastExpanded = (next: boolean | ((prev: boolean) => boolean)) =>
+    setOverrides((prev) => {
+      const current = prev[viewport] ?? viewport === "landscape";
+      const value = typeof next === "function" ? next(current) : next;
+      return { ...prev, [viewport]: value };
+    });
 
   const currentRoom = useMemo(
     () => state.rooms.get(state.currentRoomId),
@@ -90,6 +120,20 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
       set.add(parseCommand(raw).verb);
     }
     return set;
+  }, [state.transcript]);
+
+  // Last cardinal heading the player committed to — drives the compass
+  // rose's rotation in the PRESENT underlay. Purely derived from the
+  // transcript; null until the player moves.
+  const lastCardinalHeading = useMemo<CompassHeading>(() => {
+    const CARDINALS = new Set(["north", "south", "east", "west"]);
+    for (let i = state.transcript.length - 1; i >= 0; i--) {
+      const entry = state.transcript[i];
+      if (entry.kind !== "echo") continue;
+      const raw = entry.text.replace(/^>\s*/, "").trim().toLowerCase();
+      if (CARDINALS.has(raw)) return raw as CompassHeading;
+    }
+    return null;
   }, [state.transcript]);
 
   // Exits already traversed from this room (via movement-verb echoes in
@@ -119,190 +163,173 @@ export function TerminalDisplay({ state, world, onCommand, onNewGame }: Terminal
     );
   }, [currentRoom, state.turnCount, usedVerbs, traversedDirections, world]);
 
+  // Contextual keycap surfacing — pure state → visible-set projection.
+  // The *what shows* logic lives in keycapSurface.ts so this component
+  // stays presentational. Re-derived per render; the function is cheap.
+  const surface = useMemo(
+    () =>
+      computeKeycapSurface({
+        rooms: state.rooms,
+        currentRoom,
+        turnCount: state.turnCount,
+        usedVerbs,
+        layout,
+      }),
+    [state.rooms, currentRoom, state.turnCount, usedVerbs, layout]
+  );
+
   const turns = useMemo(() => groupByTurn(state.transcript), [state.transcript]);
   const past = turns.slice(0, -1);
   const present = turns.at(-1);
   const compactedPast = useMemo(() => compactTurns(past), [past]);
 
   // Auto-scroll the PAST rail to the bottom so the most recent compacted
-  // summary is flush against the PRESENT on every new turn.
+  // summary is flush against the PRESENT on every new turn — and on every
+  // expand of the drawer in portrait (the ref wasn't mounted before; the
+  // pastLength-only dep used to skip this case).
   const pastLength = compactedPast.length;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pastLength drives the scroll
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pastLength + pastExpanded drive the scroll
   useEffect(() => {
     if (pastRef.current) pastRef.current.scrollTop = pastRef.current.scrollHeight;
-  }, [pastLength]);
+  }, [pastLength, pastExpanded]);
 
-  // Keyboard parity — desktop users can still use the keyboard even though
-  // the primary input model is taps. Movement, L, X, Q, T, A, R, ?.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") return;
-      const keys: Record<string, string> = {
-        n: "north",
-        s: "south",
-        e: "east",
-        w: "west",
-        ArrowUp: "north",
-        ArrowDown: "south",
-        ArrowLeft: "west",
-        ArrowRight: "east",
-        u: "up",
-        d: "down",
-        l: "look",
-        x: "examine",
-        q: "question",
-        t: "trace back",
-        b: "back",
-        a: "accept",
-        r: "reject",
-        "?": "ask why",
-      };
-      const verb = keys[e.key] ?? keys[e.key.toLowerCase()];
-      if (verb) {
-        e.preventDefault();
-        onCommand(verb);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onCommand]);
+  // Room-visit tally from the world. The HeadingPanel shows this next to
+  // the compass rose; it's the count the old "Argument map: N visited"
+  // strip used to own, now promoted to a proper HUD readout.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: koota mutations drive updates through transcript length
+  const visitedCount = useMemo(() => {
+    const history = world.readVisitHistory();
+    return new Set(history.map((h) => h.roomId)).size;
+  }, [world, state.transcript.length]);
+
+  // The PanelDeck rows: on landscape, all three panels sit side-by-side
+  // across the chassis; on narrow portrait the deck becomes scroll-snap
+  // pages the player swipes between. Widths via flex weight — PRESENT
+  // gets the lion's share (2x), flanked by HEADING + MAP.
+  const deckPanels: DeckPanel[] = [
+    {
+      id: "heading",
+      label: "Heading",
+      weight: 1,
+      content: <HeadingPanel heading={lastCardinalHeading} visitedCount={visitedCount} />,
+    },
+    {
+      id: "present",
+      label: "Present",
+      weight: 2,
+      content: (
+        <PresentPanel
+          currentRoom={currentRoom}
+          present={present}
+          activeHint={state.activeHint}
+          onHintDismiss={onHintDismiss}
+        />
+      ),
+    },
+    {
+      id: "map",
+      label: "Argument map",
+      weight: 1,
+      content: <MapPanel state={state} world={world} />,
+    },
+  ];
 
   return (
     <div className="relative z-10 flex h-full w-full flex-col gap-4 p-4 md:p-6">
-      {/* Display surface */}
-      <GlowingPanel tone="active" className="flex-1 min-h-0 flex flex-col">
-        {/* Header */}
-        <div className="flex items-baseline justify-between px-6 pt-4 pb-2 border-b border-[var(--color-panel-edge)]/60">
-          <span className="font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.22em] text-[var(--color-dim)] uppercase">
-            Petitio Principii
-          </span>
-          <button
-            type="button"
-            onClick={onNewGame}
-            className="font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.18em] text-[var(--color-muted)] uppercase hover:text-[var(--color-violet)]"
-          >
-            New Game
-          </button>
-        </div>
-
-        {/* Argument map — geometry of the walk so far. Always visible. */}
-        <ArgumentMapOverlay state={state} world={world} />
-
-        {/* PAST zone — compacted turn summaries, scrollable, dim */}
-        {compactedPast.length > 0 && (
-          <div
-            ref={pastRef}
-            className={`
-              max-h-[30%] overflow-y-auto overflow-x-hidden
-              px-6 py-2 border-b border-[var(--color-panel-edge)]/30
-              font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3]
-              text-[var(--color-dim)]
-              [scrollbar-width:thin] [scrollbar-color:var(--color-panel-edge)_transparent]
-            `}
-            aria-label="Turn history"
-            data-testid="past-zone"
-          >
-            {compactedPast.map((c) => (
-              <div
-                key={c.turnId}
-                className="truncate"
-                title={c.full}
-                data-testid="past-entry"
-                data-turn-id={c.turnId}
-              >
-                <span className="inline-block w-[1.2em] text-[var(--color-muted)]">{c.glyph}</span>
-                <span>{c.label}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* PRESENT zone — current room title + description + latest response */}
-        <div
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
-          aria-live="polite"
-          aria-atomic="true"
-          data-testid="present-zone"
+      {/* Chassis-level header: brand + new-game action. Sits OUTSIDE the
+          panel deck so the display surface is pure game content. */}
+      <div className="flex flex-shrink-0 items-baseline justify-between px-1">
+        <span className="font-[family-name:var(--font-display)] text-[0.9rem] tracking-[0.22em] text-[var(--color-dim)] uppercase">
+          Petitio Principii
+        </span>
+        <button
+          type="button"
+          onClick={onNewGame}
+          className="font-[family-name:var(--font-display)] text-[0.85rem] tracking-[0.18em] text-[var(--color-muted)] uppercase hover:text-[var(--color-violet)]"
         >
-          {currentRoom && (
-            <div
-              className="pb-2 font-[family-name:var(--font-incantation)] text-[clamp(1.4rem,3vw,1.8rem)] leading-tight text-[var(--color-highlight)]"
-              style={{
-                textShadow: "0 0 6px rgba(255,209,250,0.45), 0 0 14px rgba(122,92,255,0.4)",
-              }}
+          New Game
+        </button>
+      </div>
+
+      {/* PAST rail on landscape sits above the deck; on portrait it's a
+          collapsible strip. Keeping it outside the panel deck so it
+          remains a persistent rail that works across pane swipes. */}
+      {compactedPast.length > 0 && (
+        <>
+          {viewport === "portrait" && (
+            <button
+              type="button"
+              onClick={() => setPastExpanded((v) => !v)}
+              className="flex-shrink-0 px-1 py-2 text-left font-[family-name:var(--font-display)] text-[0.85rem] text-[var(--color-muted)] hover:text-[var(--color-highlight)]"
+              aria-expanded={pastExpanded}
+              aria-controls="past-zone-list"
+              data-testid="past-zone-toggle"
             >
-              {currentRoom.title}
+              {pastExpanded ? "▾" : "▸"} earlier — {compactedPast.length}{" "}
+              {compactedPast.length === 1 ? "turn" : "turns"}
+            </button>
+          )}
+          {pastExpanded && (
+            <div
+              id="past-zone-list"
+              ref={pastRef}
+              className="max-h-[18%] overflow-y-auto overflow-x-hidden px-2 py-2 font-[family-name:var(--font-display)] text-[0.85rem] leading-[1.3] text-[var(--color-dim)] [scrollbar-color:var(--color-panel-edge)_transparent] [scrollbar-width:thin]"
+              aria-label="Turn history"
+              data-testid="past-zone"
+            >
+              {compactedPast.map((c) => (
+                <div
+                  key={c.turnId}
+                  className="truncate"
+                  title={c.full}
+                  data-testid="past-entry"
+                  data-turn-id={c.turnId}
+                >
+                  <span className="inline-block w-[1.2em] text-[var(--color-muted)]">
+                    {c.glyph}
+                  </span>
+                  <span>{c.label}</span>
+                </div>
+              ))}
             </div>
           )}
-          {present && (
-            <div
-              className={`
-                font-[family-name:var(--font-display)] text-[clamp(1rem,2.4vw,1.2rem)]
-                leading-[1.55] text-[var(--color-silver)]
-              `}
-              style={{ textShadow: "0 0 2px rgba(192,192,255,0.35)" }}
-            >
-              {present.entries.map((entry) => {
-                if (entry.kind === "spacer") {
-                  return (
-                    <div key={entry.id} className="h-[1.55em]">
-                      &nbsp;
-                    </div>
-                  );
-                }
-                if (entry.kind === "echo") {
-                  return (
-                    <div
-                      key={entry.id}
-                      className="text-[var(--color-violet)] mt-2"
-                      style={{ textShadow: "0 0 4px rgba(122,92,255,0.5)" }}
-                    >
-                      {entry.text}
-                    </div>
-                  );
-                }
-                if (entry.kind === "title") {
-                  // We already render the room title above; suppress the
-                  // duplicate that comes in via the transcript.
-                  return null;
-                }
-                return (
-                  <div key={entry.id} className="whitespace-pre-wrap break-words">
-                    {entry.text}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </GlowingPanel>
+        </>
+      )}
+
+      {/* The deck itself — three bezel-framed panels. */}
+      <div className="min-h-0 flex-1">
+        <PanelDeck panels={deckPanels} defaultPanelId="present" />
+      </div>
 
       {/* FUTURE zone — rhetorical verbs, directions */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap justify-center gap-2">
-          {RHETORICAL_VERBS.map((v) => (
+          {RHETORICAL_VERBS.filter((v) => surface.verbs.has(v.verb)).map((v) => (
             <KeyCap
               key={v.verb}
               label={v.label}
               variant="verb"
-              shortcut={v.hint}
               emphasis={layout?.rhetorical[emphasisKeyFor(v.verb)] ?? "charged"}
               onPress={() => onCommand(v.verb)}
             />
           ))}
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          {DIRECTION_KEYS.map((d) => {
-            const state = layout?.directions[d.dir];
+          {DIRECTION_KEYS.filter((d) => {
+            const isCardinal =
+              d.dir === "north" || d.dir === "south" || d.dir === "east" || d.dir === "west";
+            if (isCardinal) return surface.cardinals.has(d.dir);
+            return surface.nonCardinals.has(d.dir);
+          }).map((d) => {
+            const dirState = layout?.directions[d.dir];
             return (
               <KeyCap
                 key={d.dir}
                 label={d.label}
                 icon={d.icon}
                 variant="direction"
-                disabled={!state?.available}
-                traversed={state?.alreadyTraversed ?? false}
+                disabled={!dirState?.available}
+                traversed={dirState?.alreadyTraversed ?? false}
                 onPress={() => onCommand(d.dir)}
               />
             );

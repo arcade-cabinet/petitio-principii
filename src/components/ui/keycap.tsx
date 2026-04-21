@@ -4,12 +4,13 @@ import type { ReactNode } from "react";
 /**
  * KeyCap — one key on the HUD.
  *
- * Amendment to the prompt: the player does not type. Mobile-first.
- * Keycap chrome borrows the inset-shadow / LED / bg-glow vocabulary from
- * the bluetooth-key reference but is rewritten as a plain React button
- * so it's accessible, keyboard-reachable on desktop, and tap-responsive
- * on touch. Labels use VT323 — the display typeface — so they read as
- * part of the same surface as the output text.
+ * The player does not type. Mobile-first; the web harness is for testing
+ * only. Keycap chrome borrows the inset-shadow / LED / bg-glow vocabulary
+ * from the bluetooth-key reference but is rewritten as a plain React
+ * button. Tap-responsive on touch; assistive tech reads the visible label
+ * via the button's text content (no shortcut chrome, no keyboard hooks).
+ * Labels use VT323 — the display typeface — so they read as part of the
+ * same surface as the output text.
  *
  * Variants:
  *   - "direction" — compass icons from lucide (N/S/E/W/Up/Down/Back)
@@ -37,8 +38,6 @@ export interface KeyCapProps {
    * key. Ignored for non-direction variants.
    */
   traversed?: boolean;
-  /** Optional shortcut hint shown beneath the label (e.g. "N", "L") */
-  shortcut?: string;
   "aria-label"?: string;
 }
 
@@ -50,7 +49,6 @@ export function KeyCap({
   disabled = false,
   emphasis = "charged",
   traversed = false,
-  shortcut,
   "aria-label": ariaLabel,
 }: KeyCapProps) {
   const tonal = {
@@ -59,15 +57,26 @@ export function KeyCap({
     meta: "bg-[var(--color-panel)]/70 text-[var(--color-dim)]",
   }[variant];
 
-  // Emphasis maps to opacity + optional pulse + violet ring. `calm` keys are
-  // still clickable — fainter signals "available but not especially useful
-  // here" (docs/UX.md §1.3). `primary` adds the motion-safe pulse ring the
-  // rest of the screen uses for attention.
+  // Emphasis treatments per docs/UX.md §1.3 + T64:
+  //   calm    — opacity-only. "available but not especially useful here."
+  //   charged — full opacity + a subtle violet outer glow that distinguishes
+  //             it from calm at arm's length on a phone screen.
+  //   primary — full opacity + violet outer glow + inner-pink tint via a
+  //             gradient overlay + the motion-safe pulsing ring. There is
+  //             at most one primary per layout (computeKeycapLayout
+  //             enforces this), so the pink tint is the unmistakable
+  //             "tap this next" signal.
   const emphasisClasses = {
     calm: "opacity-55",
-    charged: "opacity-95",
+    charged:
+      "opacity-95 [box-shadow:inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_-6px_1px_-4px_rgba(122,92,255,0.45),inset_0_-15px_6px_-8px_rgba(30,10,60,0.9),0_0_0_1px_rgba(5,1,10,0.6),0_0_10px_rgba(122,92,255,0.25)]",
+    // The violet outline is composed into the arbitrary box-shadow as a
+    // 1px spread. Tailwind v4: ring-* and an arbitrary [box-shadow:…] both
+    // emit `box-shadow` declarations and the later cascade position wins,
+    // so mixing `ring-1` with a custom box-shadow loses the ring entirely.
+    // Baking the outline into the shadow keeps it guaranteed-visible.
     primary:
-      "opacity-100 ring-1 ring-[var(--color-violet)] motion-safe:[animation:pulse-violet_2s_ease-in-out_infinite]",
+      "opacity-100 [box-shadow:inset_0_1px_1px_rgba(255,255,255,0.12),inset_0_-6px_1px_-4px_rgba(155,127,255,0.7),inset_0_-15px_6px_-8px_rgba(30,10,60,0.9),0_0_0_1px_var(--color-violet),0_0_18px_rgba(255,209,250,0.55)] motion-safe:[animation:pulse-violet_2s_ease-in-out_infinite] before:absolute before:inset-0 before:rounded-[5px] before:bg-gradient-to-b before:from-transparent before:via-transparent before:to-[rgba(255,209,250,0.18)] before:pointer-events-none",
   }[emphasis];
 
   // Direction silhouettes: disabled + already-traversed keeps the slot in
@@ -85,6 +94,8 @@ export function KeyCap({
       }}
       disabled={disabled}
       aria-label={ariaLabel ?? label}
+      data-emphasis={emphasis}
+      data-variant={variant}
       className={cn(
         "group relative isolate select-none",
         "min-h-[52px] min-w-[52px] px-3 py-2",
@@ -102,7 +113,14 @@ export function KeyCap({
           "active:translate-y-[1px]",
           "active:shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),inset_0_-2px_1px_-1px_rgba(122,92,255,0.6),0_0_16px_rgba(122,92,255,0.55)]",
         ],
-        disabled && "cursor-not-allowed opacity-40",
+        // Disabled silhouettes preserve the slot footprint so the layout
+        // never jitters when exits change. The opacity sits at 0.55 (was
+        // 0.40 — too faint at desktop where the dark backdrop swallowed
+        // the cap entirely; confirmed via screenshot review). We also
+        // strip the outer "physical key" border so disabled caps look
+        // visibly inert next to live ones at arm's length.
+        disabled &&
+          "cursor-not-allowed opacity-55 border-dashed border-[var(--color-panel-edge)]/50",
         !disabled && emphasisClasses,
         traversedRing
       )}
@@ -126,11 +144,6 @@ export function KeyCap({
         >
           {label}
         </span>
-        {shortcut ? (
-          <span className="text-[0.6rem] tracking-[0.2em] text-[var(--color-muted)]">
-            {shortcut}
-          </span>
-        ) : null}
       </span>
     </button>
   );

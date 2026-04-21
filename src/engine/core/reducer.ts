@@ -110,18 +110,28 @@ export function applyCommand(
     nextState = applyRhetoricalVerb(state, parsed, raw, currentRoom, world, audio);
   }
 
-  maybeEmitHint(nextState, parsed.verb, world);
-  return nextState;
+  // Hints are surfaced via `state.activeHint` (overlay) instead of the
+  // transcript so they don't pollute the persistent record. The previous
+  // turn's hint (if any) clears here; a new one may take its place.
+  return { ...nextState, activeHint: maybeSelectHint(nextState, parsed.verb, world) };
 }
 
 /**
- * After a turn's main content has been emitted, fire the first eligible
- * onboarding hint if one exists and hasn't already been shown. See
- * docs/UX.md §6 and src/features/terminal/hints.ts for the catalogue.
+ * After a turn's main content has been computed, pick the first eligible
+ * onboarding hint if one exists and hasn't already been shown. Returns
+ * the hint to surface (or null) AND marks the id in HintsShown — so even
+ * a hint the player dismisses in 50ms never fires twice.
+ *
+ * See docs/UX.md §6, src/features/terminal/hints.ts (T49 catalogue),
+ * src/features/terminal/HintLine.tsx (T63 overlay).
  */
-function maybeEmitHint(state: GameState, lastVerb: CommandVerb, world: WorldBridge): void {
+function maybeSelectHint(
+  state: GameState,
+  lastVerb: CommandVerb,
+  world: WorldBridge
+): GameState["activeHint"] {
   const room = state.rooms.get(state.currentRoomId);
-  if (!room) return;
+  if (!room) return null;
   const usedVerbs = collectUsedVerbs(state);
   const hint = selectHint({
     room,
@@ -130,9 +140,19 @@ function maybeEmitHint(state: GameState, lastVerb: CommandVerb, world: WorldBrid
     shown: world.readHintsShown(),
     lastVerb,
   });
-  if (!hint) return;
+  if (!hint) return null;
   world.markHintShown(hint.id);
-  world.appendLine("narration", hint.text);
+  return { id: hint.id, text: hint.text, turnId: state.turnCount };
+}
+
+/**
+ * Clear the active hint without advancing the turn. Used by the UI when
+ * the player taps the hint to dismiss, or when the auto-fade timer fires.
+ * Pure — no side effects on the world bridge.
+ */
+export function dismissActiveHint(state: GameState): GameState {
+  if (!state.activeHint) return state;
+  return { ...state, activeHint: null };
 }
 
 /**

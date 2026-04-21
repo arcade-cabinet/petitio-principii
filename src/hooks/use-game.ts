@@ -4,6 +4,7 @@ import {
   applyCommand,
   createInitialGameState,
   describeRoom,
+  dismissActiveHint,
   generateArgumentGraph,
   generatePhrase,
 } from "@/engine";
@@ -30,6 +31,8 @@ export interface GameHandle {
   startGame: (seed: number) => Promise<void>;
   submitCommand: (raw: string) => void;
   requestNewGame: () => void;
+  /** Clear the active onboarding hint without consuming a turn. */
+  dismissHint: () => void;
   toggleMute: () => boolean;
   isMuted: () => boolean;
 }
@@ -98,10 +101,11 @@ export function useGame(): GameHandle {
       audio.playBgm();
       if (startRoom) audio.playSfx(sfxForRhetoricalType(startRoom.rhetoricalType));
 
+      // The seed + phrase used to print here as narration; the player
+      // already picks them on the splash screen and they now live in the
+      // STATUS panel of the HUD deck. Keeping them in the diegetic feed
+      // broke the fiction — the game opens directly with the threshold.
       const seedLines = [
-        "Petitio Principii",
-        `Seed: ${seed} — "${phrase}"`,
-        "",
         "You find yourself at the threshold of an argument.",
         "The premise smells faintly of tautology.",
         "",
@@ -148,12 +152,17 @@ export function useGame(): GameHandle {
     [audio, makeBridge, project]
   );
 
+  const dismissHint = useCallback(() => {
+    setState((prev) => dismissActiveHint(prev));
+  }, []);
+
   return {
     state,
     world,
     startGame,
     submitCommand,
     requestNewGame,
+    dismissHint,
     toggleMute: audio.toggleMute,
     isMuted: audio.isMuted,
   };

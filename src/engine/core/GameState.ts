@@ -25,6 +25,15 @@ export interface TranscriptEntry {
   turnId: number;
 }
 
+export interface ActiveHint {
+  /** Stable hint id (matches HintsShown trait + selectHint catalogue). */
+  readonly id: string;
+  /** Player-facing text, single short line. */
+  readonly text: string;
+  /** Turn this hint fired on. UI uses it to drop active hint when the turn advances. */
+  readonly turnId: number;
+}
+
 export interface GameState {
   seed: number;
   currentRoomId: string;
@@ -39,6 +48,15 @@ export interface GameState {
   turnCount: number;
   started: boolean;
   phrase: string;
+  /**
+   * The most recently emitted onboarding hint, or null. Set by the
+   * reducer's hint system (T49); rendered by `<HintLine />` as a
+   * fading overlay in the PRESENT zone (T63). Cleared by user tap or
+   * by the next turn beginning. The HintsShown trait records that the
+   * id has been surfaced — so even if the player dismisses it within
+   * 50ms, it never re-fires.
+   */
+  activeHint: ActiveHint | null;
 }
 
 export function createInitialGameState(): GameState {
@@ -51,5 +69,6 @@ export function createInitialGameState(): GameState {
     turnCount: 0,
     started: false,
     phrase: "",
+    activeHint: null,
   };
 }

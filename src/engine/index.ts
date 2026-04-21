@@ -2,10 +2,12 @@ export { generateArgumentGraph, type ArgumentGraph } from "./core/ArgumentGraph"
 export type { SfxKey } from "./core/audio-effects";
 export type { CommandVerb, ParsedCommand } from "./core/Command";
 export {
+  type ActiveHint,
   createInitialGameState,
   type GameState,
   type TranscriptEntry,
 } from "./core/GameState";
+export { dismissActiveHint } from "./core/reducer";
 export {
   describeExamineFor,
   describeFallacy,

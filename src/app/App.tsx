@@ -7,11 +7,13 @@ import { useGame } from "@/hooks/use-game";
  * App shell. Three layers, back to front:
  *
  *   0. CrystalField      — the memory-palace backdrop (canvas, always on)
- *   1. GlowingPanel      — the display surface (modal OR in-game terminal)
+ *   1. PanelDeck         — GlowCard-framed panels floating in dreamspace
  *   2. KeyRow            — the HUD of rhetorical action keys (in-game only)
  *
- * No CRT metaphor; the surface is a luminous projection of an argument.
- * No typing; the player presses keys. See docs/LORE.md for the conceit.
+ * No CRT metaphor, no machined chassis: the surface is a luminous
+ * projection of an argument. Each panel is a soft pointer-tracked glow
+ * card sitting directly on the nebula backdrop. The player presses
+ * keys; nobody types. See docs/LORE.md.
  */
 export function App() {
   const game = useGame();
@@ -25,6 +27,7 @@ export function App() {
           world={game.world}
           onCommand={game.submitCommand}
           onNewGame={game.requestNewGame}
+          onHintDismiss={game.dismissHint}
         />
       ) : (
         <NewGameIncantation onBegin={game.startGame} />

@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Vite's `base` defaults to `/petitio-principii/` (see vite.config.ts)
+      # so the Pages deploy has correct asset paths. The only override is
+      # `CAPACITOR=true` for native WebView builds, handled in release.yml.
       - name: Build
         run: pnpm build
 

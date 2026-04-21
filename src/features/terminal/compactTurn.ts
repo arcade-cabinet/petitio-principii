@@ -64,6 +64,22 @@ function findTitle(entries: readonly TranscriptEntry[]): TranscriptEntry | null 
   return entries.find((e) => e.kind === "title") ?? null;
 }
 
+/**
+ * The title kind in the transcript stores the text as `== ROOM NAME ==`
+ * (per reducer's classifyLine). The PAST drawer wants just the room
+ * name; strip the `==` markers and trim. Title-cased to match the
+ * Yesteryear hero rendering, which shows `Room Name`, not `ROOM NAME`.
+ */
+function cleanTitle(text: string): string {
+  const inner = text
+    .replace(/^==\s*/, "")
+    .replace(/\s*==$/, "")
+    .trim();
+  // Already-title-cased? leave alone. Otherwise lowercase + capitalize words.
+  if (/[a-z]/.test(inner)) return inner;
+  return inner.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function findFirstNarration(entries: readonly TranscriptEntry[]): TranscriptEntry | null {
   return entries.find((e) => e.kind === "narration") ?? null;
 }
@@ -92,7 +108,7 @@ export function compactTurn(turn: TranscriptTurn): CompactedTurn {
   if (echo) {
     const verb = normalizeEcho(echo.text);
     if (MOVEMENT_VERBS.has(verb) && title) {
-      return { turnId, glyph: GLYPH_MOVE, label: truncate(title.text), full };
+      return { turnId, glyph: GLYPH_MOVE, label: truncate(cleanTitle(title.text)), full };
     }
 
     // 2. Rhetorical verb — use the verb's glyph and the room title (which
@@ -100,7 +116,7 @@ export function compactTurn(turn: TranscriptTurn): CompactedTurn {
     //    each action happened in").
     const verbGlyph = VERB_GLYPH[verb];
     if (verbGlyph) {
-      const where = title?.text ?? "";
+      const where = title ? cleanTitle(title.text) : "";
       const label = where ? `${where} · you ${verb}ed` : `you ${verb}ed`;
       return { turnId, glyph: verbGlyph, label: truncate(label), full };
     }
