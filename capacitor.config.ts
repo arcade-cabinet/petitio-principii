@@ -33,6 +33,16 @@ const config: CapacitorConfig = {
       style: "DARK",
       backgroundColor: "#05010a",
     },
+    CapacitorSQLite: {
+      // Seed dbs the plugin should copy on first launch. On native,
+      // Capacitor CLI syncs `dist/assets/databases/*.db` (set by
+      // `scripts/stage-game-db.sh`) into the platform's native
+      // asset path; on web, jeep-sqlite reads from that same URL.
+      // The db name the plugin expects is `<DB_NAME>SQLite.db` where
+      // `<DB_NAME>` matches `createConnection(DB_NAME, …)`.
+      iosDatabaseLocation: "Library/CapacitorDatabase",
+      androidIsEncryption: false,
+    },
   },
 };
 
