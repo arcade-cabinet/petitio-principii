@@ -42,10 +42,12 @@ export interface BezelPanelProps {
   role?: string;
 }
 
+// Softer machined edges — bumped up so the panels read as milled wells,
+// not stamped rectangles. Feels more "rounded metal" at any size.
 const RADIUS = {
-  sm: "rounded-[4px]",
-  md: "rounded-[6px]",
-  lg: "rounded-[10px]",
+  sm: "rounded-[8px]",
+  md: "rounded-[12px]",
+  lg: "rounded-[16px]",
 } as const;
 
 export function BezelPanel({
@@ -72,7 +74,15 @@ export function BezelPanel({
         //   outer violet glow (the nebula catching the well edge)
         "bg-[var(--color-panel)]/85 backdrop-blur-sm",
         "border border-[var(--color-panel-edge)]",
-        "[box-shadow:inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.7),0_2px_0_rgba(0,0,0,0.9),0_6px_18px_rgba(0,0,0,0.55),0_0_14px_rgba(122,92,255,0.12)]",
+        // Machined, smoothed-edge box-shadow (layers outside → inside):
+        //   1. A 2px dark drop so the panel sits in a well.
+        //   2. A wider softer drop for ambient depth.
+        //   3. A faint violet outer glow — the scene nebula licking the lip.
+        //   4. Inset top-left highlight (silver) — catches ambient light.
+        //   5. Inset bottom-right rim shadow — the cut-away edge.
+        //   6. A subtle inset inner ring at 2px so the machined edge
+        //      reads as "rounded metal" rather than a flat rectangle.
+        "[box-shadow:0_2px_0_rgba(0,0,0,0.9),0_8px_22px_rgba(0,0,0,0.65),0_0_18px_rgba(122,92,255,0.14),inset_0_1.5px_0_rgba(255,255,255,0.09),inset_0_-1.5px_0_rgba(0,0,0,0.8),inset_1.5px_0_0_rgba(255,255,255,0.05),inset_-1.5px_0_0_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(255,255,255,0.02)]",
         className
       )}
     >

@@ -1,5 +1,6 @@
+import { Inlay } from "@/components/ui/inlay";
 import { useViewport } from "@/hooks/use-viewport";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 
 /**
  * PanelDeck — lays out a set of bezel-framed panels.
@@ -40,12 +41,18 @@ export function PanelDeck({ panels, defaultPanelId }: PanelDeckProps) {
 }
 
 function WideLayout({ panels }: { panels: ReadonlyArray<DeckPanel> }) {
+  // Panels are separated by brushed-steel Inlay strips — visible
+  // chassis-material dividers with rivets, not CSS gaps. The inlay
+  // strip is a flex sibling rendered between adjacent panels.
   return (
-    <div className="flex h-full min-h-0 w-full gap-3">
-      {panels.map((p) => (
-        <div key={p.id} className="min-h-0 min-w-0 flex flex-col" style={{ flex: p.weight ?? 1 }}>
-          {p.content}
-        </div>
+    <div className="flex h-full min-h-0 w-full items-stretch">
+      {panels.map((p, i) => (
+        <Fragment key={p.id}>
+          {i > 0 && <Inlay orientation="vertical" thickness={14} rivetCount={3} />}
+          <div className="flex min-h-0 min-w-0 flex-col" style={{ flex: p.weight ?? 1 }}>
+            {p.content}
+          </div>
+        </Fragment>
       ))}
     </div>
   );
