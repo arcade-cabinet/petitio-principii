@@ -1,13 +1,13 @@
-import { BezelPanel } from "@/components/ui/bezel-panel";
 import { type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
+import { GlowCard } from "@/components/ui/spotlight-card";
 
 /**
  * HeadingPanel — the "where am I facing" panel.
  *
- * Dedicated surface for the compass rose + the last-heading readout.
- * Previously the compass lived as a faint underlay of the PRESENT
- * panel at 25% opacity; pulled into its own bezel-framed panel so it
- * can earn its real estate and be unambiguously readable.
+ * Wrapped in a GlowCard (pointer-tracked spotlight + organic
+ * SVG-distorted border) instead of a machined BezelPanel. The
+ * dreamspace aesthetic the chassis was reaching for, achieved through
+ * fluid color washes that follow the cursor rather than steel rivets.
  */
 
 const READOUT_LABEL: Record<Exclude<CompassHeading, null>, string> = {
@@ -26,11 +26,11 @@ export interface HeadingPanelProps {
 export function HeadingPanel({ heading, visitedCount }: HeadingPanelProps) {
   const label = heading ? READOUT_LABEL[heading] : "—";
   return (
-    <BezelPanel
-      className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-hidden px-6 py-6"
-      rivets="corners"
-      rivetSize={10}
-      aria-label="Heading"
+    <GlowCard
+      className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-hidden bg-[var(--color-panel)]/55 px-6 py-6 backdrop-blur-sm"
+      radius={20}
+      border={1}
+      spotlightSize={280}
     >
       <div className="font-[family-name:var(--font-display)] text-[0.75rem] tracking-[0.28em] uppercase text-[var(--color-dim)]">
         Heading
@@ -49,6 +49,6 @@ export function HeadingPanel({ heading, visitedCount }: HeadingPanelProps) {
           {visitedCount} room{visitedCount === 1 ? "" : "s"} visited
         </div>
       </div>
-    </BezelPanel>
+    </GlowCard>
   );
 }

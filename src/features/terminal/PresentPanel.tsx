@@ -1,4 +1,4 @@
-import { BezelPanel } from "@/components/ui/bezel-panel";
+import { GlowCard } from "@/components/ui/spotlight-card";
 import type { GameState, Room } from "@/engine";
 import { HintLine } from "@/features/terminal/HintLine";
 import { AnimatePresence, motion } from "motion/react";
@@ -38,11 +38,11 @@ export function PresentPanel({
   onHintDismiss,
 }: PresentPanelProps) {
   return (
-    <BezelPanel
-      className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-      rivets="corners-mid-all"
-      rivetSize={12}
-      aria-label="Present"
+    <GlowCard
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--color-panel)]/55 backdrop-blur-sm"
+      radius={20}
+      border={1}
+      spotlightSize={360}
     >
       <div
         className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-6 py-4"
@@ -111,6 +111,6 @@ export function PresentPanel({
         )}
         <HintLine hint={activeHint} onDismiss={onHintDismiss} />
       </div>
-    </BezelPanel>
+    </GlowCard>
   );
 }
