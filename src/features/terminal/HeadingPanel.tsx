@@ -1,4 +1,8 @@
-import { type CompassDirection, type CompassHeading, CompassRose } from "@/components/ui/compass-rose";
+import {
+  type CompassDirection,
+  type CompassHeading,
+  CompassRose,
+} from "@/components/ui/compass-rose";
 import { GlowCard } from "@/components/ui/spotlight-card";
 
 /**

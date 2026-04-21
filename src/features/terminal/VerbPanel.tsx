@@ -1,3 +1,12 @@
+import {
+  CheckIcon,
+  EyeIcon,
+  HelpCircleIcon,
+  RotateCcwIcon,
+  SearchIcon,
+  XIcon,
+  ZapIcon,
+} from "lucide-react";
 /**
  * VerbPanel — SCUMM-style rhetorical-verb panel.
  *
@@ -20,17 +29,15 @@
  * (not in `available`) render dim — no vanish, never yank capability.
  */
 import type { ReactElement } from "react";
-import {
-  CheckIcon,
-  EyeIcon,
-  HelpCircleIcon,
-  RotateCcwIcon,
-  SearchIcon,
-  XIcon,
-  ZapIcon,
-} from "lucide-react";
 
-export type VerbId = "look" | "examine" | "question" | "ask why" | "accept" | "reject" | "trace back";
+export type VerbId =
+  | "look"
+  | "examine"
+  | "question"
+  | "ask why"
+  | "accept"
+  | "reject"
+  | "trace back";
 
 type GroupId = "observe" | "challenge" | "commit" | "memory";
 
@@ -44,16 +51,58 @@ interface VerbDef {
 
 const VERBS: ReadonlyArray<VerbDef> = [
   // OBSERVE
-  { id: "look", label: "Look", subtitle: "take in the whole room", glyph: <EyeIcon size={14} aria-hidden />, group: "observe" },
-  { id: "examine", label: "Examine", subtitle: "close inspection", glyph: <SearchIcon size={14} aria-hidden />, group: "observe" },
+  {
+    id: "look",
+    label: "Look",
+    subtitle: "take in the whole room",
+    glyph: <EyeIcon size={14} aria-hidden />,
+    group: "observe",
+  },
+  {
+    id: "examine",
+    label: "Examine",
+    subtitle: "close inspection",
+    glyph: <SearchIcon size={14} aria-hidden />,
+    group: "observe",
+  },
   // CHALLENGE
-  { id: "question", label: "Question", subtitle: "poke a claim", glyph: <HelpCircleIcon size={14} aria-hidden />, group: "challenge" },
-  { id: "ask why", label: "Ask Why", subtitle: "demand justification", glyph: <ZapIcon size={14} aria-hidden />, group: "challenge" },
+  {
+    id: "question",
+    label: "Question",
+    subtitle: "poke a claim",
+    glyph: <HelpCircleIcon size={14} aria-hidden />,
+    group: "challenge",
+  },
+  {
+    id: "ask why",
+    label: "Ask Why",
+    subtitle: "demand justification",
+    glyph: <ZapIcon size={14} aria-hidden />,
+    group: "challenge",
+  },
   // COMMIT
-  { id: "accept", label: "Accept", subtitle: "concede the point", glyph: <CheckIcon size={14} aria-hidden />, group: "commit" },
-  { id: "reject", label: "Reject", subtitle: "refuse the point", glyph: <XIcon size={14} aria-hidden />, group: "commit" },
+  {
+    id: "accept",
+    label: "Accept",
+    subtitle: "concede the point",
+    glyph: <CheckIcon size={14} aria-hidden />,
+    group: "commit",
+  },
+  {
+    id: "reject",
+    label: "Reject",
+    subtitle: "refuse the point",
+    glyph: <XIcon size={14} aria-hidden />,
+    group: "commit",
+  },
   // MEMORY
-  { id: "trace back", label: "Trace Back", subtitle: "revisit a prior premise", glyph: <RotateCcwIcon size={14} aria-hidden />, group: "memory" },
+  {
+    id: "trace back",
+    label: "Trace Back",
+    subtitle: "revisit a prior premise",
+    glyph: <RotateCcwIcon size={14} aria-hidden />,
+    group: "memory",
+  },
 ];
 
 const GROUP_LABEL: Record<GroupId, string> = {
@@ -117,15 +166,23 @@ export function VerbPanel({ available, primary, onVerb }: VerbPanelProps) {
                   `}
                   style={{
                     borderColor: isPrimary ? GROUP_TINT[g] : "var(--color-panel-edge)",
-                    background: isPrimary ? `color-mix(in srgb, ${GROUP_TINT[g]} 12%, transparent)` : "transparent",
-                    boxShadow: isPrimary ? `0 0 12px color-mix(in srgb, ${GROUP_TINT[g]} 40%, transparent)` : undefined,
+                    background: isPrimary
+                      ? `color-mix(in srgb, ${GROUP_TINT[g]} 12%, transparent)`
+                      : "transparent",
+                    boxShadow: isPrimary
+                      ? `0 0 12px color-mix(in srgb, ${GROUP_TINT[g]} 40%, transparent)`
+                      : undefined,
                   }}
                 >
                   <span className="flex items-center gap-1.5">
-                    <span style={{ color: GROUP_TINT[g] }} aria-hidden>{v.glyph}</span>
+                    <span style={{ color: GROUP_TINT[g] }} aria-hidden>
+                      {v.glyph}
+                    </span>
                     <span
                       className="font-[family-name:var(--font-incantation)] text-[1.05rem] leading-none"
-                      style={{ color: isAvailable ? "var(--color-highlight)" : "var(--color-muted)" }}
+                      style={{
+                        color: isAvailable ? "var(--color-highlight)" : "var(--color-muted)",
+                      }}
                     >
                       {v.label}
                     </span>

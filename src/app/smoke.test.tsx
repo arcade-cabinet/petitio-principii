@@ -178,9 +178,7 @@ describe("App end-to-end smoke", () => {
         const closingEdge = document.querySelector('[data-testid="argument-map-closing-edge"]');
         const present = screen.queryByTestId("present-zone")?.textContent ?? "";
         const changed =
-          closingEdge !== null ||
-          present.includes("Petitio Principii") ||
-          present !== beforeAccept;
+          closingEdge !== null || present.includes("Petitio Principii") || present !== beforeAccept;
         expect(changed).toBe(true);
       },
       { timeout: 2000 }

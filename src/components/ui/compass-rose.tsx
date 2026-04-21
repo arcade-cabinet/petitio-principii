@@ -81,9 +81,7 @@ export function CompassRose({
 }: CompassRoseProps) {
   const reducedMotion = useReducedMotion();
   const filterId = useId();
-  const angle = lastHeading
-    ? (DIRECTIONS.find((d) => d.id === lastHeading)?.angle ?? 0)
-    : 0;
+  const angle = lastHeading ? (DIRECTIONS.find((d) => d.id === lastHeading)?.angle ?? 0) : 0;
 
   return (
     <svg
@@ -92,8 +90,8 @@ export function CompassRose({
       style={{ width: size, height: "auto", display: "block" }}
       className={className}
       aria-label="Compass rose — click a direction to move"
-      role="group"
     >
+      <title>Compass rose — click a direction to move</title>
       <defs>
         <linearGradient id={`${filterId}-silver`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#e8ecf0" />
@@ -142,7 +140,14 @@ export function CompassRose({
             />
           );
         })}
-        <circle cx={CX} cy={CY} r={6} fill={`url(#${filterId}-silver)`} stroke="#1a1f2c" strokeWidth="0.5" />
+        <circle
+          cx={CX}
+          cy={CY}
+          r={6}
+          fill={`url(#${filterId}-silver)`}
+          stroke="#1a1f2c"
+          strokeWidth="0.5"
+        />
         <circle cx={CX - 1} cy={CY - 1} r={1.5} fill="#fff" opacity="0.7" />
       </motion.g>
 
@@ -176,7 +181,13 @@ export function CompassRose({
               }}
             />
             {isActive && (
-              <circle cx={pos.x} cy={pos.y} r={14} fill={`url(#${filterId}-glow)`} pointerEvents="none" />
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r={14}
+                fill={`url(#${filterId}-glow)`}
+                pointerEvents="none"
+              />
             )}
             <text
               x={pos.x}

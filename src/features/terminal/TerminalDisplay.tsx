@@ -351,7 +351,13 @@ export function TerminalDisplay({
               <KeyCap
                 key={dir}
                 label={dir === "up" ? "Up" : "Down"}
-                icon={dir === "up" ? <ChevronUp size={18} aria-hidden /> : <ChevronDown size={18} aria-hidden />}
+                icon={
+                  dir === "up" ? (
+                    <ChevronUp size={18} aria-hidden />
+                  ) : (
+                    <ChevronDown size={18} aria-hidden />
+                  )
+                }
                 variant="direction"
                 disabled={!dirState?.available}
                 traversed={dirState?.alreadyTraversed ?? false}
@@ -386,4 +392,3 @@ function primaryVerbSet(
   }
   return set;
 }
-
